@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Future Insight News | Miratuku</title>
+  <title>Insight News | Miratuku</title>
   <link rel="icon" href="https://esse-sense.com/favicon.ico">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -483,7 +483,7 @@
     }
 
     /* ============================================================
-       SECTION 2: PESTLE NEWS — Dense bento grid
+       SECTION 2: INSIGHT NEWS — Dense bento grid
        ============================================================ */
     .pestle-grid {
       display: grid;
@@ -1186,7 +1186,7 @@
       <div class="header-main">
         <div class="header-left">
           <div>
-            <a href="app.html" class="site-logo">Future Insight News</a>
+            <a href="app.html" class="site-logo">Insight News</a>
             <span class="site-logo-sub">Miratuku Intelligence</span>
           </div>
           <span class="header-date" id="headerDate"></span>
@@ -1198,7 +1198,7 @@
           </div>
           <button class="theme-toggle" id="themeToggle" title="Toggle dark mode">&#9789;</button>
           <div class="auth-area" id="authArea">
-            <span>Loading...</span>
+            <span>読み込み中...</span>
           </div>
         </div>
       </div>
@@ -1206,14 +1206,14 @@
     <nav class="site-nav">
       <div class="container">
         <ul>
-          <li><a href="#daily-report" class="active" data-nav="daily-report">Daily Report</a></li>
-          <li><a href="#pestle-news" data-nav="pestle-news">PESTLE News</a></li>
-          <li><a href="#cla-analysis" data-nav="cla-analysis">CLA Analysis</a></li>
-          <li><a href="#academic-papers" data-nav="academic-papers">Academic Papers</a></li>
-          <li><a href="#meta-report" data-nav="meta-report">Meta Report</a></li>
-          <li><a href="#insight-form" data-nav="insight-form">Insight</a></li>
-          <li><a href="#media-sources" data-nav="media-sources">Sources</a></li>
-          <li><a href="#bookmarks" data-nav="bookmarks" id="navBookmarks">Bookmarks <span id="bookmarkCount" style="font-size:0.65rem;background:var(--accent);color:#fff;padding:0 0.35rem;border-radius:8px;margin-left:0.2rem;">0</span></a></li>
+          <li><a href="#daily-report" class="active" data-nav="daily-report">日次レポート</a></li>
+          <li><a href="#pestle-news" data-nav="pestle-news">Insight News</a></li>
+          <li><a href="#cla-analysis" data-nav="cla-analysis">因果階層分析</a></li>
+          <li><a href="#academic-papers" data-nav="academic-papers">学術研究</a></li>
+          <li><a href="#meta-report" data-nav="meta-report">メタ分析</a></li>
+          <li><a href="#insight-form" data-nav="insight-form">未来洞察</a></li>
+          <li><a href="#media-sources" data-nav="media-sources">メディア</a></li>
+          <li><a href="#bookmarks" data-nav="bookmarks" id="navBookmarks">ブックマーク <span id="bookmarkCount" style="font-size:0.65rem;background:var(--accent);color:#fff;padding:0 0.35rem;border-radius:8px;margin-left:0.2rem;">0</span></a></li>
         </ul>
       </div>
     </nav>
@@ -1222,7 +1222,7 @@
   <!-- ALERTS BAR -->
   <div class="alerts-bar" id="alertsBar" style="display:none;">
     <div class="container">
-      <span class="alert-badge">ALERT</span>
+      <span class="alert-badge">速報</span>
       <div class="alert-ticker">
         <div class="alert-ticker-inner" id="alertTicker"></div>
       </div>
@@ -1236,20 +1236,20 @@
 
     <!-- Bookmarks Panel (hidden by default) -->
     <div class="bookmarks-panel" id="bookmarksPanel">
-      <h3>Bookmarks</h3>
+      <h3>ブックマーク</h3>
       <div id="bookmarksList"></div>
     </div>
 
     <!-- Section 1: Daily Report -->
     <section class="section" id="daily-report">
       <div class="section-header">
-        <h2 class="section-title">Daily Report</h2>
+        <h2 class="section-title">日次分析レポート</h2>
         <span class="section-subtitle" id="reportDateSub"></span>
       </div>
       <div id="dailyReportContent">
         <div class="loading-indicator">
           <div class="loading-spinner"></div>
-          <div>Loading daily report...</div>
+          <div>レポートを読み込み中...</div>
         </div>
       </div>
     </section>
@@ -1257,13 +1257,13 @@
     <!-- Section 2: PESTLE News -->
     <section class="section" id="pestle-news">
       <div class="section-header">
-        <h2 class="section-title">PESTLE News</h2>
+        <h2 class="section-title">Insight News</h2>
         <span class="section-subtitle" id="pestleTotalCount"></span>
       </div>
       <div id="pestleContent">
         <div class="loading-indicator">
           <div class="loading-spinner"></div>
-          <div>Loading PESTLE news...</div>
+          <div>ニュースを読み込み中...</div>
         </div>
       </div>
     </section>
@@ -1271,13 +1271,13 @@
     <!-- Section 3: CLA Analysis -->
     <section class="section" id="cla-analysis">
       <div class="section-header">
-        <h2 class="section-title">CLA Analysis</h2>
+        <h2 class="section-title">因果階層分析</h2>
         <span class="section-subtitle">Causal Layered Analysis</span>
       </div>
       <div id="claContent">
         <div class="loading-indicator">
           <div class="loading-spinner"></div>
-          <div>Loading CLA analysis...</div>
+          <div>CLA分析を読み込み中...</div>
         </div>
       </div>
     </section>
@@ -1285,13 +1285,13 @@
     <!-- Section 4: Academic Papers -->
     <section class="section" id="academic-papers">
       <div class="section-header">
-        <h2 class="section-title">Academic Papers</h2>
+        <h2 class="section-title">学術研究</h2>
         <span class="section-subtitle" id="papersDateSub"></span>
       </div>
       <div id="papersContent">
         <div class="loading-indicator">
           <div class="loading-spinner"></div>
-          <div>Loading academic papers...</div>
+          <div>学術論文を読み込み中...</div>
         </div>
       </div>
     </section>
@@ -1299,13 +1299,13 @@
     <!-- Section 5: Meta Report -->
     <section class="section" id="meta-report">
       <div class="section-header">
-        <h2 class="section-title">Meta Analysis</h2>
-        <span class="section-subtitle">Historical CLA deep analysis</span>
+        <h2 class="section-title">メタ分析</h2>
+        <span class="section-subtitle">歴史的CLA深層分析</span>
       </div>
       <div id="metaReportContent">
         <div class="loading-indicator">
           <div class="loading-spinner"></div>
-          <div>Loading meta report...</div>
+          <div>メタ分析を読み込み中...</div>
         </div>
       </div>
     </section>
@@ -1313,30 +1313,30 @@
     <!-- Section 6: Insight Form -->
     <section class="section" id="insight-form">
       <div class="section-header">
-        <h2 class="section-title">Future Insight</h2>
-        <span class="section-subtitle">Share your observations</span>
+        <h2 class="section-title">未来洞察</h2>
+        <span class="section-subtitle">問いかけと洞察の共有</span>
       </div>
       <div class="insight-form-wrapper">
-        <h3>What patterns do you see?</h3>
-        <p>Share your observations, questions, or insights about emerging trends and weak signals. Your perspective helps build collective intelligence.</p>
+        <h3>あなたはどのようなパターンを見出しますか？</h3>
+        <p>新興トレンドや弱いシグナルについての観察、疑問、洞察を共有してください。あなたの視点が集合知の構築に貢献します。</p>
         <form class="insight-form" id="insightForm">
-          <textarea placeholder="Write your insight or question here..." id="insightText"></textarea>
+          <textarea placeholder="あなたの洞察や問いかけを記入してください..." id="insightText"></textarea>
           <div class="insight-form-actions">
-            <button type="button" class="btn-secondary" onclick="document.getElementById('insightText').value=''">Clear</button>
-            <button type="submit" class="btn-primary">Submit Insight</button>
+            <button type="button" class="btn-secondary" onclick="document.getElementById('insightText').value=''">クリア</button>
+            <button type="submit" class="btn-primary">洞察を投稿</button>
           </div>
         </form>
       </div>
 
       <!-- Comments UI -->
       <div class="comments-section" style="margin-top:1.25rem;">
-        <h3 style="font-family:var(--font-serif);font-size:1rem;margin-bottom:0.75rem;">Discussion</h3>
+        <h3 style="font-family:var(--font-serif);font-size:1rem;margin-bottom:0.75rem;">ディスカッション</h3>
         <div class="comment-input-wrapper">
-          <input type="text" placeholder="Add a comment..." id="commentInput">
-          <button class="btn-primary" id="commentSubmit">Post</button>
+          <input type="text" placeholder="コメントを追加..." id="commentInput">
+          <button class="btn-primary" id="commentSubmit">投稿</button>
         </div>
         <div class="comment-placeholder" id="commentsList">
-          Comments will appear here. Be the first to share your thoughts.
+          コメントはここに表示されます。最初のコメントを投稿してください。
         </div>
       </div>
     </section>
@@ -1344,13 +1344,13 @@
     <!-- Section 7: Media Sources -->
     <section class="section" id="media-sources">
       <div class="section-header">
-        <h2 class="section-title">Media Sources</h2>
+        <h2 class="section-title">メディアソース</h2>
         <span class="section-subtitle" id="sourcesCount"></span>
       </div>
       <div id="mediaSourcesContent">
         <div class="loading-indicator">
           <div class="loading-spinner"></div>
-          <div>Loading media sources...</div>
+          <div>メディアソースを読み込み中...</div>
         </div>
       </div>
     </section>
@@ -1364,33 +1364,33 @@
     <div class="container">
       <div class="footer-grid">
         <div>
-          <div class="footer-brand">Future Insight News</div>
+          <div class="footer-brand">Insight News</div>
           <p class="footer-desc">
-            Powered by the Miratuku Intelligence Pipeline. Automated PESTLE news collection, Causal Layered Analysis, and academic paper tracking — providing daily signals for futures thinking.
+            ミラツク・インテリジェンス・パイプラインによる自動ニュース収集、因果階層分析、学術論文追跡。未来思考のためのシグナルを毎日配信しています。
           </p>
         </div>
         <div>
-          <div class="footer-heading">Sections</div>
+          <div class="footer-heading">セクション</div>
           <ul class="footer-links">
-            <li><a href="#daily-report">Daily Report</a></li>
-            <li><a href="#pestle-news">PESTLE News</a></li>
-            <li><a href="#cla-analysis">CLA Analysis</a></li>
-            <li><a href="#academic-papers">Academic Papers</a></li>
-            <li><a href="#meta-report">Meta Analysis</a></li>
+            <li><a href="#daily-report">日次レポート</a></li>
+            <li><a href="#pestle-news">Insight News</a></li>
+            <li><a href="#cla-analysis">因果階層分析</a></li>
+            <li><a href="#academic-papers">学術研究</a></li>
+            <li><a href="#meta-report">メタ分析</a></li>
           </ul>
         </div>
         <div>
-          <div class="footer-heading">About</div>
+          <div class="footer-heading">その他</div>
           <ul class="footer-links">
-            <li><a href="#">Methodology</a></li>
-            <li><a href="#">Data Pipeline</a></li>
+            <li><a href="#">分析手法について</a></li>
+            <li><a href="#">データパイプライン</a></li>
             <li><a href="#">API</a></li>
-            <li><a href="#" onclick="auth.signOut();return false;">Sign Out</a></li>
+            <li><a href="#" onclick="auth.signOut();return false;">ログアウト</a></li>
           </ul>
         </div>
       </div>
       <div class="footer-bottom">
-        &copy; 2026 Miratuku / esse-sense. All rights reserved. Data updated daily via automated pipeline.
+        &copy; 2026 Miratuku / esse-sense. All rights reserved. データは毎日午前4時に自動更新されます。
       </div>
     </div>
   </footer>
@@ -1524,7 +1524,7 @@
 
       const region = data[currentRegion] || data.japan || data.global;
       if (!region) {
-        container.innerHTML = '<p style="color:var(--text-muted);">No report for this region.</p>';
+        container.innerHTML = '<p style="color:var(--text-muted);">この地域のレポートはまだ生成されていません。</p>';
         return;
       }
 
@@ -1575,7 +1575,7 @@
         return;
       }
 
-      document.getElementById('pestleTotalCount').textContent = `${data.total_fetched || 0} articles collected on ${data.date || ''}`;
+      document.getElementById('pestleTotalCount').textContent = `${data.date || ''} / ${data.total_fetched || 0}件収集`;
 
       const translations = dataCache['ai_analysis.json']?.translations || {};
 
@@ -1608,17 +1608,17 @@
                     <div class="pestle-article-meta">
                       <span class="pestle-article-source">${escapeHtml(article.source || '')}</span>
                       <span class="pestle-article-time">${escapeHtml(timeStr)}</span>
-                      <button class="bookmark-btn ${isBookmarked ? 'bookmarked' : ''}" onclick="event.stopPropagation();toggleBookmark('${bookmarkId}','${escapeAttr(article.title)}','${escapeAttr(article.url)}',this)" title="Bookmark">&#9734;</button>
+                      <button class="bookmark-btn ${isBookmarked ? 'bookmarked' : ''}" onclick="event.stopPropagation();toggleBookmark('${bookmarkId}','${escapeAttr(article.title)}','${escapeAttr(article.url)}',this)" title="ブックマーク">&#9734;</button>
                     </div>
                     <div class="pestle-article-title">${escapeHtml(article.title)}</div>
                     ${titleJa ? `<div class="pestle-article-summary" style="color:var(--accent-soft);font-size:0.73rem;">${escapeHtml(titleJa)}</div>` : ''}
                     ${article.summary ? `<div class="pestle-article-summary">${escapeHtml(article.summary)}</div>` : ''}
-                    ${article.relevance_score ? `<div class="pestle-article-score">Relevance: ${article.relevance_score.toFixed(1)}</div>` : ''}
+                    ${article.relevance_score ? `<div class="pestle-article-score">関連度: ${article.relevance_score.toFixed(1)}</div>` : ''}
                   </div>
                 `;
               }).join('')}
             </div>
-            ${articles.length > 8 ? `<a class="pestle-show-more" onclick="expandPESTLE('${catKey}')">Show all ${articles.length} articles</a>` : ''}
+            ${articles.length > 8 ? `<a class="pestle-show-more" onclick="expandPESTLE('${catKey}')">全${articles.length}件を表示</a>` : ''}
           </div>
         `;
       }
@@ -1646,7 +1646,7 @@
             <div class="pestle-article-meta">
               <span class="pestle-article-source">${escapeHtml(article.source || '')}</span>
               <span class="pestle-article-time">${escapeHtml(article.published_date || '')}</span>
-              <button class="bookmark-btn ${isBookmarked ? 'bookmarked' : ''}" onclick="event.stopPropagation();toggleBookmark('${bookmarkId}','${escapeAttr(article.title)}','${escapeAttr(article.url)}',this)" title="Bookmark">&#9734;</button>
+              <button class="bookmark-btn ${isBookmarked ? 'bookmarked' : ''}" onclick="event.stopPropagation();toggleBookmark('${bookmarkId}','${escapeAttr(article.title)}','${escapeAttr(article.url)}',this)" title="ブックマーク">&#9734;</button>
             </div>
             <div class="pestle-article-title">${escapeHtml(article.title)}</div>
             ${titleJa ? `<div class="pestle-article-summary" style="color:var(--accent-soft);font-size:0.73rem;">${escapeHtml(titleJa)}</div>` : ''}
@@ -1704,7 +1704,7 @@
       if (weakSignals.length > 0) {
         html += `
           <div class="weak-signals">
-            <h3 style="font-family:var(--font-serif);font-size:1.05rem;font-weight:700;margin-bottom:0.75rem;color:var(--text);">Weak Signals</h3>
+            <h3 style="font-family:var(--font-serif);font-size:1.05rem;font-weight:700;margin-bottom:0.75rem;color:var(--text);">弱いシグナル</h3>
             ${weakSignals.slice(0, 8).map(ws => `
               <div class="weak-signal-item">
                 <div class="weak-signal-topic">${escapeHtml(ws.topic || ws.signal || '')}</div>
@@ -1816,7 +1816,7 @@
       const fields = data.fields || data.by_field || {};
       const fieldNames = Object.keys(fields);
       if (fieldNames.length === 0) {
-        container.innerHTML = '<p style="color:var(--text-muted);">No papers available.</p>';
+        container.innerHTML = '<p style="color:var(--text-muted);">論文データがありません。</p>';
         return;
       }
 
