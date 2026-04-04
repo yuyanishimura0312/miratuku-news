@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ミラツク未来洞察ニュース</title>
+    <link rel="icon" href="https://esse-sense.com/favicon.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #FDFAF7;
+            color: #2D2017;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container { width: 100%; max-width: 420px; }
+
+        .app-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .app-header h1 {
+            color: #7A4033;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: 0.02em;
+        }
+
+        .app-header .subtitle {
+            color: #7A6B5E;
+            font-size: 0.82rem;
+            line-height: 1.6;
+            font-weight: 300;
+        }
+
+        .card {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 36px 32px;
+            box-shadow: 0 2px 12px rgba(122, 64, 51, 0.08);
+            border: 1px solid #D9C8B8;
+        }
+
+        .tab-toggle {
+            display: flex;
+            margin-bottom: 28px;
+            border-bottom: 2px solid #F5EFE8;
+        }
+
+        .tab-toggle button {
+            flex: 1;
+            background: none;
+            border: none;
+            padding: 10px 0;
+            font-size: 0.88rem;
+            font-weight: 500;
+            color: #7A6B5E;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .tab-toggle button.active {
+            color: #7A4033;
+            border-bottom-color: #7A4033;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #6B5445;
+            margin-bottom: 8px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #D9C8B8;
+            border-radius: 8px;
+            font-size: 0.88rem;
+            color: #2D2017;
+            background: #FDFAF7;
+            transition: border-color 0.2s;
+            font-family: inherit;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #7A4033;
+            box-shadow: 0 0 0 3px rgba(122, 64, 51, 0.08);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 13px;
+            background: #7A4033;
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.88rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-family: inherit;
+        }
+
+        .btn:hover { background: #5E3028; }
+        .btn:disabled { background: #B07256; cursor: not-allowed; }
+
+        .error-msg {
+            color: #8B3D2F;
+            font-size: 0.78rem;
+            margin-top: 8px;
+            display: none;
+        }
+
+        .form-footer {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .form-footer a {
+            color: #7A4033;
+            font-size: 0.78rem;
+            text-decoration: none;
+        }
+
+        .form-footer a:hover { text-decoration: underline; }
+
+        .trial-notice {
+            text-align: center;
+            margin-top: 20px;
+            padding: 12px;
+            background: #FFF5ED;
+            border-radius: 8px;
+            font-size: 0.76rem;
+            color: #6B5445;
+            line-height: 1.5;
+        }
+
+        .provider-badge {
+            text-align: center;
+            margin-top: 24px;
+            font-size: 0.72rem;
+            color: #7A6B5E;
+            letter-spacing: 0.05em;
+        }
+
+        @media (max-width: 480px) {
+            .card { padding: 28px 24px; }
+            .app-header h1 { font-size: 1.3rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="app-header">
+            <h1>ミラツク未来洞察ニュース</h1>
+            <p class="subtitle">PESTLE分析に基づく構造的ニュースと未来洞察</p>
+        </div>
+
+        <div class="card">
+            <div class="tab-toggle">
+                <button class="active" onclick="showTab('login')">ログイン</button>
+                <button onclick="showTab('signup')">新規登録</button>
+            </div>
+
+            <!-- Login Form -->
+            <form id="login-form" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label>メールアドレス</label>
+                    <input type="email" id="login-email" required placeholder="your@email.com">
+                </div>
+                <div class="form-group">
+                    <label>パスワード</label>
+                    <input type="password" id="login-password" required placeholder="6文字以上">
+                </div>
+                <div class="error-msg" id="login-error"></div>
+                <button type="submit" class="btn">ログイン</button>
+                <div class="form-footer">
+                    <a href="reset-password.html">パスワードをお忘れですか？</a>
+                </div>
+            </form>
+
+            <!-- Signup Form -->
+            <form id="signup-form" style="display:none" onsubmit="handleSignup(event)">
+                <div class="form-group">
+                    <label>お名前</label>
+                    <input type="text" id="signup-name" required placeholder="表示名">
+                </div>
+                <div class="form-group">
+                    <label>メールアドレス</label>
+                    <input type="email" id="signup-email" required placeholder="your@email.com">
+                </div>
+                <div class="form-group">
+                    <label>パスワード</label>
+                    <input type="password" id="signup-password" required minlength="6" placeholder="6文字以上">
+                </div>
+                <div class="error-msg" id="signup-error"></div>
+                <button type="submit" class="btn">アカウント作成</button>
+                <div class="trial-notice">
+                    アカウント作成後、7日間の無料トライアルが開始されます
+                </div>
+            </form>
+        </div>
+
+        <div class="provider-badge">Provided by miratuku</div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+    <script src="js/shared/firebase-config.js"></script>
+    <script>
+        function showTab(tab) {
+            document.getElementById('login-form').style.display = tab === 'login' ? '' : 'none';
+            document.getElementById('signup-form').style.display = tab === 'signup' ? '' : 'none';
+            document.querySelectorAll('.tab-toggle button').forEach((btn, i) => {
+                btn.classList.toggle('active', (tab === 'login' && i === 0) || (tab === 'signup' && i === 1));
+            });
+        }
+
+        function showError(id, msg) {
+            const el = document.getElementById(id);
+            el.textContent = msg;
+            el.style.display = 'block';
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            try {
+                const cred = await auth.signInWithEmailAndPassword(email, password);
+                // Check user status
+                const userDoc = await db.collection('users').doc(cred.user.uid).get();
+                if (userDoc.exists) {
+                    const data = userDoc.data();
+                    if (data.status === 'disabled') {
+                        await auth.signOut();
+                        showError('login-error', 'アカウントが無効化されています。');
+                        return;
+                    }
+                    // Check trial expiration
+                    if (data.trialExpiresAt && data.trialExpiresAt.toDate() < new Date() && data.role !== 'admin') {
+                        await auth.signOut();
+                        showError('login-error', 'トライアル期間が終了しました。');
+                        return;
+                    }
+                    // Update last login
+                    await db.collection('users').doc(cred.user.uid).update({
+                        lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                }
+                window.location.href = 'app.html';
+            } catch (err) {
+                const msgs = {
+                    'auth/user-not-found': 'アカウントが見つかりません',
+                    'auth/wrong-password': 'パスワードが正しくありません',
+                    'auth/invalid-email': 'メールアドレスの形式が正しくありません',
+                    'auth/too-many-requests': 'ログイン試行回数が多すぎます。しばらく待ってからお試しください',
+                };
+                showError('login-error', msgs[err.code] || err.message);
+            }
+        }
+
+        async function handleSignup(e) {
+            e.preventDefault();
+            const name = document.getElementById('signup-name').value;
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
+            try {
+                const cred = await auth.createUserWithEmailAndPassword(email, password);
+                await cred.user.updateProfile({ displayName: name });
+
+                // Create user document with 7-day trial
+                const trialEnd = new Date();
+                trialEnd.setDate(trialEnd.getDate() + 7);
+                await db.collection('users').doc(cred.user.uid).set({
+                    email: email,
+                    displayName: name,
+                    status: 'active',
+                    role: 'user',
+                    trialExpiresAt: firebase.firestore.Timestamp.fromDate(trialEnd),
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
+                });
+
+                window.location.href = 'app.html';
+            } catch (err) {
+                const msgs = {
+                    'auth/email-already-in-use': 'このメールアドレスは既に登録されています',
+                    'auth/weak-password': 'パスワードは6文字以上にしてください',
+                    'auth/invalid-email': 'メールアドレスの形式が正しくありません',
+                };
+                showError('signup-error', msgs[err.code] || err.message);
+            }
+        }
+
+        // Auto-redirect if already logged in
+        auth.onAuthStateChanged(user => {
+            if (user) window.location.href = 'app.html';
+        });
+    </script>
+</body>
+</html>
