@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin | Insight News</title>
+  <link rel="icon" href="https://esse-sense.com/favicon.ico">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+
+  <style>
+    :root {
+      --bg: #FDFAF7;
+      --card: #ffffff;
+      --accent: #7A4033;
+      --accent-soft: #B07256;
+      --accent-warm: #DC8766;
+      --accent-light: #FAE8DC;
+      --text: #3D2E22;
+      --text-secondary: #6B5445;
+      --text-muted: #8C6D5E;
+      --border: #D9C8B8;
+      --border-light: #E6D5C4;
+      --surface: #F5EFE8;
+      --surface2: #EBE1D6;
+      --green: #2E7D32;
+      --green-light: #E8F5E9;
+      --yellow: #F57F17;
+      --yellow-light: #FFF8E1;
+      --red: #C62828;
+      --red-light: #FFEBEE;
+      --shadow-sm: 0 1px 3px rgba(61,46,34,0.06);
+      --shadow-md: 0 2px 12px rgba(122,64,51,0.08);
+      --radius: 16px;
+      --radius-sm: 12px;
+      --radius-xs: 8px;
+      --font: "Noto Sans JP", -apple-system, sans-serif;
+    }
+
+    [data-theme="dark"] {
+      --bg: #1A1410;
+      --card: #241E18;
+      --accent: #DC8766;
+      --accent-soft: #C49478;
+      --accent-warm: #E8A080;
+      --accent-light: #3A2A20;
+      --text: #E8DDD4;
+      --text-secondary: #B8A898;
+      --text-muted: #8A7D72;
+      --border: #3D342B;
+      --border-light: #332A22;
+      --surface: #2A231C;
+      --surface2: #332A22;
+      --green: #66BB6A;
+      --green-light: #1B2E1C;
+      --yellow: #FFB74D;
+      --yellow-light: #2E2410;
+      --red: #EF5350;
+      --red-light: #2E1A1A;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.2);
+      --shadow-md: 0 2px 12px rgba(0,0,0,0.3);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+    body {
+      font-family: var(--font);
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.7;
+      min-height: 100vh;
+    }
+
+    /* --- Login Screen --- */
+    .login-screen {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 2rem;
+    }
+    .login-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2.5rem;
+      max-width: 400px;
+      width: 100%;
+      box-shadow: var(--shadow-md);
+      text-align: center;
+    }
+    .login-title {
+      font-weight: 700;
+      font-size: 1.2rem;
+      margin-bottom: 0.5rem;
+    }
+    .login-subtitle {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+    }
+    .login-input {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xs);
+      font-size: 0.88rem;
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      margin-bottom: 1rem;
+    }
+    .login-input:focus { outline: none; border-color: var(--accent); }
+    .login-error { color: var(--red); font-size: 0.78rem; margin-bottom: 0.5rem; display: none; }
+
+    /* --- Layout --- */
+    .admin-hidden { display: none !important; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+
+    .admin-header {
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .admin-header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 0;
+    }
+    .admin-brand {
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--accent);
+    }
+    .admin-brand span { color: var(--text-muted); font-weight: 400; font-size: 0.82rem; margin-left: 8px; }
+    .admin-header-right { display: flex; align-items: center; gap: 8px; }
+
+    /* Tab navigation */
+    .admin-tabs {
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .admin-tabs::-webkit-scrollbar { height: 0; }
+    .admin-tab-list {
+      display: flex;
+      gap: 4px;
+      padding: 8px 0;
+      list-style: none;
+    }
+    .admin-tab {
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-family: var(--font);
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+    .admin-tab:hover { background: var(--surface); color: var(--text); }
+    .admin-tab.active { background: var(--accent); color: #fff; }
+
+    /* Panels */
+    .admin-panel { padding: 1.5rem 0 3rem; display: none; }
+    .admin-panel.active { display: block; }
+
+    .panel-title {
+      font-weight: 700;
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+    }
+    .panel-desc {
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+      margin-bottom: 1.25rem;
+    }
+
+    /* Cards */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 12px;
+    }
+    .card-title {
+      font-weight: 600;
+      font-size: 0.88rem;
+      margin-bottom: 8px;
+    }
+    .card-subtitle {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+
+    /* Stat grid */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 12px;
+      margin-bottom: 1.5rem;
+    }
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 16px;
+      text-align: center;
+    }
+    .stat-value { font-weight: 700; font-size: 1.5rem; color: var(--accent); }
+    .stat-label { font-size: 0.72rem; color: var(--text-muted); margin-top: 2px; }
+
+    /* Status badges */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.68rem;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+    .status-ok { background: var(--green-light); color: var(--green); }
+    .status-warn { background: var(--yellow-light); color: var(--yellow); }
+    .status-error { background: var(--red-light); color: var(--red); }
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    .status-dot-ok { background: var(--green); }
+    .status-dot-warn { background: var(--yellow); }
+    .status-dot-error { background: var(--red); }
+
+    /* Data table */
+    .data-table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      margin-bottom: 1rem;
+    }
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+    }
+    .data-table th {
+      text-align: left;
+      padding: 10px 14px;
+      background: var(--surface);
+      font-weight: 600;
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    .data-table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border-light);
+      vertical-align: top;
+    }
+    .data-table tr:last-child td { border-bottom: none; }
+    .data-table tr:hover td { background: var(--surface); }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: none;
+      border-radius: var(--radius-xs);
+      padding: 8px 16px;
+      font-family: var(--font);
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: var(--accent-warm); }
+    .btn-secondary { background: var(--surface); color: var(--text-secondary); border: 1px solid var(--border); }
+    .btn-secondary:hover { background: var(--surface2); }
+    .btn-danger { background: var(--red-light); color: var(--red); }
+    .btn-danger:hover { background: var(--red); color: #fff; }
+    .btn-sm { padding: 4px 10px; font-size: 0.72rem; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* Code block */
+    .code-block {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xs);
+      padding: 12px 16px;
+      font-family: 'SF Mono', 'Menlo', monospace;
+      font-size: 0.75rem;
+      line-height: 1.6;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+    }
+
+    /* Feed row */
+    .feed-tier {
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 3px;
+      color: #fff;
+    }
+    .feed-tier-1 { background: var(--accent); }
+    .feed-tier-2 { background: var(--accent-soft); }
+    .feed-tier-3 { background: var(--text-muted); }
+    .feed-status-active { color: var(--green); }
+    .feed-status-inactive { color: var(--red); }
+
+    /* Filter bar */
+    .filter-bar {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+      align-items: center;
+    }
+    .filter-select {
+      padding: 6px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xs);
+      font-size: 0.78rem;
+      font-family: var(--font);
+      background: var(--card);
+      color: var(--text);
+    }
+    .filter-input {
+      padding: 6px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xs);
+      font-size: 0.78rem;
+      font-family: var(--font);
+      background: var(--card);
+      color: var(--text);
+      flex: 1;
+      min-width: 200px;
+    }
+
+    /* Log viewer */
+    .log-viewer {
+      background: #1a1410;
+      color: #c4b8a8;
+      border-radius: var(--radius-xs);
+      padding: 16px;
+      font-family: 'SF Mono', 'Menlo', monospace;
+      font-size: 0.72rem;
+      line-height: 1.5;
+      max-height: 400px;
+      overflow-y: auto;
+      margin-bottom: 12px;
+    }
+    .log-line-info { color: #6BBF7A; }
+    .log-line-warn { color: #FFB74D; }
+    .log-line-error { color: #EF5350; }
+
+    /* Section spacer */
+    .section-space { margin-top: 2rem; }
+
+    /* Loading */
+    .loading { color: var(--text-muted); font-size: 0.82rem; padding: 1rem; text-align: center; }
+    .spinner {
+      width: 20px; height: 20px;
+      border: 2px solid var(--surface);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: inline-block;
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Toast */
+    .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; }
+    .toast {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xs);
+      padding: 10px 16px;
+      font-size: 0.78rem;
+      box-shadow: var(--shadow-md);
+      margin-top: 8px;
+      animation: toastIn 0.3s ease-out;
+    }
+    .toast-success { border-left: 3px solid var(--green); }
+    .toast-error { border-left: 3px solid var(--red); }
+    @keyframes toastIn { from { opacity: 0; transform: translateY(10px); } }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .container { padding: 0 14px; }
+      .stat-grid { grid-template-columns: repeat(2, 1fr); }
+      .admin-header-inner { flex-wrap: wrap; gap: 8px; }
+      .admin-tab { padding: 6px 12px; font-size: 0.75rem; }
+    }
+    @media (max-width: 375px) {
+      .stat-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============================================================
+       LOGIN SCREEN
+       ============================================================ -->
+  <div id="loginScreen" class="login-screen">
+    <div class="login-box">
+      <div class="login-title">Insight News Admin</div>
+      <div class="login-subtitle">管理パスワードを入力してください</div>
+      <div class="login-error" id="loginError">パスワードが正しくありません</div>
+      <input type="password" class="login-input" id="loginPassword" placeholder="管理パスワード" autofocus>
+      <button class="btn btn-primary" style="width:100%" onclick="attemptLogin()">ログイン</button>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       ADMIN INTERFACE
+       ============================================================ -->
+  <div id="adminApp" class="admin-hidden">
+
+    <header class="admin-header">
+      <div class="container">
+        <div class="admin-header-inner">
+          <div class="admin-brand">Insight News <span>Admin</span></div>
+          <div class="admin-header-right">
+            <a href="../app.html" class="btn btn-secondary btn-sm">アプリに戻る</a>
+            <button class="btn btn-secondary btn-sm" onclick="toggleTheme()">&#9789;</button>
+            <button class="btn btn-secondary btn-sm" onclick="logout()">ログアウト</button>
+          </div>
+        </div>
+      </div>
+      <nav class="admin-tabs">
+        <div class="container">
+          <ul class="admin-tab-list">
+            <li><button class="admin-tab active" data-tab="dashboard">ダッシュボード</button></li>
+            <li><button class="admin-tab" data-tab="sources">メディアソース</button></li>
+            <li><button class="admin-tab" data-tab="firebase">Firebase</button></li>
+            <li><button class="admin-tab" data-tab="pipeline">パイプライン</button></li>
+            <li><button class="admin-tab" data-tab="settings">設定</button></li>
+          </ul>
+        </div>
+      </nav>
+    </header>
+
+    <!-- ========== DASHBOARD ========== -->
+    <div class="container">
+      <div class="admin-panel active" id="panel-dashboard">
+        <h2 class="panel-title">ダッシュボード</h2>
+        <p class="panel-desc">データパイプラインの稼働状況と最新データの概要</p>
+
+        <div class="stat-grid" id="dashStats">
+          <div class="stat-card"><div class="stat-value"><span class="spinner"></span></div><div class="stat-label">読み込み中...</div></div>
+        </div>
+
+        <h3 class="card-title" style="margin-bottom:8px">データファイル状況</h3>
+        <div class="data-table-wrap">
+          <table class="data-table">
+            <thead><tr><th>ファイル</th><th>ステータス</th><th>最終更新</th><th>サイズ</th><th>操作</th></tr></thead>
+            <tbody id="dataFilesBody">
+              <tr><td colspan="5" class="loading"><span class="spinner"></span> 確認中...</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="card-title section-space" style="margin-bottom:8px">今日のデータ概要</h3>
+        <div id="dataSummary" class="card">
+          <div class="loading"><span class="spinner"></span> データを読み込み中...</div>
+        </div>
+      </div>
+
+      <!-- ========== MEDIA SOURCES ========== -->
+      <div class="admin-panel" id="panel-sources">
+        <h2 class="panel-title">メディアソース管理</h2>
+        <p class="panel-desc">ニュース収集に使用しているRSSフィード・メディアソースの一覧と状況</p>
+
+        <div class="filter-bar">
+          <select class="filter-select" id="sourceFilterTier" onchange="renderSources()">
+            <option value="">全Tier</option>
+            <option value="1">Tier 1</option>
+            <option value="2">Tier 2</option>
+            <option value="3">Tier 3</option>
+          </select>
+          <select class="filter-select" id="sourceFilterLang" onchange="renderSources()">
+            <option value="">全言語</option>
+            <option value="ja">日本語</option>
+            <option value="en">英語</option>
+          </select>
+          <select class="filter-select" id="sourceFilterCat" onchange="renderSources()">
+            <option value="">全カテゴリ</option>
+            <option value="Political">Political</option>
+            <option value="Economic">Economic</option>
+            <option value="Social">Social</option>
+            <option value="Technological">Technological</option>
+            <option value="Legal">Legal</option>
+            <option value="Environmental">Environmental</option>
+          </select>
+          <input type="text" class="filter-input" id="sourceSearch" placeholder="メディア名で検索..." oninput="renderSources()">
+        </div>
+
+        <div class="stat-grid" id="sourceStats"></div>
+
+        <div class="data-table-wrap">
+          <table class="data-table">
+            <thead><tr><th>メディア名</th><th>言語</th><th>Tier</th><th>カテゴリ</th><th>記事数</th><th>最終取得</th></tr></thead>
+            <tbody id="sourcesBody">
+              <tr><td colspan="6" class="loading"><span class="spinner"></span> 読み込み中...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ========== FIREBASE ========== -->
+      <div class="admin-panel" id="panel-firebase">
+        <h2 class="panel-title">Firebase データ管理</h2>
+        <p class="panel-desc">ユーザーコメント、ブックマーク、未来洞察クエリの管理</p>
+
+        <div class="stat-grid" id="firebaseStats">
+          <div class="stat-card"><div class="stat-value"><span class="spinner"></span></div><div class="stat-label">コメント</div></div>
+          <div class="stat-card"><div class="stat-value"><span class="spinner"></span></div><div class="stat-label">ブックマーク</div></div>
+          <div class="stat-card"><div class="stat-value"><span class="spinner"></span></div><div class="stat-label">洞察クエリ</div></div>
+        </div>
+
+        <div style="display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap">
+          <button class="btn btn-secondary" onclick="showFirebaseSection('comments')">コメント一覧</button>
+          <button class="btn btn-secondary" onclick="showFirebaseSection('bookmarks')">ブックマーク一覧</button>
+          <button class="btn btn-secondary" onclick="showFirebaseSection('foresight')">洞察クエリ一覧</button>
+        </div>
+
+        <div id="firebaseContent"></div>
+      </div>
+
+      <!-- ========== PIPELINE ========== -->
+      <div class="admin-panel" id="panel-pipeline">
+        <h2 class="panel-title">パイプライン管理</h2>
+        <p class="panel-desc">データ収集・分析パイプラインの実行状況と手動操作</p>
+
+        <div class="card">
+          <h3 class="card-title">パイプライン構成</h3>
+          <div class="card-subtitle" style="margin-bottom:12px">毎日 04:00 JST に自動実行されるデータ収集・分析パイプライン</div>
+          <div class="data-table-wrap">
+            <table class="data-table">
+              <thead><tr><th>#</th><th>ステップ</th><th>スクリプト</th><th>説明</th><th>頻度</th></tr></thead>
+              <tbody>
+                <tr><td>1</td><td>ニュース収集</td><td><code>collect_news.py</code></td><td>47+ RSSフィードからPESTLEニュース収集（各カテゴリ334件目標）</td><td>毎日</td></tr>
+                <tr><td>2</td><td>AI分析</td><td><code>ai_analyze.py</code></td><td>翻訳 + CLA分析 + 弱いシグナル検出</td><td>毎日</td></tr>
+                <tr><td>3</td><td>論文キュレーション</td><td><code>curate_daily_papers.py</code></td><td>OpenAlexから5分野の論文を選定・翻訳・新規性スコア</td><td>毎日</td></tr>
+                <tr><td>4</td><td>アラート検出</td><td><code>detect_alerts.py</code></td><td>異常・新出現トピック検出</td><td>毎日</td></tr>
+                <tr><td>5</td><td>日次レポート</td><td><code>generate_daily_report.py</code></td><td>日本版・グローバル版レポート生成（~5000字）</td><td>毎日</td></tr>
+                <tr><td>6</td><td>シナリオ生成</td><td><code>generate_scenarios.py</code></td><td>4シナリオ（不確実性-影響マトリクス）</td><td>週次（月曜）</td></tr>
+                <tr><td>7</td><td>歴史データ収集</td><td><code>collect_historical_daily.py</code></td><td>1990-2025の歴史的PESTLEデータ（1年/日）</td><td>毎日</td></tr>
+                <tr><td>8</td><td>履歴更新</td><td><code>update_history.py</code></td><td>pestle_history.json更新（50件/カテゴリ/四半期上限）</td><td>毎日</td></tr>
+                <tr><td>9</td><td>デプロイ</td><td><code>git push</code></td><td>GitHub Pagesへデプロイ</td><td>毎日</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card section-space">
+          <h3 class="card-title">手動実行コマンド</h3>
+          <div class="card-subtitle" style="margin-bottom:12px">ターミナルで実行するコマンド</div>
+
+          <div style="margin-bottom:16px">
+            <div style="font-size:0.78rem;font-weight:600;margin-bottom:4px">全パイプライン実行</div>
+            <div class="code-block">cd ~/projects/apps/future-insight-app && bash scripts/daily_update.sh</div>
+          </div>
+
+          <div style="margin-bottom:16px">
+            <div style="font-size:0.78rem;font-weight:600;margin-bottom:4px">ニュース収集のみ</div>
+            <div class="code-block">cd ~/projects/apps/future-insight-app && ~/.venv/bin/python scripts/collect_news.py</div>
+          </div>
+
+          <div style="margin-bottom:16px">
+            <div style="font-size:0.78rem;font-weight:600;margin-bottom:4px">AI分析のみ</div>
+            <div class="code-block">cd ~/projects/apps/future-insight-app && ~/.venv/bin/python scripts/ai_analyze.py</div>
+          </div>
+
+          <div style="margin-bottom:16px">
+            <div style="font-size:0.78rem;font-weight:600;margin-bottom:4px">日次レポート生成のみ</div>
+            <div class="code-block">cd ~/projects/apps/future-insight-app && ~/.venv/bin/python scripts/generate_daily_report.py</div>
+          </div>
+
+          <div>
+            <div style="font-size:0.78rem;font-weight:600;margin-bottom:4px">デプロイのみ（git push）</div>
+            <div class="code-block">cd ~/projects/apps/future-insight-app && git add data/ && git commit -m "chore: manual data update $(date +%Y-%m-%d)" && git push</div>
+          </div>
+        </div>
+
+        <div class="card section-space">
+          <h3 class="card-title">最新ログ</h3>
+          <div class="card-subtitle" style="margin-bottom:8px">パイプラインの最新実行ログ（ローカルのみ）</div>
+          <div class="log-viewer" id="pipelineLog">
+            <span class="log-line-info">[INFO]</span> ログはローカル環境でのみ閲覧可能です。<br>
+            <span class="log-line-info">[INFO]</span> ログファイル: ~/projects/apps/future-insight-app/logs/<br>
+            <span class="log-line-info">[INFO]</span> 閲覧コマンド: cat ~/projects/apps/future-insight-app/logs/daily_$(date +%Y-%m-%d).log
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== SETTINGS ========== -->
+      <div class="admin-panel" id="panel-settings">
+        <h2 class="panel-title">システム設定</h2>
+        <p class="panel-desc">Insight Newsの構成情報</p>
+
+        <div class="card">
+          <h3 class="card-title">データソース</h3>
+          <div class="data-table-wrap" style="margin-top:8px">
+            <table class="data-table">
+              <thead><tr><th>項目</th><th>値</th></tr></thead>
+              <tbody>
+                <tr><td>データ配信元</td><td><code>https://yuyanishimura0312.github.io/future-insight-app/data/</code></td></tr>
+                <tr><td>Cloudflare Worker</td><td><code>https://future-insight-proxy.yuyanishimura0312.workers.dev</code></td></tr>
+                <tr><td>Firebase Project</td><td><code>miratuku-afa2c</code></td></tr>
+                <tr><td>パイプライン場所</td><td><code>~/projects/apps/future-insight-app/scripts/</code></td></tr>
+                <tr><td>SQLiteデータベース</td><td><code>~/projects/apps/future-insight-app/data/future_insight.db</code></td></tr>
+                <tr><td>ログ</td><td><code>~/projects/apps/future-insight-app/logs/</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card section-space">
+          <h3 class="card-title">AI分析設定</h3>
+          <div class="data-table-wrap" style="margin-top:8px">
+            <table class="data-table">
+              <thead><tr><th>項目</th><th>値</th></tr></thead>
+              <tbody>
+                <tr><td>AI分析モデル</td><td><code>claude-haiku-4-5-20251001</code></td></tr>
+                <tr><td>未来洞察モデル</td><td><code>claude-sonnet-4-20250514</code></td></tr>
+                <tr><td>翻訳対象</td><td>各カテゴリ上位20件</td></tr>
+                <tr><td>弱いシグナル</td><td>8-10件/日</td></tr>
+                <tr><td>レートリミット</td><td>5リクエスト/分/ユーザー</td></tr>
+                <tr><td>質問文字数上限</td><td>2,000文字</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card section-space">
+          <h3 class="card-title">収集設定</h3>
+          <div class="data-table-wrap" style="margin-top:8px">
+            <table class="data-table">
+              <thead><tr><th>項目</th><th>値</th></tr></thead>
+              <tbody>
+                <tr><td>RSSフィード数</td><td id="settingFeedCount">-</td></tr>
+                <tr><td>目標収集数</td><td>334件/カテゴリ/日（合計約2,000件）</td></tr>
+                <tr><td>PESTLEカテゴリ</td><td>Political, Economic, Social, Technological, Legal, Environmental</td></tr>
+                <tr><td>学術論文API</td><td>OpenAlex（無料）</td></tr>
+                <tr><td>論文分野</td><td>自然科学, 工学, 社会科学, 人文学, 芸術</td></tr>
+                <tr><td>実行スケジュール</td><td>毎日 04:00 JST</td></tr>
+                <tr><td>Tierボーナス</td><td>Tier 1: 1.0x / Tier 2: 1.5x / Tier 3: 2.0x</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card section-space">
+          <h3 class="card-title">管理パスワード変更</h3>
+          <div style="margin-top:8px">
+            <input type="password" class="login-input" id="newPassword" placeholder="新しいパスワード" style="max-width:300px;margin-bottom:8px">
+            <button class="btn btn-primary" onclick="changePassword()">変更</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- ============================================================
+       JAVASCRIPT
+       ============================================================ -->
+  <script>
+  (function() {
+    'use strict';
+
+    const DATA_BASE = 'https://yuyanishimura0312.github.io/future-insight-app/data';
+    const DEFAULT_PASSWORD = 'insightnews2026';
+    const cb = () => '?v=' + Date.now();
+
+    // Firebase init
+    firebase.initializeApp({
+      apiKey: "AIzaSyB5ubJobtiCOelI-hI6vQ9cyMnBBewyNwg",
+      authDomain: "miratuku-afa2c.firebaseapp.com",
+      projectId: "miratuku-afa2c",
+      storageBucket: "miratuku-afa2c.firebasestorage.app",
+      messagingSenderId: "344400461535",
+      appId: "1:344400461535:web:544ebe32ad4add42f4b36a"
+    });
+    const db = firebase.firestore();
+
+    let mediaSources = [];
+    let dataCache = {};
+
+    // ============================================================
+    // AUTH
+    // ============================================================
+    function getAdminPassword() {
+      return localStorage.getItem('insightnews_admin_pw') || DEFAULT_PASSWORD;
+    }
+
+    window.attemptLogin = function() {
+      const pw = document.getElementById('loginPassword').value;
+      if (pw === getAdminPassword()) {
+        sessionStorage.setItem('admin_auth', '1');
+        document.getElementById('loginScreen').classList.add('admin-hidden');
+        document.getElementById('adminApp').classList.remove('admin-hidden');
+        initAdmin();
+      } else {
+        const err = document.getElementById('loginError');
+        err.style.display = 'block';
+        document.getElementById('loginPassword').value = '';
+      }
+    };
+
+    document.getElementById('loginPassword').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') attemptLogin();
+    });
+
+    window.logout = function() {
+      sessionStorage.removeItem('admin_auth');
+      location.reload();
+    };
+
+    window.changePassword = function() {
+      const pw = document.getElementById('newPassword').value;
+      if (!pw || pw.length < 4) { toast('4文字以上のパスワードを入力してください', 'error'); return; }
+      localStorage.setItem('insightnews_admin_pw', pw);
+      document.getElementById('newPassword').value = '';
+      toast('パスワードを変更しました', 'success');
+    };
+
+    // Auto-login if session exists
+    if (sessionStorage.getItem('admin_auth') === '1') {
+      document.getElementById('loginScreen').classList.add('admin-hidden');
+      document.getElementById('adminApp').classList.remove('admin-hidden');
+      initAdmin();
+    }
+
+    // ============================================================
+    // TAB NAVIGATION
+    // ============================================================
+    document.querySelectorAll('.admin-tab').forEach(tab => {
+      tab.addEventListener('click', function() {
+        document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
+        this.classList.add('active');
+        const panel = document.getElementById('panel-' + this.dataset.tab);
+        if (panel) panel.classList.add('active');
+      });
+    });
+
+    // ============================================================
+    // THEME
+    // ============================================================
+    if (localStorage.getItem('admin_theme') === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+    window.toggleTheme = function() {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      if (isDark) { document.documentElement.removeAttribute('data-theme'); localStorage.setItem('admin_theme', 'light'); }
+      else { document.documentElement.setAttribute('data-theme', 'dark'); localStorage.setItem('admin_theme', 'dark'); }
+    };
+
+    // ============================================================
+    // TOAST
+    // ============================================================
+    function toast(msg, type) {
+      const c = document.getElementById('toastContainer');
+      const t = document.createElement('div');
+      t.className = 'toast' + (type ? ' toast-' + type : '');
+      t.textContent = msg;
+      c.appendChild(t);
+      setTimeout(() => { t.style.opacity = '0'; t.style.transition = 'opacity 0.3s'; setTimeout(() => t.remove(), 300); }, 3000);
+    }
+
+    // ============================================================
+    // UTILITIES
+    // ============================================================
+    function esc(str) {
+      if (!str) return '';
+      const d = document.createElement('div');
+      d.textContent = String(str);
+      return d.innerHTML;
+    }
+
+    async function fetchJSON(filename) {
+      if (dataCache[filename]) return dataCache[filename];
+      try {
+        const r = await fetch(DATA_BASE + '/' + filename + cb());
+        if (!r.ok) return null;
+        const d = await r.json();
+        dataCache[filename] = d;
+        return d;
+      } catch { return null; }
+    }
+
+    function relativeTime(dateStr) {
+      if (!dateStr) return '-';
+      const d = new Date(dateStr);
+      if (isNaN(d)) return dateStr;
+      const diff = Date.now() - d.getTime();
+      const hours = Math.floor(diff / 3600000);
+      if (hours < 1) return Math.floor(diff / 60000) + '分前';
+      if (hours < 24) return hours + '時間前';
+      return Math.floor(hours / 24) + '日前';
+    }
+
+    function formatBytes(bytes) {
+      if (!bytes) return '-';
+      if (bytes < 1024) return bytes + ' B';
+      if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+      return (bytes / 1048576).toFixed(1) + ' MB';
+    }
+
+    // ============================================================
+    // INIT
+    // ============================================================
+    function initAdmin() {
+      loadDashboard();
+      loadSources();
+      loadFirebaseStats();
+    }
+
+    // ============================================================
+    // DASHBOARD
+    // ============================================================
+    const DATA_FILES = [
+      { name: 'latest.json', label: 'PESTLEニュース', critical: true },
+      { name: 'daily_report.json', label: '日次レポート', critical: true },
+      { name: 'ai_analysis.json', label: 'AI分析', critical: true },
+      { name: 'daily_papers.json', label: '学術論文', critical: true },
+      { name: 'alerts.json', label: 'アラート', critical: false },
+      { name: 'media_sources.json', label: 'メディアソース', critical: false },
+      { name: 'scenarios.json', label: 'シナリオ', critical: false },
+      { name: 'cla_historical_yearly.json', label: 'CLA年次', critical: false },
+      { name: 'cla_historical_quarterly.json', label: 'CLA四半期', critical: false },
+      { name: 'cla_meta_report.json', label: 'CLAメタ分析', critical: false },
+    ];
+
+    async function loadDashboard() {
+      const results = await Promise.all(DATA_FILES.map(async f => {
+        try {
+          const r = await fetch(DATA_BASE + '/' + f.name + cb(), { method: 'HEAD' });
+          return {
+            ...f,
+            ok: r.ok,
+            lastModified: r.headers.get('last-modified'),
+            size: parseInt(r.headers.get('content-length') || '0')
+          };
+        } catch {
+          return { ...f, ok: false, lastModified: null, size: 0 };
+        }
+      }));
+
+      // Render file status table
+      const tbody = document.getElementById('dataFilesBody');
+      tbody.innerHTML = results.map(f => {
+        const status = f.ok ? 'ok' : 'error';
+        const statusLabel = f.ok ? '正常' : 'エラー';
+        const mod = f.lastModified ? new Date(f.lastModified).toLocaleString('ja-JP') : '-';
+        const age = f.lastModified ? relativeTime(f.lastModified) : '-';
+        return '<tr>' +
+          '<td><strong>' + esc(f.label) + '</strong><br><code style="font-size:0.68rem;color:var(--text-muted)">' + esc(f.name) + '</code></td>' +
+          '<td><span class="status-badge status-' + status + '"><span class="status-dot status-dot-' + status + '"></span>' + statusLabel + '</span></td>' +
+          '<td>' + mod + '<br><span style="font-size:0.68rem;color:var(--text-muted)">' + age + '</span></td>' +
+          '<td>' + formatBytes(f.size) + '</td>' +
+          '<td><button class="btn btn-secondary btn-sm" onclick="previewFile(\'' + f.name + '\')">確認</button></td>' +
+        '</tr>';
+      }).join('');
+
+      // Load actual data for stats
+      const [latest, report, ai, papers] = await Promise.all([
+        fetchJSON('latest.json'),
+        fetchJSON('daily_report.json'),
+        fetchJSON('ai_analysis.json'),
+        fetchJSON('daily_papers.json'),
+      ]);
+
+      // Stats
+      let totalArticles = 0;
+      if (latest?.pestle) {
+        Object.values(latest.pestle).forEach(cat => { totalArticles += (cat.articles || []).length; });
+      }
+      const signalCount = ai?.weak_signals?.length || 0;
+      let paperCount = 0;
+      const fields = papers?.fields || papers?.by_field || {};
+      Object.values(fields).forEach(f => { paperCount += (Array.isArray(f) ? f : f?.papers || []).length; });
+      const reportDate = report?.generated_at ? report.generated_at.split('T')[0] : '-';
+
+      document.getElementById('dashStats').innerHTML =
+        '<div class="stat-card"><div class="stat-value">' + totalArticles + '</div><div class="stat-label">ニュース記事数</div></div>' +
+        '<div class="stat-card"><div class="stat-value">' + Object.keys(latest?.pestle || {}).length + '</div><div class="stat-label">PESTLEカテゴリ</div></div>' +
+        '<div class="stat-card"><div class="stat-value">' + signalCount + '</div><div class="stat-label">弱いシグナル</div></div>' +
+        '<div class="stat-card"><div class="stat-value">' + paperCount + '</div><div class="stat-label">学術論文</div></div>' +
+        '<div class="stat-card"><div class="stat-value" style="font-size:1rem">' + reportDate + '</div><div class="stat-label">レポート日付</div></div>';
+
+      // Data summary
+      const summary = document.getElementById('dataSummary');
+      let sumHtml = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">';
+      if (latest?.pestle) {
+        sumHtml += '<div><strong style="font-size:0.82rem">カテゴリ別記事数</strong>';
+        const catLabels = { Political: '政治', Economic: '経済', Social: '社会', Technological: '技術', Legal: '法律', Environmental: '環境' };
+        Object.entries(latest.pestle).forEach(([k, v]) => {
+          sumHtml += '<div style="display:flex;justify-content:space-between;font-size:0.78rem;padding:3px 0;border-bottom:1px solid var(--border-light)">' +
+            '<span>' + (catLabels[k] || k) + '</span><span style="font-weight:600">' + (v.articles || []).length + '件</span></div>';
+        });
+        sumHtml += '</div>';
+      }
+      if (papers) {
+        sumHtml += '<div><strong style="font-size:0.82rem">分野別論文数</strong>';
+        Object.entries(fields).forEach(([k, v]) => {
+          const count = (Array.isArray(v) ? v : v?.papers || []).length;
+          sumHtml += '<div style="display:flex;justify-content:space-between;font-size:0.78rem;padding:3px 0;border-bottom:1px solid var(--border-light)">' +
+            '<span>' + esc(k) + '</span><span style="font-weight:600">' + count + '件</span></div>';
+        });
+        sumHtml += '</div>';
+      }
+      sumHtml += '</div>';
+      summary.innerHTML = sumHtml;
+    }
+
+    window.previewFile = function(filename) {
+      window.open(DATA_BASE + '/' + filename + cb(), '_blank');
+    };
+
+    // ============================================================
+    // MEDIA SOURCES
+    // ============================================================
+    async function loadSources() {
+      const data = await fetchJSON('media_sources.json');
+      if (!data) { document.getElementById('sourcesBody').innerHTML = '<tr><td colspan="6">データ取得失敗</td></tr>'; return; }
+
+      let sources = Array.isArray(data) ? data : (data.sources || data.feeds || []);
+      if (!Array.isArray(sources) && typeof data === 'object') {
+        sources = [];
+        for (const [key, val] of Object.entries(data)) {
+          if (Array.isArray(val)) val.forEach(s => sources.push(typeof s === 'string' ? { name: s, category: key } : { ...s, category: s.categories || s.category || key }));
+        }
+      }
+      mediaSources = sources;
+
+      // Update settings feed count
+      const feedCountEl = document.getElementById('settingFeedCount');
+      if (feedCountEl) feedCountEl.textContent = sources.length + 'メディア';
+
+      renderSources();
+    }
+
+    window.renderSources = function() {
+      const tierFilter = document.getElementById('sourceFilterTier').value;
+      const langFilter = document.getElementById('sourceFilterLang').value;
+      const catFilter = document.getElementById('sourceFilterCat').value;
+      const search = document.getElementById('sourceSearch').value.toLowerCase();
+
+      let filtered = [...mediaSources];
+      if (tierFilter) filtered = filtered.filter(s => String(s.tier) === tierFilter);
+      if (langFilter) filtered = filtered.filter(s => (s.language || '').toLowerCase() === langFilter);
+      if (catFilter) filtered = filtered.filter(s => {
+        const cats = Array.isArray(s.categories) ? s.categories : [s.categories || s.category || ''];
+        return cats.some(c => c === catFilter);
+      });
+      if (search) filtered = filtered.filter(s => ((s.name_ja || '') + (s.name || '')).toLowerCase().includes(search));
+
+      // Sort by article count
+      filtered.sort((a, b) => (b.articles_count || 0) - (a.articles_count || 0));
+
+      // Stats
+      const totalArticles = filtered.reduce((s, f) => s + (f.articles_count || 0), 0);
+      const jaCount = filtered.filter(s => (s.language || '') === 'ja').length;
+      const enCount = filtered.filter(s => (s.language || '') === 'en').length;
+
+      document.getElementById('sourceStats').innerHTML =
+        '<div class="stat-card"><div class="stat-value">' + filtered.length + '</div><div class="stat-label">メディア数</div></div>' +
+        '<div class="stat-card"><div class="stat-value">' + totalArticles.toLocaleString() + '</div><div class="stat-label">総記事数</div></div>' +
+        '<div class="stat-card"><div class="stat-value">' + jaCount + '</div><div class="stat-label">日本語</div></div>' +
+        '<div class="stat-card"><div class="stat-value">' + enCount + '</div><div class="stat-label">英語</div></div>';
+
+      const tbody = document.getElementById('sourcesBody');
+      if (filtered.length === 0) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted)">該当するメディアがありません</td></tr>'; return; }
+
+      tbody.innerHTML = filtered.map(s => {
+        const name = s.name_ja || s.name || s.title || '-';
+        const lang = (s.language || '-').toUpperCase();
+        const tier = s.tier || '-';
+        const tierClass = tier === 1 ? 'feed-tier-1' : (tier === 2 ? 'feed-tier-2' : 'feed-tier-3');
+        const cats = Array.isArray(s.categories) ? s.categories.join(', ') : (s.categories || s.category || '-');
+        return '<tr>' +
+          '<td><strong>' + esc(name) + '</strong>' + (s.name_ja && s.name ? '<br><span style="font-size:0.68rem;color:var(--text-muted)">' + esc(s.name) + '</span>' : '') + '</td>' +
+          '<td>' + lang + '</td>' +
+          '<td>' + (tier !== '-' ? '<span class="feed-tier ' + tierClass + '">Tier ' + tier + '</span>' : '-') + '</td>' +
+          '<td style="font-size:0.75rem">' + esc(cats) + '</td>' +
+          '<td style="text-align:right;font-weight:600">' + (s.articles_count || 0) + '</td>' +
+          '<td style="font-size:0.72rem;color:var(--text-muted)">' + esc(s.last_fetched || '-') + '</td>' +
+        '</tr>';
+      }).join('');
+    };
+
+    // ============================================================
+    // FIREBASE
+    // ============================================================
+    async function loadFirebaseStats() {
+      try {
+        const [comments, bookmarks, foresight] = await Promise.all([
+          db.collection('news_comments').get().then(s => s.size).catch(() => 0),
+          db.collection('news_bookmarks').get().then(s => s.size).catch(() => 0),
+          db.collection('foresight_queries').get().then(s => s.size).catch(() => 0),
+        ]);
+
+        document.getElementById('firebaseStats').innerHTML =
+          '<div class="stat-card"><div class="stat-value">' + comments + '</div><div class="stat-label">コメント</div></div>' +
+          '<div class="stat-card"><div class="stat-value">' + bookmarks + '</div><div class="stat-label">ブックマーク</div></div>' +
+          '<div class="stat-card"><div class="stat-value">' + foresight + '</div><div class="stat-label">洞察クエリ</div></div>';
+      } catch (e) {
+        console.error('Firebase stats error:', e);
+      }
+    }
+
+    window.showFirebaseSection = async function(section) {
+      const container = document.getElementById('firebaseContent');
+      container.innerHTML = '<div class="loading"><span class="spinner"></span> 読み込み中...</div>';
+
+      try {
+        if (section === 'comments') {
+          const snap = await db.collection('news_comments').orderBy('createdAt', 'desc').limit(50).get();
+          if (snap.empty) { container.innerHTML = '<p style="color:var(--text-muted);font-size:0.82rem">コメントはありません。</p>'; return; }
+          let html = '<div class="data-table-wrap"><table class="data-table"><thead><tr><th>ユーザー</th><th>記事ID</th><th>コメント</th><th>日時</th><th>操作</th></tr></thead><tbody>';
+          snap.docs.forEach(doc => {
+            const d = doc.data();
+            const time = d.createdAt ? new Date(d.createdAt.seconds * 1000).toLocaleString('ja-JP') : '-';
+            html += '<tr>' +
+              '<td>' + esc(d.userName || d.userId || '-') + '</td>' +
+              '<td style="font-size:0.72rem;max-width:120px;overflow:hidden;text-overflow:ellipsis">' + esc(d.articleId || '') + '</td>' +
+              '<td style="max-width:300px">' + esc(d.text || d.content || '') + '</td>' +
+              '<td style="font-size:0.72rem">' + time + '</td>' +
+              '<td><button class="btn btn-danger btn-sm" onclick="deleteFirebaseDoc(\'news_comments\',\'' + doc.id + '\')">削除</button></td>' +
+            '</tr>';
+          });
+          html += '</tbody></table></div>';
+          container.innerHTML = html;
+
+        } else if (section === 'bookmarks') {
+          const snap = await db.collection('news_bookmarks').orderBy('createdAt', 'desc').limit(50).get();
+          if (snap.empty) { container.innerHTML = '<p style="color:var(--text-muted);font-size:0.82rem">ブックマークはありません。</p>'; return; }
+          let html = '<div class="data-table-wrap"><table class="data-table"><thead><tr><th>ユーザー</th><th>タイトル</th><th>カテゴリ</th><th>日時</th><th>操作</th></tr></thead><tbody>';
+          snap.docs.forEach(doc => {
+            const d = doc.data();
+            const time = d.createdAt ? new Date(d.createdAt.seconds * 1000).toLocaleString('ja-JP') : '-';
+            html += '<tr>' +
+              '<td style="font-size:0.72rem">' + esc(d.userId || '-') + '</td>' +
+              '<td>' + esc(d.title || '-') + '</td>' +
+              '<td>' + esc(d.category || d.articleType || '-') + '</td>' +
+              '<td style="font-size:0.72rem">' + time + '</td>' +
+              '<td><button class="btn btn-danger btn-sm" onclick="deleteFirebaseDoc(\'news_bookmarks\',\'' + doc.id + '\')">削除</button></td>' +
+            '</tr>';
+          });
+          html += '</tbody></table></div>';
+          container.innerHTML = html;
+
+        } else if (section === 'foresight') {
+          const snap = await db.collection('foresight_queries').orderBy('createdAt', 'desc').limit(30).get();
+          if (snap.empty) { container.innerHTML = '<p style="color:var(--text-muted);font-size:0.82rem">洞察クエリはありません。</p>'; return; }
+          let html = '';
+          snap.docs.forEach(doc => {
+            const d = doc.data();
+            const time = d.createdAt ? new Date(d.createdAt.seconds * 1000).toLocaleString('ja-JP') : '-';
+            html += '<div class="card">' +
+              '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">' +
+                '<span style="font-size:0.72rem;color:var(--text-muted)">' + esc(d.userId || '-') + ' / ' + time + '</span>' +
+                '<button class="btn btn-danger btn-sm" onclick="deleteFirebaseDoc(\'foresight_queries\',\'' + doc.id + '\')">削除</button>' +
+              '</div>' +
+              '<div style="font-weight:600;font-size:0.84rem;margin-bottom:6px">' + esc(d.question || '') + '</div>' +
+              '<details><summary style="font-size:0.78rem;color:var(--accent);cursor:pointer">回答を表示</summary>' +
+              '<div style="font-size:0.78rem;color:var(--text-secondary);margin-top:6px;white-space:pre-line">' + esc(d.answer || '') + '</div></details>' +
+            '</div>';
+          });
+          container.innerHTML = html;
+        }
+      } catch (e) {
+        container.innerHTML = '<p style="color:var(--red);font-size:0.82rem">読み込みエラー: ' + esc(e.message) + '</p>';
+      }
+    };
+
+    window.deleteFirebaseDoc = async function(collection, docId) {
+      if (!confirm('このデータを削除しますか？')) return;
+      try {
+        await db.collection(collection).doc(docId).delete();
+        toast('削除しました', 'success');
+        // Refresh the section
+        const sectionMap = { 'news_comments': 'comments', 'news_bookmarks': 'bookmarks', 'foresight_queries': 'foresight' };
+        showFirebaseSection(sectionMap[collection] || 'comments');
+        loadFirebaseStats();
+      } catch (e) {
+        toast('削除失敗: ' + e.message, 'error');
+      }
+    };
+
+  })();
+  </script>
+</body>
+</html>
