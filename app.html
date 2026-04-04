@@ -493,12 +493,11 @@
     .pestle-article {
       padding: 10px 0;
       border-bottom: 1px solid var(--border-light);
-      cursor: pointer;
-      transition: background 0.2s, padding-left 0.2s;
+      transition: background 0.2s;
       border-radius: 4px;
     }
     .pestle-article:last-child { border-bottom: none; }
-    .pestle-article:hover { padding-left: 8px; background: var(--accent-light); }
+    .pestle-article:hover { background: var(--accent-light); }
     .pestle-article-meta {
       display: flex;
       align-items: center;
@@ -808,6 +807,76 @@
     }
     .cla-cross-synthesis-label { font-size: 0.72rem; font-weight: 600; color: var(--accent); margin-bottom: 4px; }
     .cla-cross-synthesis-text { font-size: 0.82rem; line-height: 1.65; }
+
+    /* CLA Year List (transition overview) */
+    .cla-year-list-toggle {
+      margin-bottom: 1rem;
+      display: flex;
+      gap: 8px;
+    }
+    .cla-year-list-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 12px;
+      margin-bottom: 1.5rem;
+    }
+    .cla-year-list-item {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xs);
+      padding: 14px 16px;
+      transition: border-color 0.2s;
+    }
+    .cla-year-list-item:hover { border-color: var(--accent); }
+    .cla-year-list-period {
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--accent);
+      margin-bottom: 8px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid var(--accent-light);
+    }
+    .cla-year-list-layer {
+      padding: 4px 0;
+      font-size: 0.78rem;
+      line-height: 1.55;
+    }
+    .cla-year-list-layer-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .cla-year-list-layer-text {
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+    .cla-year-list-synthesis {
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid var(--border-light);
+      font-size: 0.75rem;
+      color: var(--accent-soft);
+      line-height: 1.5;
+    }
+
+    /* PESTLE article bookmark */
+    .pestle-article-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .pestle-article-content {
+      flex: 1;
+      min-width: 0;
+      cursor: pointer;
+    }
+    .pestle-article-content:hover { padding-left: 8px; }
+    .pestle-article-bookmark {
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
 
     /* ================================================================
        ACADEMIC PAPERS
@@ -1274,9 +1343,20 @@
        RESPONSIVE
        ================================================================ */
     @media (max-width: 768px) {
-      .container { padding: 0 16px; }
+      .container { padding: 0 14px; }
+
+      /* Header: stack vertically on mobile */
+      .header-main { flex-wrap: wrap; padding: 10px 0; gap: 8px; }
+      .header-left { flex: 1; min-width: 0; }
       .header-date { display: none; }
-      .header-right { gap: 6px; }
+      .header-right { gap: 6px; width: 100%; justify-content: flex-end; }
+      .region-btn { padding: 5px 10px; font-size: 0.72rem; }
+      .theme-toggle { padding: 5px 8px; font-size: 0.75rem; }
+      .auth-area { font-size: 0.72rem; }
+      .auth-btn { padding: 4px 8px; font-size: 0.68rem; }
+
+      /* Nav: better touch targets */
+      .site-nav { position: relative; }
       .site-nav::after {
         content: '';
         position: absolute;
@@ -1285,23 +1365,79 @@
         background: linear-gradient(90deg, transparent, var(--card));
         pointer-events: none;
       }
-      .site-nav { position: relative; }
-      .nav-list { padding-right: 2rem; }
-      .pestle-grid { grid-template-columns: 1fr; }
+      .nav-list { padding-right: 2rem; gap: 4px; padding-top: 8px; padding-bottom: 8px; }
+      .nav-link { padding: 8px 14px; font-size: 0.78rem; }
+
+      /* Section spacing */
+      .app-section { padding: 1.25rem 0 2rem; }
+      .section-title { font-size: 1.15rem; }
+      .section-header { margin-bottom: 1rem; }
+
+      /* Cards & grid */
+      .pestle-grid { grid-template-columns: 1fr; gap: 14px; }
+      .pestle-card-header { padding: 10px 14px 6px; }
+      .pestle-articles { padding: 0 14px 10px; }
+      .pestle-article { padding: 8px 0; }
+      .pestle-article-title { font-size: 0.82rem; }
+
+      /* Report cards */
+      .report-summary { padding: 12px 14px; }
+      .report-body { padding: 0 14px 14px; }
       .myth-grid { grid-template-columns: 1fr; }
       .report-myth-section { grid-template-columns: 1fr; }
-      .footer-grid { grid-template-columns: 1fr; gap: 1.5rem; }
-      .insight-form { flex-direction: column; }
-      .skeleton-grid { grid-template-columns: 1fr; }
-      .toast-container { left: 1rem; right: 1rem; bottom: 1rem; }
+
+      /* Signal cards */
+      .ws-card-header { padding: 12px 14px; gap: 8px; }
+      .ws-card-title { font-size: 0.84rem; }
+      .ws-card-badges { flex-wrap: wrap; }
+      .ws-card-body { padding: 0 14px 14px; }
+
+      /* CLA */
+      .cla-tab-bar { gap: 4px; }
+      .cla-tab-btn { padding: 7px 12px; font-size: 0.75rem; }
+      .cla-layer { padding: 12px 14px; }
+      .cla-layer-text { font-size: 0.8rem; }
       .cla-timeline-grid { flex-direction: column; }
-      .modal-overlay { padding: 1rem; }
+      .cla-timeline-col { min-width: unset; }
+
+      /* Papers */
+      .papers-field-header { padding: 12px 14px; }
+      .papers-field-body { padding: 0 14px 14px; }
+      .paper-item { padding: 10px 0; padding-left: 10px; }
+      .paper-title { font-size: 0.84rem; }
+
+      /* Insight */
+      .insight-box { padding: 14px; }
+      .insight-form { flex-direction: column; }
+      .insight-textarea { min-height: 100px; }
+
+      /* Modal: nearly full screen on mobile */
+      .modal-overlay { padding: 0.5rem; align-items: flex-start; padding-top: 2rem; }
+      .modal-box { max-height: 90vh; padding: 16px; border-radius: var(--radius-sm); }
+      .modal-title { font-size: 0.95rem; padding-right: 2.5rem; }
+      .modal-close { top: 10px; right: 10px; }
+
+      /* Footer */
+      .footer-grid { grid-template-columns: 1fr; gap: 1.5rem; }
+      .site-footer { padding: 1.5rem 0 1rem; margin-top: 2rem; }
+
+      /* Others */
+      .skeleton-grid { grid-template-columns: 1fr; }
+      .toast-container { left: 0.75rem; right: 0.75rem; bottom: 0.75rem; }
+      .home-stack { gap: 1.5rem; }
+
+      /* CLA archive year list */
+      .cla-year-list-grid { grid-template-columns: 1fr !important; }
+      .cla-year-list-item { padding: 12px !important; }
     }
     @media (max-width: 375px) {
-      .container { padding: 0 12px; }
+      .container { padding: 0 10px; }
       .site-title { font-size: 1rem; }
-      .section-title { font-size: 1.1rem; }
-      .nav-link { padding: 7px 12px; font-size: 0.78rem; }
+      .section-title { font-size: 1.05rem; }
+      .nav-link { padding: 6px 10px; font-size: 0.75rem; }
+      .region-btn { padding: 4px 8px; font-size: 0.68rem; }
+      .cla-tab-btn { padding: 6px 10px; font-size: 0.72rem; }
+      .ws-badge { font-size: 0.6rem; padding: 2px 6px; }
     }
 
     /* ================================================================
@@ -1400,22 +1536,28 @@
             <div class="loading-indicator"><div class="loading-spinner loading-spinner-sm"></div><div>読み込み中...</div></div>
           </div>
         </details>
-        <div class="cla-timeline-grid">
-          <div class="cla-timeline-col">
-            <h4 class="cla-timeline-heading">年次 CLA（1990-2020）</h4>
-            <div class="cla-timeline-buttons" id="claYearlyTimeline"></div>
-            <div class="cla-detail-panel" id="claYearlyDetail">
-              <div class="cla-detail-placeholder">年を選択してください</div>
+        <div class="cla-year-list-toggle">
+          <button class="btn-secondary" id="claViewToggle" onclick="toggleCLAView()">年次変遷を一覧表示</button>
+        </div>
+        <div id="claTimelineView">
+          <div class="cla-timeline-grid">
+            <div class="cla-timeline-col">
+              <h4 class="cla-timeline-heading">年次 CLA（1990-2020）</h4>
+              <div class="cla-timeline-buttons" id="claYearlyTimeline"></div>
+              <div class="cla-detail-panel" id="claYearlyDetail">
+                <div class="cla-detail-placeholder">年を選択してください</div>
+              </div>
             </div>
-          </div>
-          <div class="cla-timeline-col">
-            <h4 class="cla-timeline-heading">四半期 CLA（2021-2026）</h4>
-            <div class="cla-timeline-buttons" id="claQuarterlyTimeline"></div>
-            <div class="cla-detail-panel" id="claQuarterlyDetail">
-              <div class="cla-detail-placeholder">四半期を選択してください</div>
+            <div class="cla-timeline-col">
+              <h4 class="cla-timeline-heading">四半期 CLA（2021-2026）</h4>
+              <div class="cla-timeline-buttons" id="claQuarterlyTimeline"></div>
+              <div class="cla-detail-panel" id="claQuarterlyDetail">
+                <div class="cla-detail-placeholder">四半期を選択してください</div>
+              </div>
             </div>
           </div>
         </div>
+        <div id="claYearListView" style="display:none"></div>
       </div>
     </section>
 
@@ -1869,16 +2011,21 @@
         if (display.length === 0) {
           gridHtml += '<div class="pestle-no-articles">記事がありません</div>';
         } else {
-          display.forEach(a => {
+          display.forEach((a, displayIdx) => {
             const origIdx = allArticles.indexOf(a);
             const tr = catTrans.find(t => t.index === origIdx);
             const ja = tr?.title_translated || '';
-            gridHtml += '<div class="pestle-article" onclick="window.open(\'' + escapeAttr(safeUrl(a.url)) + '\',\'_blank\')">' +
+            const bmId = 'news-' + catKey + '-' + origIdx;
+            const isBm = bookmarks.some(b => b.id === bmId);
+            gridHtml += '<div class="pestle-article"><div class="pestle-article-row">' +
+              '<div class="pestle-article-content" onclick="window.open(\'' + escapeAttr(safeUrl(a.url)) + '\',\'_blank\')">' +
               '<div class="pestle-article-meta"><span class="pestle-article-source">' + escapeHtml(a.source || '') + '</span>' +
               '<span class="pestle-article-time">' + escapeHtml(a.published_date || '') + '</span></div>' +
               '<div class="pestle-article-title">' + escapeHtml(a.title) + '</div>' +
               (ja ? '<div class="pestle-article-trans">' + escapeHtml(ja) + '</div>' : '') +
-            '</div>';
+              '</div>' +
+              '<button class="bookmark-btn pestle-article-bookmark ' + (isBm ? 'bookmarked' : '') + '" onclick="event.stopPropagation();toggleBookmark(\'' + bmId + '\',\'' + escapeAttr(a.title || '') + '\',\'' + escapeAttr(safeUrl(a.url)) + '\',this)" title="ブックマーク">&#9734;</button>' +
+            '</div></div>';
           });
         }
         if (articles.length > 5) {
@@ -1910,14 +2057,20 @@
       const el = cards[idx].querySelector('.pestle-articles');
       if (!el) return;
       el.innerHTML = filtered.map(a => {
-        const tr = catTrans.find(t => t.index === articles.indexOf(a));
+        const origIdx = articles.indexOf(a);
+        const tr = catTrans.find(t => t.index === origIdx);
         const ja = tr?.title_translated || '';
-        return '<div class="pestle-article" onclick="window.open(\'' + escapeAttr(safeUrl(a.url)) + '\',\'_blank\')">' +
+        const bmId = 'news-' + catKey + '-' + origIdx;
+        const isBm = bookmarks.some(b => b.id === bmId);
+        return '<div class="pestle-article"><div class="pestle-article-row">' +
+          '<div class="pestle-article-content" onclick="window.open(\'' + escapeAttr(safeUrl(a.url)) + '\',\'_blank\')">' +
           '<div class="pestle-article-meta"><span class="pestle-article-source">' + escapeHtml(a.source || '') + '</span>' +
           '<span class="pestle-article-time">' + escapeHtml(a.published_date || '') + '</span></div>' +
           '<div class="pestle-article-title">' + escapeHtml(a.title) + '</div>' +
           (ja ? '<div class="pestle-article-trans">' + escapeHtml(ja) + '</div>' : '') +
-        '</div>';
+          '</div>' +
+          '<button class="bookmark-btn pestle-article-bookmark ' + (isBm ? 'bookmarked' : '') + '" onclick="event.stopPropagation();toggleBookmark(\'' + bmId + '\',\'' + escapeAttr(a.title || '') + '\',\'' + escapeAttr(safeUrl(a.url)) + '\',this)" title="ブックマーク">&#9734;</button>' +
+        '</div></div>';
       }).join('');
       const more = cards[idx].querySelector('.pestle-show-more');
       if (more) more.remove();
@@ -2053,6 +2206,96 @@
           window._claQuarterly = quarterlyEntries;
         }
       } catch (e) { console.error('CLA archive load error:', e); }
+    }
+
+    // CLA Year List View toggle
+    let claListViewActive = false;
+    window.toggleCLAView = function() {
+      claListViewActive = !claListViewActive;
+      const timelineView = document.getElementById('claTimelineView');
+      const listView = document.getElementById('claYearListView');
+      const toggleBtn = document.getElementById('claViewToggle');
+      if (claListViewActive) {
+        timelineView.style.display = 'none';
+        listView.style.display = 'block';
+        toggleBtn.textContent = '個別選択に戻す';
+        renderCLAYearList();
+      } else {
+        timelineView.style.display = '';
+        listView.style.display = 'none';
+        toggleBtn.textContent = '年次変遷を一覧表示';
+      }
+    };
+
+    function renderCLAYearList() {
+      const container = document.getElementById('claYearListView');
+      const yearly = window._claYearly || [];
+      const quarterly = window._claQuarterly || [];
+      if (yearly.length === 0 && quarterly.length === 0) {
+        container.innerHTML = '<p class="text-muted">アーカイブデータがまだ読み込まれていません。</p>';
+        return;
+      }
+
+      let html = '';
+
+      if (yearly.length > 0) {
+        html += '<h4 class="cla-timeline-heading" style="margin-bottom:12px">年次 CLA 変遷（1990-2020）</h4>';
+        html += '<div class="cla-year-list-grid">';
+        yearly.forEach(entry => {
+          html += renderCLAYearListItem(entry);
+        });
+        html += '</div>';
+      }
+
+      if (quarterly.length > 0) {
+        html += '<h4 class="cla-timeline-heading" style="margin-bottom:12px;margin-top:1.5rem">四半期 CLA 変遷（2021-2026）</h4>';
+        html += '<div class="cla-year-list-grid">';
+        quarterly.forEach(entry => {
+          html += renderCLAYearListItem(entry);
+        });
+        html += '</div>';
+      }
+
+      container.innerHTML = html;
+    }
+
+    function renderCLAYearListItem(entry) {
+      if (!entry?.categories) return '';
+      // Merge all categories into combined layers for overview
+      const merged = {};
+      CLA_LAYERS.forEach(layer => {
+        const parts = [];
+        for (const [catKey, catData] of Object.entries(entry.categories)) {
+          if (catData[layer.key]) {
+            const label = PESTLE_CATS[catKey]?.labelJa || catKey;
+            // Truncate each category's text for overview
+            const text = catData[layer.key].length > 80
+              ? catData[layer.key].substring(0, 80) + '...'
+              : catData[layer.key];
+            parts.push('[' + label + '] ' + text);
+          }
+        }
+        merged[layer.key] = parts.join('\n');
+      });
+
+      let html = '<div class="cla-year-list-item">';
+      html += '<div class="cla-year-list-period">' + escapeHtml(entry.period) + '</div>';
+      CLA_LAYERS.forEach(layer => {
+        if (merged[layer.key]) {
+          html += '<div class="cla-year-list-layer">' +
+            '<div class="cla-year-list-layer-label">' + layer.labelJa + '</div>' +
+            '<div class="cla-year-list-layer-text">' + escapeHtml(merged[layer.key]) + '</div>' +
+          '</div>';
+        }
+      });
+      if (entry.cross_category_synthesis) {
+        const synth = entry.cross_category_synthesis.length > 120
+          ? entry.cross_category_synthesis.substring(0, 120) + '...'
+          : entry.cross_category_synthesis;
+        html += '<div class="cla-year-list-synthesis">' + escapeHtml(synth) + '</div>';
+      }
+      html += '</div>';
+      return html;
     }
 
     window.showCLADetail = function(type, period) {
