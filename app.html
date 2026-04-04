@@ -2090,7 +2090,7 @@
       result.innerHTML = '<div class="insight-loading"><div class="loading-spinner loading-spinner-sm"></div><span>分析中です。しばらくお待ちください...</span></div>';
       input.value = '';
 
-      const WORKER_BASE = 'https://future-insight-proxy.yuyanishimura0312.workers.dev';
+      const WORKER_BASE = 'https://future-insight-workspace.nishimura-69a.workers.dev';
       try {
         const resp = await fetch(WORKER_BASE + '/api/foresight', {
           method: 'POST',
@@ -2754,7 +2754,7 @@
       submitBtn.disabled = true;
       submitBtn.textContent = '分析中...';
 
-      const WORKER_BASE = 'https://future-insight-proxy.yuyanishimura0312.workers.dev';
+      const WORKER_BASE = 'https://future-insight-workspace.nishimura-69a.workers.dev';
       try {
         const resp = await fetch(WORKER_BASE + '/api/foresight', {
           method: 'POST',
