@@ -1712,6 +1712,7 @@
     }
 
     async function loadAllData() {
+      try {
       const now = new Date();
       document.getElementById('headerDate').textContent = formatDateFull(now);
 
@@ -1724,15 +1725,26 @@
         fetchJSON('media_sources.json')
       ]);
 
-      renderAlerts(alerts);
-      renderHomeDashboard(dailyReport, latest, aiAnalysis, papers);
-      renderPESTLE(latest, aiAnalysis);
-      renderCLASummary(aiAnalysis);
-      renderSignals(aiAnalysis);
-      renderPapers(papers);
-      renderMediaSources(mediaSources);
-      renderReportsArchive(dailyReport);
-      updateBookmarkUI();
+      try {
+        renderAlerts(alerts);
+        renderHomeDashboard(dailyReport, latest, aiAnalysis, papers);
+        renderPESTLE(latest, aiAnalysis);
+        renderCLASummary(aiAnalysis);
+        renderSignals(aiAnalysis);
+        renderPapers(papers);
+        renderMediaSources(mediaSources);
+        renderReportsArchive(dailyReport);
+        updateBookmarkUI();
+      } catch (renderErr) {
+        console.error('Render error:', renderErr);
+        document.getElementById('homeDashboard').innerHTML = '<div style="color:red;padding:2rem;">' +
+          '<h3>レンダリングエラー</h3><pre>' + renderErr.message + '\n' + renderErr.stack + '</pre></div>';
+      }
+      } catch (loadErr) {
+        console.error('Data load error:', loadErr);
+        document.getElementById('homeDashboard').innerHTML = '<div style="color:red;padding:2rem;">' +
+          '<h3>データ読み込みエラー</h3><pre>' + loadErr.message + '\n' + loadErr.stack + '</pre></div>';
+      }
     }
 
     // ==========================================================
@@ -2484,7 +2496,7 @@
                 '<div class="ws-card-badges">' +
                   '<span class="ws-badge ' + impactClass + '">' + escapeHtml(ws.potential_impact || 'N/A') + '</span>' +
                   (ws.time_horizon ? '<span class="ws-badge ws-badge-horizon">' + escapeHtml(ws.time_horizon) + '</span>' : '') +
-                  '<button class="bookmark-btn ' + (wsIsBookmarked ? 'bookmarked' : '') + '" onclick="event.stopPropagation();toggleBookmark(\'' + wsBookmarkId + '\',\'' + escapeAttr(ws.description || '') + '\',\\'\\',this)" title="ブックマーク" style="font-size:0.78rem;">&#9734;</button>' +
+                  '<button class="bookmark-btn ' + (wsIsBookmarked ? 'bookmarked' : '') + '" onclick="event.stopPropagation();toggleBookmark(\'' + wsBookmarkId + '\',\'' + escapeAttr(ws.description || '') + '\',\'\',this)" title="ブックマーク" style="font-size:0.78rem;">&#9734;</button>' +
                 '</div>' +
                 '<span class="ws-card-chevron">&#9654;</span>' +
               '</div>' +
