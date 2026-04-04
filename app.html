@@ -1869,7 +1869,6 @@
       <div class="container">
         <ul>
           <li><a href="app.html#section-home" data-nav="section-home">ホーム</a></li>
-          <li><a href="app.html#section-news" data-nav="section-news">Insight News</a></li>
           <li><a href="app.html#section-cla" data-nav="section-cla">因果階層分析</a></li>
           <li><a href="app.html#section-signals" data-nav="section-signals">シグナル</a></li>
           <li><a href="app.html#section-papers" data-nav="section-papers">学術研究</a></li>
@@ -2429,7 +2428,93 @@
 
       html += '</div>';
       container.innerHTML = html;
+
+      // Render full PESTLE grid inside home
+      const homeGrid = document.getElementById('homePestleGrid');
+      if (homeGrid && latest) {
+        renderPESTLEInto(homeGrid, latest, aiData);
+      }
     }
+
+    // Render PESTLE grid into a target element (reusable for home)
+    function renderPESTLEInto(targetEl, data, aiData) {
+      if (!data || !data.pestle) {
+        targetEl.innerHTML = '<p style="color:var(--text-muted);">ニュースデータを取得できませんでした。</p>';
+        return;
+      }
+      const pestle = data.pestle;
+      const translations = aiData?.translations || {};
+      const catKeys = Object.keys(PESTLE_CATS);
+      let gridHtml = '<div class="pestle-grid">';
+      catKeys.forEach(catKey => {
+        const catData = pestle[catKey];
+        if (!catData) return;
+        const catInfo = PESTLE_CATS[catKey];
+        let articles = [...(catData.articles || [])];
+        articles.sort((a,b) => (b.published_date||'').localeCompare(a.published_date||''));
+        const allArticles = [...articles];
+        if (currentRegion === 'japan') { articles = articles.filter(a => isJaSource(a)); }
+        else { articles = articles.filter(a => !isJaSource(a)); }
+        const display = articles.slice(0, 5);
+        const catTrans = translations[catKey] || [];
+        gridHtml += '<div class="pestle-card" style="border-top:4px solid ' + catInfo.color + ';">' +
+          '<div class="pestle-card-header"><span class="pestle-cat-name" style="color:' + catInfo.color + ';">' + catInfo.labelJa + '</span>' +
+          '<span class="pestle-cat-count">' + articles.length + '件</span></div><div class="pestle-articles">';
+        if (display.length === 0) {
+          gridHtml += '<div style="padding:1rem;color:var(--text-muted);font-size:0.82rem;text-align:center;">記事がありません</div>';
+        } else {
+          display.forEach(a => {
+            const origIdx = allArticles.indexOf(a);
+            const tr = catTrans.find(t => t.index === origIdx);
+            const ja = tr?.title_translated || '';
+            gridHtml += '<div class="pestle-article" onclick="window.open(\'' + escapeAttr(safeUrl(a.url)) + '\',\'_blank\')">' +
+              '<div class="pestle-article-meta"><span class="pestle-article-source">' + escapeHtml(a.source||'') + '</span>' +
+              '<span class="pestle-article-time">' + escapeHtml(a.published_date||'') + '</span></div>' +
+              '<div class="pestle-article-title">' + escapeHtml(a.title) + '</div>' +
+              (ja ? '<div class="pestle-article-summary" style="color:var(--accent-soft);font-size:0.73rem;">' + escapeHtml(ja) + '</div>' : '') +
+            '</div>';
+          });
+        }
+        if (articles.length > 5) {
+          gridHtml += '<a class="pestle-show-more" onclick="event.stopPropagation();expandHomePESTLE(\'' + catKey + '\')">全' + articles.length + '件を表示</a>';
+        }
+        gridHtml += '</div></div>';
+      });
+      gridHtml += '</div>';
+      const total = catKeys.reduce((s,k) => {
+        const a = pestle[k]?.articles || [];
+        return s + (currentRegion==='japan' ? a.filter(x=>isJaSource(x)).length : a.filter(x=>!isJaSource(x)).length);
+      }, 0);
+      const rl = currentRegion==='japan' ? '日本メディア' : '海外メディア';
+      targetEl.innerHTML = '<div style="margin-bottom:0.75rem;font-size:0.82rem;color:var(--text-secondary);">' + (data.date||'') + ' / ' + total + '件 (' + rl + ')</div>' + gridHtml;
+    }
+
+    window.expandHomePESTLE = function(catKey) {
+      const data = dataCache['latest.json'];
+      const aiData = dataCache['ai_analysis.json'];
+      if (!data?.pestle?.[catKey]) return;
+      const articles = [...(data.pestle[catKey].articles||[])];
+      articles.sort((a,b)=>(b.published_date||'').localeCompare(a.published_date||''));
+      const filtered = currentRegion==='japan' ? articles.filter(a=>isJaSource(a)) : articles.filter(a=>!isJaSource(a));
+      const catTrans = (aiData?.translations||{})[catKey] || [];
+      const cards = document.querySelectorAll('#homePestleGrid .pestle-card');
+      const idx = Object.keys(PESTLE_CATS).indexOf(catKey);
+      if (idx<0||!cards[idx]) return;
+      const el = cards[idx].querySelector('.pestle-articles');
+      if (!el) return;
+      el.innerHTML = filtered.map(a => {
+        const tr = catTrans.find(t=>t.index===articles.indexOf(a));
+        const ja = tr?.title_translated||'';
+        return '<div class="pestle-article" onclick="window.open(\''+escapeAttr(safeUrl(a.url))+'\',\'_blank\')">' +
+          '<div class="pestle-article-meta"><span class="pestle-article-source">'+escapeHtml(a.source||'')+'</span>' +
+          '<span class="pestle-article-time">'+escapeHtml(a.published_date||'')+'</span></div>' +
+          '<div class="pestle-article-title">'+escapeHtml(a.title)+'</div>' +
+          (ja?'<div class="pestle-article-summary" style="color:var(--accent-soft);font-size:0.73rem;">'+escapeHtml(ja)+'</div>':'')+
+        '</div>';
+      }).join('');
+      const more = cards[idx].querySelector('.pestle-show-more');
+      if (more) more.remove();
+    };
 
     // Helper: render a paper card for home dashboard
     function renderPaperCard(p) {
