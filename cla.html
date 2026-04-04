@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CLA 因果階層分析アーカイブ | Miratuku</title>
+  <link rel="icon" href="https://esse-sense.com/favicon.ico">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&family=Noto+Serif+JP:wght@400;700;900&display=swap" rel="stylesheet">
+
+  <style>
+    /* ============================================================
+       DESIGN SYSTEM — Miratuku CLA Archive
+       ============================================================ */
+    :root {
+      --bg: #FDFAF7;
+      --card: #ffffff;
+      --accent: #7A4033;
+      --accent-soft: #B07256;
+      --accent-warm: #DC8766;
+      --text: #2D2017;
+      --text-secondary: #6B5445;
+      --text-muted: #7A6B5E;
+      --border: #D9C8B8;
+      --surface: #F5EFE8;
+      --highlight-bg: #FFF5ED;
+      --shadow-sm: 0 1px 4px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.04);
+      --shadow-md: 0 2px 8px rgba(0,0,0,0.12), 0 8px 24px rgba(0,0,0,0.06);
+      --P: #8B3D2F; --E: #B87A4A; --S: #4F7A47;
+      --T: #3A7A96; --L: #6B4F82; --En: #2D7A6B;
+      --cla-1: #FFF5ED;
+      --cla-2: #F5EFE8;
+      --cla-3: #E8DDD4;
+      --cla-4: #D9C8B8;
+      --font-serif: 'Noto Serif JP', 'Georgia', 'Times New Roman', serif;
+      --font-sans: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    [data-theme="dark"] {
+      --bg: #1A1410;
+      --card: #241E18;
+      --accent: #DC8766;
+      --accent-soft: #C49478;
+      --accent-warm: #E8A080;
+      --text: #E8DDD4;
+      --text-secondary: #B8A898;
+      --text-muted: #8A7D72;
+      --border: #3D342B;
+      --surface: #2A231C;
+      --highlight-bg: #2E2318;
+      --shadow-sm: 0 1px 4px rgba(0,0,0,0.2), 0 4px 16px rgba(0,0,0,0.12);
+      --shadow-md: 0 2px 8px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.18);
+      --P: #C06050; --E: #D4956A; --S: #6A9A60;
+      --T: #5A9AB0; --L: #8A70A0; --En: #4A9A88;
+      --cla-1: #2E2318;
+      --cla-2: #2A231C;
+      --cla-3: #332A22;
+      --cla-4: #3D342B;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html {
+      font-size: 16px;
+      scroll-behavior: smooth;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      font-weight: 400;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.8;
+      min-height: 100vh;
+    }
+
+    a { color: var(--accent); text-decoration: none; transition: color 0.2s; }
+    a:hover { color: var(--accent-warm); text-decoration: underline; }
+
+    h1, h2, h3, h4 {
+      font-family: var(--font-serif);
+      font-weight: 700;
+      line-height: 1.4;
+    }
+
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    /* ============================================================
+       HEADER
+       ============================================================ */
+    .site-header {
+      background: var(--accent);
+      color: #fff;
+      position: sticky;
+      top: 0;
+      z-index: 200;
+    }
+
+    [data-theme="dark"] .site-header {
+      background: #2D2017;
+    }
+
+    .header-main {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.65rem 0;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .site-logo {
+      font-family: var(--font-serif);
+      font-size: 1.55rem;
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: -0.03em;
+      white-space: nowrap;
+      text-decoration: none;
+    }
+    .site-logo:hover { text-decoration: none; color: #fff; }
+
+    .site-logo-sub {
+      font-family: var(--font-sans);
+      font-size: 0.68rem;
+      font-weight: 300;
+      color: rgba(255,255,255,0.7);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      display: block;
+      margin-top: -2px;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+
+    .back-link {
+      font-size: 0.82rem;
+      color: rgba(255,255,255,0.8);
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      transition: color 0.2s;
+    }
+    .back-link:hover { color: #fff; text-decoration: none; }
+
+    /* Region toggle */
+    .region-toggle {
+      display: flex;
+      background: rgba(255,255,255,0.12);
+      border-radius: 5px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .region-toggle button {
+      padding: 0.28rem 0.65rem;
+      border: none;
+      background: transparent;
+      color: rgba(255,255,255,0.7);
+      cursor: pointer;
+      font-family: var(--font-sans);
+      font-size: 0.75rem;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .region-toggle button.active {
+      background: rgba(255,255,255,0.25);
+      color: #fff;
+    }
+
+    .region-toggle button:hover:not(.active) {
+      background: rgba(255,255,255,0.1);
+    }
+
+    /* Theme toggle */
+    .theme-toggle {
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 5px;
+      padding: 0.28rem 0.5rem;
+      cursor: pointer;
+      font-size: 0.82rem;
+      color: rgba(255,255,255,0.8);
+      line-height: 1;
+      transition: background 0.2s;
+    }
+    .theme-toggle:hover { background: rgba(255,255,255,0.2); }
+
+    /* ============================================================
+       SECTION NAV
+       ============================================================ */
+    .section-nav {
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .section-nav::-webkit-scrollbar { height: 0; }
+    .section-nav ul {
+      display: flex;
+      list-style: none;
+      gap: 0;
+      white-space: nowrap;
+    }
+    .section-nav a {
+      display: block;
+      padding: 0.65rem 1rem;
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      border-bottom: 3px solid transparent;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+    .section-nav a:hover,
+    .section-nav a.active {
+      color: var(--accent);
+      text-decoration: none;
+      border-bottom-color: var(--accent);
+    }
+
+    /* ============================================================
+       LOADING
+       ============================================================ */
+    .loading-indicator {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--text-muted);
+      font-size: 0.88rem;
+    }
+    .loading-spinner {
+      display: inline-block;
+      width: 28px;
+      height: 28px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-bottom: 0.75rem;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ============================================================
+       SECTIONS
+       ============================================================ */
+    .section {
+      padding: 2rem 0;
+    }
+
+    .section-title {
+      font-size: 1.4rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--accent);
+      display: inline-block;
+    }
+
+    /* ============================================================
+       META REPORT
+       ============================================================ */
+    .meta-report-content {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 2rem;
+      box-shadow: var(--shadow-sm);
+      line-height: 2;
+    }
+    .meta-report-content h2 {
+      font-size: 1.25rem;
+      margin-top: 1.5rem;
+      margin-bottom: 0.75rem;
+      color: var(--accent);
+    }
+    .meta-report-content h3 {
+      font-size: 1.05rem;
+      margin-top: 1.2rem;
+      margin-bottom: 0.5rem;
+    }
+    .meta-report-content p {
+      margin-bottom: 0.8rem;
+      font-size: 0.92rem;
+    }
+    .meta-report-content ul {
+      margin: 0.5rem 0 1rem 1.5rem;
+      font-size: 0.9rem;
+    }
+    .meta-report-content li {
+      margin-bottom: 0.3rem;
+    }
+    .meta-report-content strong {
+      color: var(--accent);
+    }
+
+    /* ============================================================
+       TIMELINE (paradigm shifts & myth)
+       ============================================================ */
+    .timeline-container {
+      margin-top: 1.5rem;
+    }
+    .timeline-subtitle {
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+      font-family: var(--font-serif);
+    }
+
+    .paradigm-timeline {
+      position: relative;
+      padding-left: 2rem;
+      border-left: 3px solid var(--accent);
+    }
+    .paradigm-item {
+      position: relative;
+      margin-bottom: 1.5rem;
+      padding: 1rem 1.2rem;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      box-shadow: var(--shadow-sm);
+    }
+    .paradigm-item::before {
+      content: '';
+      position: absolute;
+      left: -2.55rem;
+      top: 1.2rem;
+      width: 12px;
+      height: 12px;
+      background: var(--accent);
+      border-radius: 50%;
+      border: 2px solid var(--bg);
+    }
+    .paradigm-year {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+      margin-bottom: 0.2rem;
+    }
+    .paradigm-title {
+      font-family: var(--font-serif);
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 0.3rem;
+    }
+    .paradigm-desc {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+
+    /* Myth timeline */
+    .myth-timeline {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 0.75rem;
+    }
+    .myth-item {
+      background: var(--cla-4);
+      border-radius: 8px;
+      padding: 0.8rem 1rem;
+      border: 1px solid var(--border);
+    }
+    .myth-period {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 0.25rem;
+    }
+    .myth-text {
+      font-size: 0.85rem;
+      font-family: var(--font-serif);
+      font-style: italic;
+      line-height: 1.6;
+    }
+
+    /* ============================================================
+       YEAR/QUARTER TIMELINE BAR
+       ============================================================ */
+    .timeline-bar {
+      display: flex;
+      overflow-x: auto;
+      gap: 0;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.25rem;
+      margin-bottom: 1.5rem;
+      -webkit-overflow-scrolling: touch;
+    }
+    .timeline-bar::-webkit-scrollbar { height: 6px; }
+    .timeline-bar::-webkit-scrollbar-track { background: transparent; }
+    .timeline-bar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    .timeline-bar button {
+      flex-shrink: 0;
+      padding: 0.4rem 0.7rem;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-family: var(--font-sans);
+      font-size: 0.75rem;
+      font-weight: 500;
+      border-radius: 5px;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .timeline-bar button:hover {
+      background: var(--card);
+      color: var(--text);
+    }
+    .timeline-bar button.active {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    /* ============================================================
+       CLA CARD — 4-layer analysis display
+       ============================================================ */
+    .cla-display {
+      display: none;
+    }
+    .cla-display.visible {
+      display: block;
+    }
+
+    .cla-period-label {
+      font-family: var(--font-serif);
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .cla-synthesis {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem 1.2rem;
+      margin-bottom: 1.5rem;
+      font-size: 0.88rem;
+      line-height: 1.8;
+      box-shadow: var(--shadow-sm);
+    }
+    .cla-synthesis-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      margin-bottom: 0.4rem;
+    }
+
+    .cla-categories {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+      gap: 1rem;
+    }
+
+    .cla-category-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .cla-category-header {
+      padding: 0.6rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .pestle-badge {
+      display: inline-block;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .pestle-badge.P { background: var(--P); }
+    .pestle-badge.E { background: var(--E); }
+    .pestle-badge.S { background: var(--S); }
+    .pestle-badge.T { background: var(--T); }
+    .pestle-badge.L { background: var(--L); }
+    .pestle-badge.En { background: var(--En); }
+
+    .cla-category-name {
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    .cla-layer {
+      padding: 0.7rem 1rem;
+      font-size: 0.82rem;
+      line-height: 1.7;
+      border-bottom: 1px solid rgba(0,0,0,0.04);
+    }
+    .cla-layer:last-child { border-bottom: none; }
+
+    .cla-layer-1 { background: var(--cla-1); }
+    .cla-layer-2 { background: var(--cla-2); }
+    .cla-layer-3 { background: var(--cla-3); }
+    .cla-layer-4 { background: var(--cla-4); }
+
+    .cla-layer-label {
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 0.2rem;
+    }
+    .cla-layer-text {
+      color: var(--text);
+    }
+
+    /* ============================================================
+       FOOTER
+       ============================================================ */
+    .site-footer {
+      background: #2D2017;
+      color: rgba(255,255,255,0.7);
+      padding: 2.5rem 0 1.5rem;
+      margin-top: 3rem;
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+    .footer-brand {
+      font-family: var(--font-serif);
+      font-size: 1.25rem;
+      font-weight: 900;
+      color: #fff;
+      margin-bottom: 0.5rem;
+    }
+    .footer-desc {
+      font-size: 0.78rem;
+      line-height: 1.7;
+      color: rgba(255,255,255,0.55);
+    }
+    .footer-heading {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: rgba(255,255,255,0.4);
+      margin-bottom: 0.75rem;
+    }
+    .footer-links { list-style: none; }
+    .footer-links li { margin-bottom: 0.4rem; }
+    .footer-links a {
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.65);
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: #fff; text-decoration: none; }
+    .footer-bottom {
+      border-top: 1px solid rgba(255,255,255,0.1);
+      padding-top: 1rem;
+      text-align: center;
+      font-size: 0.7rem;
+      color: rgba(255,255,255,0.35);
+    }
+
+    /* ============================================================
+       RESPONSIVE
+       ============================================================ */
+    @media (max-width: 1024px) {
+      .cla-categories { grid-template-columns: 1fr 1fr; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 768px) {
+      .header-main { flex-wrap: wrap; gap: 0.5rem; }
+      .header-left { width: 100%; justify-content: space-between; }
+      .header-right { width: 100%; justify-content: flex-end; }
+      .site-logo { font-size: 1.3rem; }
+      .cla-categories { grid-template-columns: 1fr; }
+      .myth-timeline { grid-template-columns: 1fr 1fr; }
+      .footer-grid { grid-template-columns: 1fr; }
+      .container { padding: 0 1rem; }
+      .meta-report-content { padding: 1.2rem; }
+    }
+
+    @media (max-width: 480px) {
+      .myth-timeline { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="site-header">
+    <div class="container">
+      <div class="header-main">
+        <div class="header-left">
+          <div>
+            <a href="app.html" class="site-logo">CLA Archive</a>
+            <span class="site-logo-sub">Causal Layered Analysis</span>
+          </div>
+        </div>
+        <div class="header-right">
+          <a href="app.html" class="back-link">&larr; Insight News</a>
+          <div class="region-toggle">
+            <button class="active" data-region="japan">Japan</button>
+            <button data-region="global">Global</button>
+          </div>
+          <button class="theme-toggle" id="themeToggle" title="Toggle dark mode">&#9789;</button>
+        </div>
+      </div>
+    </div>
+    <nav class="section-nav">
+      <div class="container">
+        <ul>
+          <li><a class="active" data-section="meta-report">Meta Report</a></li>
+          <li><a data-section="yearly-cla">Yearly CLA (1990-2020)</a></li>
+          <li><a data-section="quarterly-cla">Quarterly CLA (2021-2026)</a></li>
+        </ul>
+      </div>
+    </nav>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main>
+
+    <!-- SECTION 1: META REPORT -->
+    <section class="section" id="meta-report">
+      <div class="container">
+        <h2 class="section-title">Meta Report</h2>
+
+        <div id="metaReportContent" class="meta-report-content">
+          <div class="loading-indicator">
+            <div class="loading-spinner"></div>
+            <div>Loading meta report...</div>
+          </div>
+        </div>
+
+        <div class="timeline-container" id="paradigmShiftsContainer" style="display:none;">
+          <h3 class="timeline-subtitle">Paradigm Shifts</h3>
+          <div class="paradigm-timeline" id="paradigmTimeline"></div>
+        </div>
+
+        <div class="timeline-container" id="mythTimelineContainer" style="display:none;">
+          <h3 class="timeline-subtitle">Myth Timeline</h3>
+          <div class="myth-timeline" id="mythTimeline"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 2: YEARLY CLA -->
+    <section class="section" id="yearly-cla" style="display:none;">
+      <div class="container">
+        <h2 class="section-title">Yearly CLA (1990-2020)</h2>
+        <div class="timeline-bar" id="yearlyTimelineBar"></div>
+        <div id="yearlyDisplay">
+          <div class="loading-indicator">
+            <div class="loading-spinner"></div>
+            <div>Loading yearly CLA data...</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 3: QUARTERLY CLA -->
+    <section class="section" id="quarterly-cla" style="display:none;">
+      <div class="container">
+        <h2 class="section-title">Quarterly CLA (2021-2026)</h2>
+        <div class="timeline-bar" id="quarterlyTimelineBar"></div>
+        <div id="quarterlyDisplay">
+          <div class="loading-indicator">
+            <div class="loading-spinner"></div>
+            <div>Loading quarterly CLA data...</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="footer-brand">CLA Archive</div>
+          <p class="footer-desc">
+            Causal Layered Analysis (CLA) archives for historical trend analysis. Powered by Miratuku Intelligence Pipeline.
+          </p>
+        </div>
+        <div>
+          <div class="footer-heading">Sections</div>
+          <ul class="footer-links">
+            <li><a href="#" data-section="meta-report">Meta Report</a></li>
+            <li><a href="#" data-section="yearly-cla">Yearly CLA</a></li>
+            <li><a href="#" data-section="quarterly-cla">Quarterly CLA</a></li>
+          </ul>
+        </div>
+        <div>
+          <div class="footer-heading">Links</div>
+          <ul class="footer-links">
+            <li><a href="app.html">Insight News</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        &copy; 2026 Miratuku / esse-sense. All rights reserved.
+      </div>
+    </div>
+  </footer>
+
+  <!-- ============================================================
+       JAVASCRIPT
+       ============================================================ -->
+  <script>
+  (function() {
+    'use strict';
+
+    // --- Data URLs ---
+    const DATA_URLS = {
+      yearly: 'https://yuyanishimura0312.github.io/future-insight-app/data/cla_historical_yearly.json',
+      quarterly: 'https://yuyanishimura0312.github.io/future-insight-app/data/cla_historical_quarterly.json',
+      meta: 'https://yuyanishimura0312.github.io/future-insight-app/data/cla_meta_report.json'
+    };
+
+    // --- State ---
+    let currentRegion = 'japan';
+    let metaData = null;
+    let yearlyData = null;
+    let quarterlyData = null;
+    let selectedYear = null;
+    let selectedQuarter = null;
+
+    // --- PESTLE mapping ---
+    const PESTLE_MAP = {
+      Political: { label: 'Political', badge: 'P', nameJa: '政治' },
+      Economic: { label: 'Economic', badge: 'E', nameJa: '経済' },
+      Social: { label: 'Social', badge: 'S', nameJa: '社会' },
+      Technological: { label: 'Technological', badge: 'T', nameJa: '技術' },
+      Legal: { label: 'Legal', badge: 'L', nameJa: '法律' },
+      Environmental: { label: 'Environmental', badge: 'En', nameJa: '環境' }
+    };
+
+    const CLA_LAYERS = [
+      { key: 'litany', label: 'Litany', labelJa: 'リタニー（表層事象）', cssClass: 'cla-layer-1' },
+      { key: 'systemic_causes', label: 'Systemic Causes', labelJa: '社会的原因（構造）', cssClass: 'cla-layer-2' },
+      { key: 'worldview', label: 'Worldview', labelJa: 'ディスコース（世界観）', cssClass: 'cla-layer-3' },
+      { key: 'myth_metaphor', label: 'Myth / Metaphor', labelJa: '神話・メタファー（深層）', cssClass: 'cla-layer-4' }
+    ];
+
+    // --- Simple Markdown to HTML converter ---
+    function mdToHtml(md) {
+      if (!md) return '';
+      let html = md;
+
+      // Process line by line for headings and lists
+      const lines = html.split('\n');
+      let result = [];
+      let inList = false;
+
+      for (let i = 0; i < lines.length; i++) {
+        let line = lines[i];
+
+        // Headings
+        if (line.startsWith('### ')) {
+          if (inList) { result.push('</ul>'); inList = false; }
+          result.push('<h3>' + line.slice(4) + '</h3>');
+          continue;
+        }
+        if (line.startsWith('## ')) {
+          if (inList) { result.push('</ul>'); inList = false; }
+          result.push('<h2>' + line.slice(3) + '</h2>');
+          continue;
+        }
+
+        // List items
+        if (/^[-*]\s/.test(line.trim())) {
+          if (!inList) { result.push('<ul>'); inList = true; }
+          result.push('<li>' + line.trim().slice(2) + '</li>');
+          continue;
+        }
+
+        // Close list if we're in one and hit a non-list line
+        if (inList) { result.push('</ul>'); inList = false; }
+
+        // Empty line = paragraph break
+        if (line.trim() === '') {
+          result.push('</p><p>');
+          continue;
+        }
+
+        result.push(line);
+      }
+      if (inList) result.push('</ul>');
+
+      html = '<p>' + result.join('\n') + '</p>';
+
+      // Bold
+      html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+
+      // Clean up empty paragraphs
+      html = html.replace(/<p>\s*<\/p>/g, '');
+      html = html.replace(/<p>\s*<(h[23]|ul)/g, '<$1');
+      html = html.replace(/<\/(h[23]|ul)>\s*<\/p>/g, '</$1>');
+
+      return html;
+    }
+
+    // --- Section navigation ---
+    function showSection(sectionId) {
+      document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
+      const target = document.getElementById(sectionId);
+      if (target) target.style.display = 'block';
+
+      document.querySelectorAll('.section-nav a').forEach(a => {
+        a.classList.toggle('active', a.dataset.section === sectionId);
+      });
+    }
+
+    document.querySelectorAll('[data-section]').forEach(el => {
+      el.addEventListener('click', function(e) {
+        e.preventDefault();
+        showSection(this.dataset.section);
+      });
+    });
+
+    // --- Region toggle ---
+    document.querySelectorAll('.region-toggle button').forEach(btn => {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.region-toggle button').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        currentRegion = this.dataset.region;
+        renderMetaReport();
+        if (selectedYear) renderClaEntry(yearlyData, selectedYear, 'yearlyDisplay');
+        if (selectedQuarter) renderClaEntry(quarterlyData, selectedQuarter, 'quarterlyDisplay');
+      });
+    });
+
+    // --- Theme toggle ---
+    const themeToggle = document.getElementById('themeToggle');
+    const savedTheme = localStorage.getItem('cla-theme');
+    if (savedTheme === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+
+    themeToggle.addEventListener('click', function() {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      if (isDark) {
+        document.documentElement.removeAttribute('data-theme');
+        localStorage.setItem('cla-theme', 'light');
+      } else {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        localStorage.setItem('cla-theme', 'dark');
+      }
+    });
+
+    // --- Render Meta Report ---
+    function renderMetaReport() {
+      if (!metaData) return;
+
+      const regionData = currentRegion === 'japan' ? metaData.japan : metaData.global;
+      if (!regionData) {
+        document.getElementById('metaReportContent').innerHTML = '<p style="color:var(--text-muted);padding:2rem;text-align:center;">No data available for this region.</p>';
+        document.getElementById('paradigmShiftsContainer').style.display = 'none';
+        document.getElementById('mythTimelineContainer').style.display = 'none';
+        return;
+      }
+
+      // Report text
+      document.getElementById('metaReportContent').innerHTML = mdToHtml(regionData.report_text || '');
+
+      // Paradigm shifts
+      const shifts = regionData.paradigm_shifts || [];
+      const psContainer = document.getElementById('paradigmShiftsContainer');
+      const psTimeline = document.getElementById('paradigmTimeline');
+      if (shifts.length > 0) {
+        psContainer.style.display = 'block';
+        psTimeline.innerHTML = shifts.map(s =>
+          '<div class="paradigm-item">' +
+            '<div class="paradigm-year">' + escHtml(s.year || s.period || '') + '</div>' +
+            '<div class="paradigm-title">' + escHtml(s.title) + '</div>' +
+            '<div class="paradigm-desc">' + escHtml(s.description) + '</div>' +
+          '</div>'
+        ).join('');
+      } else {
+        psContainer.style.display = 'none';
+      }
+
+      // Myth timeline
+      const myths = regionData.myth_timeline || [];
+      const mythContainer = document.getElementById('mythTimelineContainer');
+      const mythTimeline = document.getElementById('mythTimeline');
+      if (myths.length > 0) {
+        mythContainer.style.display = 'block';
+        mythTimeline.innerHTML = myths.map(m =>
+          '<div class="myth-item">' +
+            '<div class="myth-period">' + escHtml(m.period) + '</div>' +
+            '<div class="myth-text">' + escHtml(m.dominant_myth) + '</div>' +
+          '</div>'
+        ).join('');
+      } else {
+        mythContainer.style.display = 'none';
+      }
+    }
+
+    // --- Build timeline bar ---
+    function buildTimelineBar(entries, containerId, selectCallback) {
+      const container = document.getElementById(containerId);
+      if (!entries || entries.length === 0) {
+        container.innerHTML = '<span style="padding:0.5rem;color:var(--text-muted);font-size:0.82rem;">No data available.</span>';
+        return;
+      }
+      container.innerHTML = entries.map(e =>
+        '<button data-period="' + escAttr(e.period) + '">' + escHtml(e.period) + '</button>'
+      ).join('');
+
+      container.querySelectorAll('button').forEach(btn => {
+        btn.addEventListener('click', function() {
+          container.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+          this.classList.add('active');
+          selectCallback(this.dataset.period);
+        });
+      });
+
+      // Auto-select first
+      const firstBtn = container.querySelector('button');
+      if (firstBtn) firstBtn.click();
+    }
+
+    // --- Render CLA entry for a given period ---
+    function renderClaEntry(dataStore, period, displayContainerId) {
+      const container = document.getElementById(displayContainerId);
+      if (!dataStore || !dataStore.entries) {
+        container.innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:2rem;">No data loaded.</p>';
+        return;
+      }
+
+      const entry = dataStore.entries.find(e => e.period === period);
+      if (!entry) {
+        container.innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:2rem;">No data for ' + escHtml(period) + '.</p>';
+        return;
+      }
+
+      // Determine categories — use region-specific if available, otherwise use top-level
+      let categories = entry.categories;
+      if (entry[currentRegion] && entry[currentRegion].categories) {
+        categories = entry[currentRegion].categories;
+      }
+
+      let synthesis = entry.cross_category_synthesis || '';
+      if (entry[currentRegion] && entry[currentRegion].cross_category_synthesis) {
+        synthesis = entry[currentRegion].cross_category_synthesis;
+      }
+
+      let html = '<div class="cla-display visible">';
+      html += '<div class="cla-period-label">' + escHtml(period) + '</div>';
+
+      // Cross-category synthesis
+      if (synthesis) {
+        html += '<div class="cla-synthesis">';
+        html += '<div class="cla-synthesis-label">Cross-Category Synthesis</div>';
+        html += '<div>' + escHtml(synthesis) + '</div>';
+        html += '</div>';
+      }
+
+      // Category cards
+      html += '<div class="cla-categories">';
+      if (categories) {
+        for (const [catKey, catData] of Object.entries(categories)) {
+          const pestleInfo = PESTLE_MAP[catKey] || { label: catKey, badge: catKey.charAt(0), nameJa: catKey };
+
+          html += '<div class="cla-category-card">';
+          html += '<div class="cla-category-header">';
+          html += '<span class="pestle-badge ' + escAttr(pestleInfo.badge) + '">' + escHtml(pestleInfo.badge) + '</span>';
+          html += '<span class="cla-category-name">' + escHtml(pestleInfo.label) + ' / ' + escHtml(pestleInfo.nameJa) + '</span>';
+          html += '</div>';
+
+          for (const layer of CLA_LAYERS) {
+            const text = catData[layer.key] || '';
+            html += '<div class="cla-layer ' + layer.cssClass + '">';
+            html += '<div class="cla-layer-label">' + escHtml(layer.labelJa) + '</div>';
+            html += '<div class="cla-layer-text">' + escHtml(text) + '</div>';
+            html += '</div>';
+          }
+
+          html += '</div>';
+        }
+      }
+      html += '</div>';
+      html += '</div>';
+
+      container.innerHTML = html;
+    }
+
+    // --- Utility ---
+    function escHtml(str) {
+      if (!str) return '';
+      const d = document.createElement('div');
+      d.textContent = String(str);
+      return d.innerHTML;
+    }
+    function escAttr(str) {
+      return escHtml(str).replace(/"/g, '&quot;');
+    }
+
+    // --- Fetch data ---
+    async function loadData() {
+      try {
+        const [metaRes, yearlyRes, quarterlyRes] = await Promise.all([
+          fetch(DATA_URLS.meta).then(r => r.ok ? r.json() : null).catch(() => null),
+          fetch(DATA_URLS.yearly).then(r => r.ok ? r.json() : null).catch(() => null),
+          fetch(DATA_URLS.quarterly).then(r => r.ok ? r.json() : null).catch(() => null)
+        ]);
+
+        metaData = metaRes;
+        yearlyData = yearlyRes;
+        quarterlyData = quarterlyRes;
+
+        // Render meta report
+        if (metaData) {
+          renderMetaReport();
+        } else {
+          document.getElementById('metaReportContent').innerHTML = '<p style="color:var(--text-muted);padding:2rem;text-align:center;">Meta report data could not be loaded.</p>';
+        }
+
+        // Build yearly timeline
+        if (yearlyData && yearlyData.entries) {
+          buildTimelineBar(yearlyData.entries, 'yearlyTimelineBar', function(period) {
+            selectedYear = period;
+            renderClaEntry(yearlyData, period, 'yearlyDisplay');
+          });
+        } else {
+          document.getElementById('yearlyDisplay').innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:2rem;">Yearly CLA data could not be loaded.</p>';
+        }
+
+        // Build quarterly timeline
+        if (quarterlyData && quarterlyData.entries) {
+          buildTimelineBar(quarterlyData.entries, 'quarterlyTimelineBar', function(period) {
+            selectedQuarter = period;
+            renderClaEntry(quarterlyData, period, 'quarterlyDisplay');
+          });
+        } else {
+          document.getElementById('quarterlyDisplay').innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:2rem;">Quarterly CLA data could not be loaded.</p>';
+        }
+
+      } catch (err) {
+        console.error('Failed to load CLA data:', err);
+      }
+    }
+
+    // --- Init ---
+    loadData();
+
+  })();
+  </script>
+</body>
+</html>
