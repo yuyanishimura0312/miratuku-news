@@ -2170,7 +2170,7 @@
     window.toggleWeakSignals = function() {
       const container = document.getElementById('weakSignalsContainer');
       const chevron = document.getElementById('wsChevron');
-      if (!container) return;
+      if (!container || !chevron) return;
       const isHidden = container.style.display === 'none';
       container.style.display = isHidden ? 'block' : 'none';
       chevron.style.transform = isHidden ? 'rotate(90deg)' : 'rotate(0deg)';
@@ -2431,8 +2431,8 @@
               <div style="font-size:0.65rem;color:var(--text-muted);">${b.addedAt ? new Date(b.addedAt).toLocaleDateString('ja-JP') : ''}</div>
             </div>
             <div style="display:flex;gap:0.35rem;flex-shrink:0;">
-              <button class="bookmark-remove" onclick="toggleArchiveBookmark('${b.id}')" title="${b.archived ? '復元' : 'アーカイブ'}" style="font-size:0.7rem;color:var(--text-muted);">${b.archived ? '&#8634;' : '&#9744;'}</button>
-              <button class="bookmark-remove" onclick="deleteBookmark('${b.id}')" title="削除" style="color:#C0392B;">&times;</button>
+              <button class="bookmark-remove" onclick="toggleArchiveBookmark('${escapeAttr(b.id)}')" title="${b.archived ? '復元' : 'アーカイブ'}" style="font-size:0.7rem;color:var(--text-muted);">${b.archived ? '&#8634;' : '&#9744;'}</button>
+              <button class="bookmark-remove" onclick="deleteBookmark('${escapeAttr(b.id)}')" title="削除" style="color:#C0392B;">&times;</button>
             </div>
           </div>
         `).join('');
@@ -2459,11 +2459,6 @@
       updateBookmarkUI();
     };
 
-    window.removeBookmark = function(id) {
-      bookmarks = bookmarks.filter(b => b.id !== id);
-      localStorage.setItem('fin_bookmarks', JSON.stringify(bookmarks));
-      updateBookmarkUI();
-    };
 
     // ==========================================================
     // REGION TOGGLE (re-renders region-dependent sections)
