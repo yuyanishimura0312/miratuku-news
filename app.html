@@ -1388,14 +1388,14 @@
     <nav class="site-nav">
       <div class="container">
         <ul>
-          <li><a href="#daily-report" class="active" data-nav="daily-report">日次レポート</a></li>
-          <li><a href="#pestle-news" data-nav="pestle-news">Insight News</a></li>
-          <li><a href="#cla-analysis" data-nav="cla-analysis">因果階層分析</a></li>
-          <li><a href="#academic-papers" data-nav="academic-papers">学術研究</a></li>
-          <li><a href="#insight-form" data-nav="insight-form">未来洞察</a></li>
-          <li><a href="#media-sources" data-nav="media-sources">メディア</a></li>
+          <li><a href="app.html#section-report" data-nav="section-report">日次レポート</a></li>
+          <li><a href="app.html#section-news" data-nav="section-news">Insight News</a></li>
+          <li><a href="app.html#section-cla" data-nav="section-cla">因果階層分析</a></li>
+          <li><a href="app.html#section-papers" data-nav="section-papers">学術研究</a></li>
+          <li><a href="app.html#section-foresight" data-nav="section-foresight">未来洞察</a></li>
+          <li><a href="app.html#section-media" data-nav="section-media">メディア</a></li>
           <li><a href="reports.html" data-nav="reports">レポート一覧</a></li>
-          <li><a href="#bookmarks" data-nav="bookmarks" id="navBookmarks">ブックマーク <span id="bookmarkCount" style="font-size:0.65rem;background:var(--accent);color:#fff;padding:0 0.35rem;border-radius:8px;margin-left:0.2rem;">0</span></a></li>
+          <li><a href="app.html#section-bookmarks" data-nav="section-bookmarks" id="navBookmarks">ブックマーク <span id="bookmarkCount" style="font-size:0.65rem;background:var(--accent);color:#fff;padding:0 0.35rem;border-radius:8px;margin-left:0.2rem;">0</span></a></li>
         </ul>
       </div>
     </nav>
@@ -1416,14 +1416,16 @@
        ============================================================ -->
   <main class="container">
 
-    <!-- Bookmarks Panel (hidden by default) -->
-    <div class="bookmarks-panel" id="bookmarksPanel">
-      <h3>ブックマーク</h3>
+    <!-- Section: Bookmarks -->
+    <section class="section app-section" id="section-bookmarks" style="display:none;">
+      <div class="section-header">
+        <h2 class="section-title">ブックマーク</h2>
+      </div>
       <div id="bookmarksList"></div>
-    </div>
+    </section>
 
     <!-- Section 1: Daily Report -->
-    <section class="section" id="daily-report">
+    <section class="section app-section" id="section-report">
       <div class="section-header">
         <h2 class="section-title">日次分析レポート</h2>
         <span class="section-subtitle" id="reportDateSub"></span>
@@ -1437,7 +1439,7 @@
     </section>
 
     <!-- Section 2: PESTLE News -->
-    <section class="section" id="pestle-news">
+    <section class="section app-section" id="section-news" style="display:none;">
       <div class="section-header">
         <h2 class="section-title">Insight News</h2>
         <span class="section-subtitle" id="pestleTotalCount"></span>
@@ -1451,7 +1453,7 @@
     </section>
 
     <!-- Section 3: CLA Analysis (Summary) -->
-    <section class="section" id="cla-analysis">
+    <section class="section app-section" id="section-cla" style="display:none;">
       <div class="section-header">
         <h2 class="section-title">因果階層分析</h2>
         <span class="section-subtitle">Causal Layered Analysis</span>
@@ -1465,7 +1467,7 @@
     </section>
 
     <!-- Section 4: Academic Papers -->
-    <section class="section" id="academic-papers">
+    <section class="section app-section" id="section-papers" style="display:none;">
       <div class="section-header">
         <h2 class="section-title">学術研究</h2>
         <span class="section-subtitle" id="papersDateSub"></span>
@@ -1479,7 +1481,7 @@
     </section>
 
     <!-- Section 5: Insight Form -->
-    <section class="section" id="insight-form">
+    <section class="section app-section" id="section-foresight" style="display:none;">
       <div class="section-header">
         <h2 class="section-title">未来洞察</h2>
         <span class="section-subtitle">Future Insight</span>
@@ -1497,8 +1499,8 @@
       </div>
     </section>
 
-    <!-- Section 7: Media Sources -->
-    <section class="section" id="media-sources">
+    <!-- Section 6: Media Sources -->
+    <section class="section app-section" id="section-media" style="display:none;">
       <div class="section-header">
         <h2 class="section-title">メディアソース</h2>
         <span class="section-subtitle" id="sourcesCount"></span>
@@ -1538,10 +1540,10 @@
         <div>
           <div class="footer-heading">セクション</div>
           <ul class="footer-links">
-            <li><a href="#daily-report">日次レポート</a></li>
-            <li><a href="#pestle-news">Insight News</a></li>
-            <li><a href="#cla-analysis">因果階層分析</a></li>
-            <li><a href="#academic-papers">学術研究</a></li>
+            <li><a href="app.html#section-report">日次レポート</a></li>
+            <li><a href="app.html#section-news">Insight News</a></li>
+            <li><a href="app.html#section-cla">因果階層分析</a></li>
+            <li><a href="app.html#section-papers">学術研究</a></li>
             <li><a href="cla.html">CLA分析 全体版</a></li>
           </ul>
         </div>
@@ -1549,7 +1551,7 @@
           <div class="footer-heading">その他</div>
           <ul class="footer-links">
             <li><a href="reports.html">レポート一覧</a></li>
-            <li><a href="#media-sources">メディアソース</a></li>
+            <li><a href="app.html#section-media">メディアソース</a></li>
             <li><a href="#" onclick="auth.signOut();return false;">ログアウト</a></li>
           </ul>
         </div>
@@ -2498,34 +2500,48 @@
     });
 
     // ==========================================================
-    // NAV SCROLL SPY & SMOOTH SCROLL
+    // SECTION ROUTING (each tab = separate URL)
     // ==========================================================
-    document.querySelectorAll('.site-nav a').forEach(link => {
+    const VALID_SECTIONS = ['section-report', 'section-news', 'section-cla', 'section-papers', 'section-foresight', 'section-media', 'section-bookmarks'];
+    const DEFAULT_SECTION = 'section-report';
+
+    function showSection(sectionId) {
+      if (!VALID_SECTIONS.includes(sectionId)) sectionId = DEFAULT_SECTION;
+      // Hide all sections
+      document.querySelectorAll('.app-section').forEach(s => s.style.display = 'none');
+      // Show target section
+      const target = document.getElementById(sectionId);
+      if (target) target.style.display = '';
+      // Update nav active state
+      document.querySelectorAll('.site-nav a[data-nav]').forEach(a => {
+        a.classList.toggle('active', a.dataset.nav === sectionId);
+      });
+      // Scroll to top
+      window.scrollTo(0, 0);
+    }
+
+    function initSectionFromHash() {
+      const hash = (location.hash || '').replace('#', '');
+      showSection(hash || DEFAULT_SECTION);
+    }
+
+    // Nav click handlers
+    document.querySelectorAll('.site-nav a[data-nav]').forEach(link => {
       link.addEventListener('click', function(e) {
-        const href = this.getAttribute('href');
-
-        // External links (reports.html etc.) — let them navigate normally
-        if (href && !href.startsWith('#')) return;
-
+        const nav = this.dataset.nav;
+        // External links (reports.html etc.)
+        if (!nav || !VALID_SECTIONS.includes(nav)) return;
         e.preventDefault();
-
-        // Bookmarks toggle
-        if (href === '#bookmarks') {
-          const panel = document.getElementById('bookmarksPanel');
-          panel.classList.toggle('visible');
-          panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          return;
-        }
-
-        const el = document.querySelector(href);
-        if (el) {
-          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-
-        document.querySelectorAll('.site-nav a').forEach(a => a.classList.remove('active'));
-        this.classList.add('active');
+        history.pushState(null, '', 'app.html#' + nav);
+        showSection(nav);
       });
     });
+
+    // Handle back/forward navigation
+    window.addEventListener('popstate', initSectionFromHash);
+
+    // Init on page load
+    initSectionFromHash();
 
     // ==========================================================
     // INSIGHT FORM
