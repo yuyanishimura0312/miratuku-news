@@ -1833,6 +1833,92 @@
       body { background: #fff; color: #000; }
       .card, .pestle-card { box-shadow: none; border: 1px solid #ccc; }
     }
+
+    /* ============================================================
+       HOME DASHBOARD — CSS classes replacing inline styles
+       ============================================================ */
+    .home-stack { display: flex; flex-direction: column; gap: 2rem; }
+    .home-report-card {
+      margin-bottom: 1rem; background: var(--card); border: 1px solid var(--border);
+      border-radius: 8px; box-shadow: var(--shadow-sm);
+    }
+    .home-report-summary {
+      padding: 1rem 1.25rem; cursor: pointer; list-style: none;
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .home-report-chevron { color: var(--accent); font-size: 0.72rem; }
+    .home-report-title { font-weight: 600; font-size: 0.88rem; }
+    .home-report-count { font-size: 0.72rem; color: var(--text-muted); margin-left: auto; }
+    .home-report-body { padding: 0 1.25rem 1.25rem; }
+    .home-report-preview { font-size: 0.84rem; line-height: 1.75; color: var(--text-secondary); margin-bottom: 1rem; }
+    .home-myth-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+    .home-myth-box { padding: 0.75rem; background: var(--cla-1); border-radius: 6px; }
+    .home-myth-label { font-size: 0.72rem; font-weight: 600; margin-bottom: 0.3rem; }
+    .home-myth-label-decline { color: #8B3D2F; }
+    .home-myth-label-emerge { color: #2D7A6B; }
+    .home-myth-item { font-size: 0.75rem; line-height: 1.5; }
+    .home-fulltext-toggle { cursor: pointer; font-size: 0.78rem; color: var(--accent); font-weight: 500; }
+    .home-signal-card {
+      padding: 0.75rem 1rem; background: var(--card); border: 1px solid var(--border);
+      border-radius: 8px; margin-bottom: 0.5rem; box-shadow: var(--shadow-sm);
+    }
+    .home-signal-badges { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem; }
+    .home-signal-title { font-size: 0.88rem; font-weight: 600; line-height: 1.45; margin-bottom: 0.2rem; }
+    .home-signal-desc { font-size: 0.84rem; line-height: 1.6; }
+    .home-paper-card { padding: 0.65rem 0; border-bottom: 1px solid var(--surface); }
+    .home-paper-meta { display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.15rem; }
+    .home-paper-badge {
+      font-size: 0.62rem; font-weight: 600; padding: 0.1rem 0.3rem; border-radius: 3px;
+    }
+    .home-paper-source { font-size: 0.72rem; color: var(--text-muted); }
+    .home-paper-title { font-size: 0.84rem; font-weight: 500; line-height: 1.45; }
+    .home-paper-subtitle { font-size: 0.72rem; color: var(--text-muted); line-height: 1.35; margin-top: 0.1rem; }
+    .home-foresight-box {
+      background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+      padding: 1.25rem; box-shadow: var(--shadow-sm);
+    }
+    .home-foresight-form { display: flex; gap: 0.5rem; }
+    .home-foresight-input {
+      flex: 1; padding: 0.65rem 0.85rem; border: 1px solid var(--border);
+      border-radius: 6px; font-size: 0.84rem; font-family: var(--font-sans); background: var(--bg);
+      color: var(--text);
+    }
+    .home-foresight-input:focus { outline: none; border-color: var(--accent); }
+    .home-more-link { display: block; margin-top: 0.5rem; font-size: 0.78rem; font-weight: 500; }
+    .home-section-title { margin-bottom: 1rem; }
+    .home-foresight-result { margin-top: 0.75rem; display: none; }
+    .home-foresight-loading {
+      display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem;
+      background: var(--surface); border-radius: 6px;
+    }
+    .home-foresight-loading .loading-spinner { width: 16px; height: 16px; border-width: 2px; margin: 0; }
+    .home-foresight-answer {
+      padding: 1rem; background: var(--card); border: 1px solid var(--border);
+      border-radius: 6px; font-size: 0.84rem; line-height: 1.75;
+    }
+    .home-foresight-error {
+      padding: 0.75rem; background: #FFF5ED; border-radius: 6px;
+      font-size: 0.82rem; color: #8B3D2F;
+    }
+
+    /* Skeleton loading states */
+    .skeleton-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 8px; padding: 1.25rem; margin-bottom: 1rem;
+    }
+    .skeleton-title { width: 40%; height: 1.2rem; margin-bottom: 1rem; }
+    .skeleton-text { width: 100%; height: 0.85rem; margin-bottom: 0.5rem; }
+    .skeleton-text:nth-child(3) { width: 85%; }
+    .skeleton-text:nth-child(4) { width: 70%; }
+    .skeleton-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .skeleton-grid-item { height: 180px; border-radius: 6px; }
+
+    @media (max-width: 768px) {
+      .home-myth-grid { grid-template-columns: 1fr; }
+      .home-foresight-form { flex-direction: column; }
+      .home-foresight-input { width: 100%; }
+      .skeleton-grid { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
@@ -1899,9 +1985,10 @@
     <!-- Section HOME: Dashboard -->
     <section class="section app-section" id="section-home">
       <div id="homeDashboard">
-        <div class="loading-indicator">
-          <div class="loading-spinner"></div>
-          <div>ダッシュボードを読み込み中...</div>
+        <div class="home-stack">
+          <div class="skeleton-card"><div class="skeleton skeleton-title"></div><div class="skeleton skeleton-text"></div><div class="skeleton skeleton-text"></div><div class="skeleton skeleton-text"></div></div>
+          <div class="skeleton-grid"><div class="skeleton skeleton-grid-item"></div><div class="skeleton skeleton-grid-item"></div></div>
+          <div class="skeleton-card"><div class="skeleton skeleton-title"></div><div class="skeleton skeleton-text"></div><div class="skeleton skeleton-text"></div></div>
         </div>
       </div>
     </section>
@@ -1913,9 +2000,11 @@
         <span class="section-subtitle" id="pestleTotalCount"></span>
       </div>
       <div id="pestleContent">
-        <div class="loading-indicator">
-          <div class="loading-spinner"></div>
-          <div>ニュースを読み込み中...</div>
+        <div class="skeleton-grid" style="grid-template-columns:repeat(2,1fr);">
+          <div class="skeleton skeleton-grid-item" style="height:240px;"></div>
+          <div class="skeleton skeleton-grid-item" style="height:240px;"></div>
+          <div class="skeleton skeleton-grid-item" style="height:240px;"></div>
+          <div class="skeleton skeleton-grid-item" style="height:240px;"></div>
         </div>
       </div>
     </section>
@@ -1990,10 +2079,8 @@
         <span class="section-subtitle" id="papersDateSub"></span>
       </div>
       <div id="papersContent">
-        <div class="loading-indicator">
-          <div class="loading-spinner"></div>
-          <div>学術論文を読み込み中...</div>
-        </div>
+        <div class="skeleton-card"><div class="skeleton skeleton-title"></div><div class="skeleton skeleton-text"></div><div class="skeleton skeleton-text"></div><div class="skeleton skeleton-text"></div><div class="skeleton skeleton-text"></div></div>
+        <div class="skeleton-card"><div class="skeleton skeleton-title"></div><div class="skeleton skeleton-text"></div><div class="skeleton skeleton-text"></div></div>
       </div>
     </section>
 
@@ -2292,7 +2379,7 @@
       const topPapers = allPapers.slice(0, 10);
 
       // --- Build HTML ---
-      let html = '<div style="display:flex;flex-direction:column;gap:2rem;">';
+      let html = '<div class="home-stack">';
 
       // ===== 1. Daily Report =====
       html += '<div>';
@@ -2301,19 +2388,19 @@
       // Japan report
       if (jpReport) {
         const jpPreview = (jpReport.report_text || '').substring(0, 300);
-        html += '<details open style="margin-bottom:1rem;background:var(--card);border:1px solid var(--border);border-radius:8px;box-shadow:var(--shadow-sm);">' +
-          '<summary style="padding:1rem 1.25rem;cursor:pointer;list-style:none;display:flex;align-items:center;gap:0.5rem;">' +
-            '<span style="color:var(--accent);font-size:0.72rem;">&#9654;</span>' +
-            '<span style="font-weight:600;font-size:0.88rem;">日本メディアの視点</span>' +
-            '<span style="font-size:0.72rem;color:var(--text-muted);margin-left:auto;">' + ((jpReport.key_observations || jpReport.observations || []).length || 0) + '件の観測</span>' +
+        html += '<details open class="home-report-card">' +
+          '<summary class="home-report-summary">' +
+            '<span class="home-report-chevron">&#9654;</span>' +
+            '<span class="home-report-title">日本メディアの視点</span>' +
+            '<span class="home-report-count">' + ((jpReport.key_observations || jpReport.observations || []).length || 0) + '件の観測</span>' +
           '</summary>' +
-          '<div style="padding:0 1.25rem 1.25rem;">' +
-            '<div style="font-size:0.84rem;line-height:1.75;color:var(--text-secondary);margin-bottom:1rem;">' + escapeHtml(jpPreview) + '...</div>';
+          '<div class="home-report-body">' +
+            '<div class="home-report-preview">' + escapeHtml(jpPreview) + '...</div>';
         // Declining/Emerging myths — support both myth_in_transition.declining and legacy declining_myths
         const jpDeclining = (jpReport.myth_in_transition?.declining) || jpReport.declining_myths || [];
         const jpEmerging = (jpReport.myth_in_transition?.emerging) || jpReport.emerging_myths || [];
         if ((Array.isArray(jpDeclining) && jpDeclining.length > 0) || (Array.isArray(jpEmerging) && jpEmerging.length > 0)) {
-          html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">';
+          html += '<div class="home-myth-grid">';
           if (Array.isArray(jpDeclining) && jpDeclining.length > 0) {
             html += '<div style="padding:0.75rem;background:var(--cla-1);border-radius:6px;"><div style="font-size:0.68rem;font-weight:600;color:#8B3D2F;margin-bottom:0.3rem;">衰退する神話</div>';
             jpDeclining.slice(0,3).forEach(m => { html += '<div style="font-size:0.75rem;line-height:1.5;">- ' + escapeHtml(String(m)) + '</div>'; });
@@ -2335,19 +2422,19 @@
       // Global report
       if (glReport) {
         const glPreview = (glReport.report_text || '').substring(0, 300);
-        html += '<details open style="margin-bottom:1rem;background:var(--card);border:1px solid var(--border);border-radius:8px;box-shadow:var(--shadow-sm);">' +
-          '<summary style="padding:1rem 1.25rem;cursor:pointer;list-style:none;display:flex;align-items:center;gap:0.5rem;">' +
-            '<span style="color:var(--accent);font-size:0.72rem;">&#9654;</span>' +
-            '<span style="font-weight:600;font-size:0.88rem;">海外メディアの視点</span>' +
-            '<span style="font-size:0.72rem;color:var(--text-muted);margin-left:auto;">' + ((glReport.key_observations || glReport.observations || []).length || 0) + '件の観測</span>' +
+        html += '<details open class="home-report-card">' +
+          '<summary class="home-report-summary">' +
+            '<span class="home-report-chevron">&#9654;</span>' +
+            '<span class="home-report-title">海外メディアの視点</span>' +
+            '<span class="home-report-count">' + ((glReport.key_observations || glReport.observations || []).length || 0) + '件の観測</span>' +
           '</summary>' +
-          '<div style="padding:0 1.25rem 1.25rem;">' +
-            '<div style="font-size:0.84rem;line-height:1.75;color:var(--text-secondary);margin-bottom:1rem;">' + escapeHtml(glPreview) + '...</div>';
+          '<div class="home-report-body">' +
+            '<div class="home-report-preview">' + escapeHtml(glPreview) + '...</div>';
         // Declining/Emerging myths — support myth_in_transition.declining and legacy declining_myths
         const glDeclining = (glReport.myth_in_transition?.declining) || glReport.declining_myths || [];
         const glEmerging = (glReport.myth_in_transition?.emerging) || glReport.emerging_myths || [];
         if ((Array.isArray(glDeclining) && glDeclining.length > 0) || (Array.isArray(glEmerging) && glEmerging.length > 0)) {
-          html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">';
+          html += '<div class="home-myth-grid">';
           if (Array.isArray(glDeclining) && glDeclining.length > 0) {
             html += '<div style="padding:0.75rem;background:var(--cla-1);border-radius:6px;"><div style="font-size:0.68rem;font-weight:600;color:#8B3D2F;margin-bottom:0.3rem;">衰退する神話</div>';
             glDeclining.slice(0,3).forEach(m => { html += '<div style="font-size:0.75rem;line-height:1.5;">- ' + escapeHtml(String(m)) + '</div>'; });
@@ -2379,8 +2466,8 @@
         signals.forEach(ws => {
           const impactClass = (ws.potential_impact || '').toLowerCase() === 'high' ? 'ws-badge-high' :
                               (ws.potential_impact || '').toLowerCase() === 'medium' ? 'ws-badge-medium' : 'ws-badge-low';
-          html += '<div style="padding:0.75rem 1rem;background:var(--card);border:1px solid var(--border);border-radius:8px;margin-bottom:0.5rem;box-shadow:var(--shadow-sm);">' +
-            '<div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.25rem;">' +
+          html += '<div class="home-signal-card">' +
+            '<div class="home-signal-badges">' +
               '<span class="ws-badge ' + impactClass + '">' + escapeHtml(ws.potential_impact || '') + '</span>' +
               (ws.time_horizon ? '<span class="ws-badge ws-badge-horizon">' + escapeHtml(ws.time_horizon) + '</span>' : '') +
             '</div>' +
@@ -2416,14 +2503,14 @@
       }
 
       // ===== 5. Future Insight text box =====
-      html += '<div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:1.25rem;box-shadow:var(--shadow-sm);">' +
+      html += '<div class="home-foresight-box">' +
         '<h2 class="section-title" style="margin-bottom:0.75rem;">未来洞察</h2>' +
         '<p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:0.75rem;">あなたの問題意識を記述してください。蓄積されたデータから未来洞察の視点で回答します。</p>' +
-        '<form onsubmit="submitHomeForesight(event)" style="display:flex;gap:0.5rem;">' +
-          '<input type="text" id="homeForesightInput" placeholder="例: AI規制と雇用市場の今後3年の見通し..." style="flex:1;padding:0.65rem 0.85rem;border:1px solid var(--border);border-radius:6px;font-size:0.84rem;font-family:var(--font-sans);background:var(--bg);">' +
+        '<form onsubmit="submitHomeForesight(event)" class="home-foresight-form">' +
+          '<input type="text" id="homeForesightInput" placeholder="例: AI規制と雇用市場の今後3年の見通し..." class="home-foresight-input">' +
           '<button type="submit" class="btn-primary" style="white-space:nowrap;">問いかける</button>' +
         '</form>' +
-        '<div id="homeForesightResult" style="margin-top:0.75rem;display:none;"></div>' +
+        '<div id="homeForesightResult" class="home-foresight-result"></div>' +
       '</div>';
 
       html += '</div>';
@@ -2533,21 +2620,49 @@
     }
 
     // Home foresight submission
-    window.submitHomeForesight = function(e) {
+    window.submitHomeForesight = async function(e) {
       e.preventDefault();
       const input = document.getElementById('homeForesightInput');
       const question = input.value.trim();
       if (!question) return;
+      const user = auth.currentUser;
+      if (!user) { showToast('問いかけるにはログインが必要です。', 'error'); return; }
+
       const result = document.getElementById('homeForesightResult');
       result.style.display = 'block';
-      result.innerHTML = '<div style="font-size:0.82rem;color:var(--text-secondary);padding:0.75rem;background:var(--surface);border-radius:6px;">問いかけを受け付けました。未来洞察タブで回答をご確認ください。</div>';
-      // Navigate to foresight tab with the question
-      document.getElementById('insightText').value = question;
+      result.innerHTML = '<div class="home-foresight-loading"><div class="loading-spinner"></div><span style="font-size:0.82rem;color:var(--text-secondary);">分析中です。しばらくお待ちください...</span></div>';
       input.value = '';
-      setTimeout(() => {
-        history.pushState(null, '', 'app.html#section-foresight');
-        showSection('section-foresight');
-      }, 1500);
+
+      const WORKER_BASE = 'https://future-insight-proxy.yuyanishimura0312.workers.dev';
+      try {
+        const resp = await fetch(WORKER_BASE + '/api/foresight', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-User-Id': user.uid },
+          body: JSON.stringify({
+            question: question,
+            claContext: window.__claContext || '',
+            signalsContext: window.__signalsContext || '',
+            newsContext: window.__newsContext || ''
+          })
+        });
+        if (!resp.ok) {
+          const errData = await resp.json().catch(() => ({}));
+          throw new Error(errData.error || 'HTTP ' + resp.status);
+        }
+        const data = await resp.json();
+        // Display the AI answer
+        result.innerHTML = '<div class="home-foresight-answer">' + renderMarkdown(data.answer || '') + '</div>';
+        // Save to Firestore for history
+        try {
+          await db.collection('foresight_queries').add({
+            question: question, answer: data.answer || '',
+            userId: user.uid, createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+        } catch (saveErr) { console.warn('Foresight save failed:', saveErr); }
+      } catch (err) {
+        console.error('Foresight API error:', err);
+        result.innerHTML = '<div class="home-foresight-error">回答の取得に失敗しました: ' + escapeHtml(err.message) + '</div>';
+      }
     };
 
     // ==========================================================
@@ -2708,9 +2823,12 @@
         </div>
       `;
 
+      window._modalReturnFocus = document.activeElement;
       document.getElementById('articleModal').classList.add('visible');
       document.body.style.overflow = 'hidden';
       loadArticleComments(articleId);
+      // Focus the close button for accessibility
+      setTimeout(() => { const closeBtn = document.querySelector('#articleModal .modal-close'); if (closeBtn) closeBtn.focus(); }, 100);
     };
 
     window.openReportCommentModal = function(reportId, title) {
@@ -2735,6 +2853,11 @@
     window.closeArticleModal = function() {
       document.getElementById('articleModal').classList.remove('visible');
       document.body.style.overflow = '';
+      // Restore focus to the element that opened the modal
+      if (window._modalReturnFocus) {
+        window._modalReturnFocus.focus();
+        window._modalReturnFocus = null;
+      }
     };
 
     // Close modal on overlay click
@@ -2742,9 +2865,22 @@
       if (e.target === this) closeArticleModal();
     });
 
-    // Close modal on Escape
+    // Close modal on Escape + focus trap
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape') closeArticleModal();
+      // Focus trap: keep Tab within modal when open
+      const modal = document.getElementById('articleModal');
+      if (!modal.classList.contains('visible')) return;
+      if (e.key !== 'Tab') return;
+      const focusable = modal.querySelectorAll('button, input, textarea, a[href], [tabindex]:not([tabindex="-1"])');
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault(); last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault(); first.focus();
+      }
     });
 
     // Firestore comments per article/report
@@ -3074,7 +3210,7 @@
 
       let html = '<div style="display:flex;flex-direction:column;gap:1rem;">';
       // Current report card
-      html += '<div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:1.25rem;box-shadow:var(--shadow-sm);">' +
+      html += '<div class="home-foresight-box">' +
         '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.75rem;">' +
           '<div style="font-family:var(--font-serif);font-weight:700;font-size:1rem;">' + dateStr + ' レポート</div>' +
           '<span style="font-size:0.72rem;color:var(--text-muted);">' + (currentRegion === 'japan' ? '日本版' : 'グローバル版') + '</span>' +
@@ -3498,19 +3634,53 @@
       const user = auth.currentUser;
       if (!user) { showToast('投稿するにはログインが必要です。', 'error'); return; }
 
+      // Show loading in the form area
+      const submitBtn = this.querySelector('button[type="submit"]');
+      const origText = submitBtn.textContent;
+      submitBtn.disabled = true;
+      submitBtn.textContent = '分析中...';
+
+      const WORKER_BASE = 'https://future-insight-proxy.yuyanishimura0312.workers.dev';
       try {
-        await db.collection('insights').add({
-          text: text,
-          userId: user.uid,
-          userName: user.displayName || user.email,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-          region: currentRegion
+        const resp = await fetch(WORKER_BASE + '/api/foresight', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-User-Id': user.uid },
+          body: JSON.stringify({
+            question: text,
+            claContext: window.__claContext || '',
+            signalsContext: window.__signalsContext || '',
+            newsContext: window.__newsContext || ''
+          })
         });
-        document.getElementById('insightText').value = '';
-        showToast('洞察を投稿しました。ありがとうございます。', 'success');
+        if (!resp.ok) {
+          const errData = await resp.json().catch(() => ({}));
+          throw new Error(errData.error || 'HTTP ' + resp.status);
+        }
+        const data = await resp.json();
+        // Display answer below the form
+        let answerEl = document.getElementById('foresightAnswer');
+        if (!answerEl) {
+          answerEl = document.createElement('div');
+          answerEl.id = 'foresightAnswer';
+          answerEl.className = 'home-foresight-answer';
+          answerEl.style.marginTop = '1.5rem';
+          this.parentElement.appendChild(answerEl);
+        }
+        answerEl.innerHTML = '<h4 style="font-family:var(--font-serif);font-size:0.95rem;margin-bottom:0.75rem;color:var(--accent);">回答</h4>' + renderMarkdown(data.answer || '');
+        // Save to Firestore
+        try {
+          await db.collection('foresight_queries').add({
+            question: text, answer: data.answer || '',
+            userId: user.uid, createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+        } catch (saveErr) { console.warn('Foresight save failed:', saveErr); }
+        showToast('回答を生成しました。', 'success');
       } catch (err) {
-        console.error('Failed to save insight:', err);
-        showToast('投稿に失敗しました。もう一度お試しください。', 'error');
+        console.error('Foresight API error:', err);
+        showToast('回答の取得に失敗しました: ' + err.message, 'error');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = origText;
       }
     });
 
