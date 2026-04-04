@@ -1388,7 +1388,7 @@
     <nav class="site-nav">
       <div class="container">
         <ul>
-          <li><a href="app.html#section-report" data-nav="section-report">日次レポート</a></li>
+          <li><a href="app.html#section-home" data-nav="section-home">ホーム</a></li>
           <li><a href="app.html#section-news" data-nav="section-news">Insight News</a></li>
           <li><a href="app.html#section-cla" data-nav="section-cla">因果階層分析</a></li>
           <li><a href="app.html#section-signals" data-nav="section-signals">シグナル</a></li>
@@ -1425,16 +1425,12 @@
       <div id="bookmarksList"></div>
     </section>
 
-    <!-- Section 1: Daily Report -->
-    <section class="section app-section" id="section-report">
-      <div class="section-header">
-        <h2 class="section-title">日次分析レポート</h2>
-        <span class="section-subtitle" id="reportDateSub"></span>
-      </div>
-      <div id="dailyReportContent">
+    <!-- Section HOME: Dashboard -->
+    <section class="section app-section" id="section-home">
+      <div id="homeDashboard">
         <div class="loading-indicator">
           <div class="loading-spinner"></div>
-          <div>レポートを読み込み中...</div>
+          <div>ダッシュボードを読み込み中...</div>
         </div>
       </div>
     </section>
@@ -1613,7 +1609,7 @@
         <div>
           <div class="footer-heading">セクション</div>
           <ul class="footer-links">
-            <li><a href="app.html#section-report">日次レポート</a></li>
+            <li><a href="app.html#section-home">ホーム</a></li>
             <li><a href="app.html#section-news">Insight News</a></li>
             <li><a href="app.html#section-cla">因果階層分析</a></li>
             <li><a href="app.html#section-signals">シグナル</a></li>
@@ -1729,7 +1725,7 @@
       ]);
 
       renderAlerts(alerts);
-      renderDailyReport(dailyReport);
+      renderHomeDashboard(dailyReport, latest, aiAnalysis, papers);
       renderPESTLE(latest, aiAnalysis);
       renderCLASummary(aiAnalysis);
       renderSignals(aiAnalysis);
@@ -1760,7 +1756,259 @@
     }
 
     // ==========================================================
-    // RENDER: DAILY REPORT
+    // RENDER: HOME DASHBOARD
+    // ==========================================================
+    function renderHomeDashboard(dailyReport, latest, aiData, papers) {
+      const container = document.getElementById('homeDashboard');
+      const dateStr = dailyReport?.generated_at ? dailyReport.generated_at.split('T')[0] : new Date().toISOString().split('T')[0];
+
+      // --- 1. Daily Report (Japan + Global, with background news) ---
+      const jpReport = dailyReport?.japan;
+      const glReport = dailyReport?.global;
+
+      // --- 2. Insight News preview (Japan + Global, a few each) ---
+      const pestle = latest?.pestle || {};
+      const translations = aiData?.translations || {};
+      const catKeys = Object.keys(pestle);
+
+      // Collect top 5 latest articles per region
+      let jpArticles = [], glArticles = [];
+      catKeys.forEach(catKey => {
+        const articles = (pestle[catKey]?.articles || []);
+        articles.forEach(a => {
+          a._pestleCat = catKey;
+        });
+        const jaArts = articles.filter(a => a.lang === 'ja').slice(0, 2);
+        const enArts = articles.filter(a => a.lang === 'en').slice(0, 2);
+        jpArticles.push(...jaArts);
+        glArticles.push(...enArts);
+      });
+      jpArticles = jpArticles.sort((a,b) => (b.published_date||'').localeCompare(a.published_date||'')).slice(0, 6);
+      glArticles = glArticles.sort((a,b) => (b.published_date||'').localeCompare(a.published_date||'')).slice(0, 6);
+
+      // --- 3. Latest signals ---
+      const signals = (aiData?.weak_signals || []).slice(0, 3);
+
+      // --- 4. Academic papers (latest 10: 3 shown, 7 folded) ---
+      const allPapers = [];
+      const fields = papers?.by_field || papers?.fields || {};
+      Object.entries(fields).forEach(([field, list]) => {
+        (list || []).forEach(p => { p._field = field; allPapers.push(p); });
+      });
+      allPapers.sort((a,b) => (b.published_date||'').localeCompare(a.published_date||''));
+      const topPapers = allPapers.slice(0, 10);
+
+      // --- Build HTML ---
+      let html = '<div style="display:flex;flex-direction:column;gap:2rem;">';
+
+      // ===== 1. Daily Report =====
+      html += '<div>';
+      html += '<h2 class="section-title" style="margin-bottom:1rem;">日次分析レポート <span style="font-family:var(--font-sans);font-size:0.72rem;font-weight:400;color:var(--text-muted);margin-left:0.5rem;">' + dateStr + '</span></h2>';
+
+      // Japan report
+      if (jpReport) {
+        const jpPreview = (jpReport.report_text || '').substring(0, 300);
+        html += '<details style="margin-bottom:1rem;background:var(--card);border:1px solid var(--border);border-radius:8px;box-shadow:var(--shadow-sm);">' +
+          '<summary style="padding:1rem 1.25rem;cursor:pointer;list-style:none;display:flex;align-items:center;gap:0.5rem;">' +
+            '<span style="color:var(--accent);font-size:0.72rem;">&#9654;</span>' +
+            '<span style="font-weight:600;font-size:0.88rem;">日本メディアの視点</span>' +
+            '<span style="font-size:0.72rem;color:var(--text-muted);margin-left:auto;">' + (jpReport.observations?.length || 0) + '件の観測</span>' +
+          '</summary>' +
+          '<div style="padding:0 1.25rem 1.25rem;">' +
+            '<div style="font-size:0.84rem;line-height:1.75;color:var(--text-secondary);margin-bottom:1rem;">' + escapeHtml(jpPreview) + '...</div>';
+        // Declining/Emerging myths
+        if (jpReport.declining_myths || jpReport.emerging_myths) {
+          html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">';
+          if (jpReport.declining_myths) {
+            html += '<div style="padding:0.75rem;background:var(--cla-1);border-radius:6px;"><div style="font-size:0.68rem;font-weight:600;color:#8B3D2F;margin-bottom:0.3rem;">衰退する神話</div>';
+            jpReport.declining_myths.slice(0,3).forEach(m => { html += '<div style="font-size:0.75rem;line-height:1.5;">- ' + escapeHtml(m) + '</div>'; });
+            html += '</div>';
+          }
+          if (jpReport.emerging_myths) {
+            html += '<div style="padding:0.75rem;background:var(--cla-1);border-radius:6px;"><div style="font-size:0.68rem;font-weight:600;color:#2D7A6B;margin-bottom:0.3rem;">浮上する神話</div>';
+            jpReport.emerging_myths.slice(0,3).forEach(m => { html += '<div style="font-size:0.75rem;line-height:1.5;">- ' + escapeHtml(m) + '</div>'; });
+            html += '</div>';
+          }
+          html += '</div>';
+        }
+        // Full text expandable
+        html += '<details style="margin-top:0.5rem;"><summary style="cursor:pointer;font-size:0.78rem;color:var(--accent);font-weight:500;">全文を読む</summary>' +
+          '<div class="meta-report-body" style="margin-top:0.5rem;">' + renderMarkdown(jpReport.report_text || '') + '</div></details>';
+        html += '</div></details>';
+      }
+
+      // Global report
+      if (glReport) {
+        const glPreview = (glReport.report_text || '').substring(0, 300);
+        html += '<details style="margin-bottom:1rem;background:var(--card);border:1px solid var(--border);border-radius:8px;box-shadow:var(--shadow-sm);">' +
+          '<summary style="padding:1rem 1.25rem;cursor:pointer;list-style:none;display:flex;align-items:center;gap:0.5rem;">' +
+            '<span style="color:var(--accent);font-size:0.72rem;">&#9654;</span>' +
+            '<span style="font-weight:600;font-size:0.88rem;">海外メディアの視点</span>' +
+            '<span style="font-size:0.72rem;color:var(--text-muted);margin-left:auto;">' + (glReport.observations?.length || 0) + '件の観測</span>' +
+          '</summary>' +
+          '<div style="padding:0 1.25rem 1.25rem;">' +
+            '<div style="font-size:0.84rem;line-height:1.75;color:var(--text-secondary);margin-bottom:1rem;">' + escapeHtml(glPreview) + '...</div>';
+        if (glReport.declining_myths || glReport.emerging_myths) {
+          html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">';
+          if (glReport.declining_myths) {
+            html += '<div style="padding:0.75rem;background:var(--cla-1);border-radius:6px;"><div style="font-size:0.68rem;font-weight:600;color:#8B3D2F;margin-bottom:0.3rem;">衰退する神話</div>';
+            glReport.declining_myths.slice(0,3).forEach(m => { html += '<div style="font-size:0.75rem;line-height:1.5;">- ' + escapeHtml(m) + '</div>'; });
+            html += '</div>';
+          }
+          if (glReport.emerging_myths) {
+            html += '<div style="padding:0.75rem;background:var(--cla-1);border-radius:6px;"><div style="font-size:0.68rem;font-weight:600;color:#2D7A6B;margin-bottom:0.3rem;">浮上する神話</div>';
+            glReport.emerging_myths.slice(0,3).forEach(m => { html += '<div style="font-size:0.75rem;line-height:1.5;">- ' + escapeHtml(m) + '</div>'; });
+            html += '</div>';
+          }
+          html += '</div>';
+        }
+        html += '<details style="margin-top:0.5rem;"><summary style="cursor:pointer;font-size:0.78rem;color:var(--accent);font-weight:500;">全文を読む</summary>' +
+          '<div class="meta-report-body" style="margin-top:0.5rem;">' + renderMarkdown(glReport.report_text || '') + '</div></details>';
+        html += '</div></details>';
+      }
+      html += '</div>';
+
+      // ===== 2. Insight News Preview =====
+      html += '<div>';
+      html += '<h2 class="section-title" style="margin-bottom:1rem;">Insight News</h2>';
+      html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">';
+
+      // Japan news
+      html += '<div>';
+      html += '<div style="font-weight:600;font-size:0.82rem;color:var(--accent);margin-bottom:0.5rem;padding-bottom:0.35rem;border-bottom:2px solid var(--accent);">日本メディア</div>';
+      if (jpArticles.length > 0) {
+        jpArticles.forEach(a => {
+          const catInfo = PESTLE_CATS[a._pestleCat] || {};
+          html += '<div style="padding:0.5rem 0;border-bottom:1px solid var(--surface);cursor:pointer;" onclick="window.open(\'' + escapeAttr(a.url) + '\',\'_blank\')">' +
+            '<div style="display:flex;align-items:center;gap:0.4rem;margin-bottom:0.15rem;">' +
+              '<span style="font-size:0.62rem;font-weight:600;color:' + (catInfo.color||'var(--accent)') + ';background:' + (catInfo.color||'var(--accent)') + '15;padding:0.1rem 0.3rem;border-radius:3px;">' + (catInfo.labelJa||a._pestleCat) + '</span>' +
+              '<span style="font-size:0.68rem;color:var(--text-muted);">' + escapeHtml(a.source || '') + '</span>' +
+            '</div>' +
+            '<div style="font-size:0.82rem;font-weight:500;line-height:1.45;">' + escapeHtml(a.title) + '</div>' +
+          '</div>';
+        });
+      } else {
+        html += '<div style="color:var(--text-muted);font-size:0.82rem;">日本語ソースの記事がありません</div>';
+      }
+      html += '<a href="app.html#section-news" style="display:block;margin-top:0.5rem;font-size:0.78rem;font-weight:500;" onclick="showSection(\'section-news\')">もっと見る &rarr;</a>';
+      html += '</div>';
+
+      // Global news
+      html += '<div>';
+      html += '<div style="font-weight:600;font-size:0.82rem;color:var(--accent);margin-bottom:0.5rem;padding-bottom:0.35rem;border-bottom:2px solid var(--accent);">海外メディア</div>';
+      if (glArticles.length > 0) {
+        glArticles.forEach((a, idx) => {
+          const catInfo = PESTLE_CATS[a._pestleCat] || {};
+          // Try to find translation
+          const catTranslations = translations[a._pestleCat] || [];
+          const trans = catTranslations.find(t => t.index === idx);
+          const titleJa = trans?.title_translated || '';
+          html += '<div style="padding:0.5rem 0;border-bottom:1px solid var(--surface);cursor:pointer;" onclick="window.open(\'' + escapeAttr(a.url) + '\',\'_blank\')">' +
+            '<div style="display:flex;align-items:center;gap:0.4rem;margin-bottom:0.15rem;">' +
+              '<span style="font-size:0.62rem;font-weight:600;color:' + (catInfo.color||'var(--accent)') + ';background:' + (catInfo.color||'var(--accent)') + '15;padding:0.1rem 0.3rem;border-radius:3px;">' + (catInfo.labelJa||a._pestleCat) + '</span>' +
+              '<span style="font-size:0.68rem;color:var(--text-muted);">' + escapeHtml(a.source || '') + '</span>' +
+            '</div>' +
+            '<div style="font-size:0.82rem;font-weight:500;line-height:1.45;">' + escapeHtml(a.title) + '</div>' +
+            (titleJa ? '<div style="font-size:0.75rem;color:var(--accent-soft);line-height:1.4;margin-top:0.1rem;">' + escapeHtml(titleJa) + '</div>' : '') +
+          '</div>';
+        });
+      } else {
+        html += '<div style="color:var(--text-muted);font-size:0.82rem;">英語ソースの記事がありません</div>';
+      }
+      html += '<a href="app.html#section-news" style="display:block;margin-top:0.5rem;font-size:0.78rem;font-weight:500;" onclick="showSection(\'section-news\')">もっと見る &rarr;</a>';
+      html += '</div>';
+
+      html += '</div></div>';
+
+      // ===== 3. Latest Signals =====
+      if (signals.length > 0) {
+        html += '<div>';
+        html += '<h2 class="section-title" style="margin-bottom:1rem;">最新シグナル</h2>';
+        signals.forEach(ws => {
+          const impactClass = (ws.potential_impact || '').toLowerCase() === 'high' ? 'ws-badge-high' :
+                              (ws.potential_impact || '').toLowerCase() === 'medium' ? 'ws-badge-medium' : 'ws-badge-low';
+          html += '<div style="padding:0.75rem 1rem;background:var(--card);border:1px solid var(--border);border-radius:8px;margin-bottom:0.5rem;box-shadow:var(--shadow-sm);">' +
+            '<div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.25rem;">' +
+              '<span class="ws-badge ' + impactClass + '">' + escapeHtml(ws.potential_impact || '') + '</span>' +
+              (ws.time_horizon ? '<span class="ws-badge ws-badge-horizon">' + escapeHtml(ws.time_horizon) + '</span>' : '') +
+            '</div>' +
+            '<div style="font-size:0.84rem;line-height:1.6;">' + escapeHtml(ws.description || '') + '</div>' +
+          '</div>';
+        });
+        html += '<a href="app.html#section-signals" style="display:block;margin-top:0.5rem;font-size:0.78rem;font-weight:500;" onclick="showSection(\'section-signals\')">全シグナルを見る &rarr;</a>';
+        html += '</div>';
+      }
+
+      // ===== 4. Academic Papers (3 shown + 7 folded) =====
+      if (topPapers.length > 0) {
+        html += '<div>';
+        html += '<h2 class="section-title" style="margin-bottom:1rem;">学術研究 — 最新の研究成果</h2>';
+        const shownPapers = topPapers.slice(0, 3);
+        const foldedPapers = topPapers.slice(3, 10);
+
+        shownPapers.forEach(p => {
+          html += renderPaperCard(p);
+        });
+
+        if (foldedPapers.length > 0) {
+          html += '<details style="margin-top:0.5rem;">' +
+            '<summary style="cursor:pointer;font-size:0.82rem;font-weight:500;color:var(--accent);padding:0.5rem 0;">残り ' + foldedPapers.length + ' 件を表示</summary>' +
+            '<div style="margin-top:0.5rem;">';
+          foldedPapers.forEach(p => { html += renderPaperCard(p); });
+          html += '</div></details>';
+        }
+
+        html += '<a href="app.html#section-papers" style="display:block;margin-top:0.75rem;font-size:0.78rem;font-weight:500;" onclick="showSection(\'section-papers\')">全分野を見る &rarr;</a>';
+        html += '</div>';
+      }
+
+      // ===== 5. Future Insight text box =====
+      html += '<div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:1.25rem;box-shadow:var(--shadow-sm);">' +
+        '<h2 class="section-title" style="margin-bottom:0.75rem;">未来洞察</h2>' +
+        '<p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:0.75rem;">あなたの問題意識を記述してください。蓄積されたデータから未来洞察の視点で回答します。</p>' +
+        '<form onsubmit="submitHomeForesight(event)" style="display:flex;gap:0.5rem;">' +
+          '<input type="text" id="homeForesightInput" placeholder="例: AI規制と雇用市場の今後3年の見通し..." style="flex:1;padding:0.65rem 0.85rem;border:1px solid var(--border);border-radius:6px;font-size:0.84rem;font-family:var(--font-sans);background:var(--bg);">' +
+          '<button type="submit" class="btn-primary" style="white-space:nowrap;">問いかける</button>' +
+        '</form>' +
+        '<div id="homeForesightResult" style="margin-top:0.75rem;display:none;"></div>' +
+      '</div>';
+
+      html += '</div>';
+      container.innerHTML = html;
+    }
+
+    // Helper: render a paper card for home dashboard
+    function renderPaperCard(p) {
+      const fieldColors = { '自然科学': 'var(--T)', '工学': 'var(--L)', '社会科学': 'var(--S)', '人文学': 'var(--E)', '芸術': 'var(--P)' };
+      const color = fieldColors[p._field] || 'var(--accent)';
+      return '<div style="padding:0.65rem 0;border-bottom:1px solid var(--surface);">' +
+        '<div style="display:flex;align-items:center;gap:0.4rem;margin-bottom:0.15rem;">' +
+          '<span style="font-size:0.62rem;font-weight:600;color:' + color + ';background:' + color + '15;padding:0.1rem 0.3rem;border-radius:3px;">' + escapeHtml(p._field || '') + '</span>' +
+          '<span style="font-size:0.68rem;color:var(--text-muted);">' + escapeHtml(p.source_name || '') + '</span>' +
+          (p.novelty_score ? '<span style="font-size:0.62rem;color:var(--accent-warm);margin-left:auto;">Novelty: ' + p.novelty_score + '</span>' : '') +
+        '</div>' +
+        '<div style="font-size:0.84rem;font-weight:500;line-height:1.45;">' + escapeHtml(p.title_ja || p.title || '') + '</div>' +
+        (p.title_ja && p.title ? '<div style="font-size:0.72rem;color:var(--text-muted);line-height:1.35;margin-top:0.1rem;">' + escapeHtml(p.title) + '</div>' : '') +
+        '<div style="font-size:0.72rem;color:var(--text-muted);margin-top:0.1rem;">' + escapeHtml(p.authors || '') + '</div>' +
+      '</div>';
+    }
+
+    // Home foresight submission
+    window.submitHomeForesight = function(e) {
+      e.preventDefault();
+      const input = document.getElementById('homeForesightInput');
+      const question = input.value.trim();
+      if (!question) return;
+      const result = document.getElementById('homeForesightResult');
+      result.style.display = 'block';
+      result.innerHTML = '<div style="font-size:0.82rem;color:var(--text-secondary);padding:0.75rem;background:var(--surface);border-radius:6px;">問いかけを受け付けました。未来洞察タブで回答をご確認ください。</div>';
+      // Navigate to foresight tab with the question
+      document.getElementById('insightText').value = question;
+      input.value = '';
+    };
+
+    // ==========================================================
+    // RENDER: DAILY REPORT (kept for report-archive use)
     // ==========================================================
     function renderDailyReport(data) {
       const container = document.getElementById('dailyReportContent');
@@ -2721,8 +2969,8 @@
     // ==========================================================
     // SECTION ROUTING (each tab = separate URL)
     // ==========================================================
-    const VALID_SECTIONS = ['section-report', 'section-news', 'section-cla', 'section-signals', 'section-papers', 'section-foresight', 'section-media', 'section-reports', 'section-bookmarks'];
-    const DEFAULT_SECTION = 'section-report';
+    const VALID_SECTIONS = ['section-home', 'section-news', 'section-cla', 'section-signals', 'section-papers', 'section-foresight', 'section-media', 'section-reports', 'section-bookmarks'];
+    const DEFAULT_SECTION = 'section-home';
 
     function showSection(sectionId) {
       if (!VALID_SECTIONS.includes(sectionId)) sectionId = DEFAULT_SECTION;
