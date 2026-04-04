@@ -1391,10 +1391,11 @@
           <li><a href="app.html#section-report" data-nav="section-report">日次レポート</a></li>
           <li><a href="app.html#section-news" data-nav="section-news">Insight News</a></li>
           <li><a href="app.html#section-cla" data-nav="section-cla">因果階層分析</a></li>
+          <li><a href="app.html#section-signals" data-nav="section-signals">シグナル</a></li>
           <li><a href="app.html#section-papers" data-nav="section-papers">学術研究</a></li>
           <li><a href="app.html#section-foresight" data-nav="section-foresight">未来洞察</a></li>
           <li><a href="app.html#section-media" data-nav="section-media">メディア</a></li>
-          <li><a href="reports.html" data-nav="reports">レポート一覧</a></li>
+          <li><a href="app.html#section-reports" data-nav="section-reports">レポート一覧</a></li>
           <li><a href="app.html#section-bookmarks" data-nav="section-bookmarks" id="navBookmarks">ブックマーク <span id="bookmarkCount" style="font-size:0.65rem;background:var(--accent);color:#fff;padding:0 0.35rem;border-radius:8px;margin-left:0.2rem;">0</span></a></li>
         </ul>
       </div>
@@ -1452,7 +1453,7 @@
       </div>
     </section>
 
-    <!-- Section 3: CLA Analysis (Summary) -->
+    <!-- Section 3: CLA Analysis (Summary + Archive) -->
     <section class="section app-section" id="section-cla" style="display:none;">
       <div class="section-header">
         <h2 class="section-title">因果階層分析</h2>
@@ -1462,6 +1463,55 @@
         <div class="loading-indicator">
           <div class="loading-spinner"></div>
           <div>CLA分析を読み込み中...</div>
+        </div>
+      </div>
+
+      <!-- CLA Archive (embedded from cla.html) -->
+      <div id="claArchive" style="margin-top:2rem;">
+        <h3 style="font-family:var(--font-serif);font-size:1.1rem;margin-bottom:1rem;padding-top:1.5rem;border-top:1px solid var(--border);">CLA アーカイブ</h3>
+
+        <!-- Meta Analysis (collapsed) -->
+        <details class="cla-archive-details" style="margin-bottom:1rem;">
+          <summary style="cursor:pointer;font-weight:500;color:var(--accent);padding:0.75rem 1rem;background:var(--surface);border-radius:8px;list-style:none;display:flex;align-items:center;gap:0.5rem;">
+            <span style="transition:transform 0.2s;display:inline-block;">&#9654;</span> メタ分析レポート
+          </summary>
+          <div id="claMetaContent" style="padding:1rem;background:var(--card);border:1px solid var(--border);border-top:none;border-radius:0 0 8px 8px;max-height:600px;overflow-y:auto;">
+            <div class="loading-indicator"><div class="loading-spinner"></div><div>読み込み中...</div></div>
+          </div>
+        </details>
+
+        <!-- Yearly + Quarterly CLA timeline -->
+        <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+          <!-- Yearly 1990-2020 -->
+          <div style="flex:1;min-width:300px;">
+            <h4 style="font-size:0.85rem;font-weight:500;color:var(--text-secondary);margin-bottom:0.5rem;">年次 CLA（1990-2020）</h4>
+            <div id="claYearlyTimeline" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:0.75rem;"></div>
+            <div id="claYearlyDetail" style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:1rem;min-height:200px;">
+              <div style="color:var(--text-muted);font-size:0.82rem;">年を選択してください</div>
+            </div>
+          </div>
+          <!-- Quarterly 2021-2026 -->
+          <div style="flex:1;min-width:300px;">
+            <h4 style="font-size:0.85rem;font-weight:500;color:var(--text-secondary);margin-bottom:0.5rem;">四半期 CLA（2021-2026）</h4>
+            <div id="claQuarterlyTimeline" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:0.75rem;"></div>
+            <div id="claQuarterlyDetail" style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:1rem;min-height:200px;">
+              <div style="color:var(--text-muted);font-size:0.82rem;">四半期を選択してください</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 3.5: Weak Signals (separate tab) -->
+    <section class="section app-section" id="section-signals" style="display:none;">
+      <div class="section-header">
+        <h2 class="section-title">弱いシグナル</h2>
+        <span class="section-subtitle">Weak Signals</span>
+      </div>
+      <div id="signalsContent">
+        <div class="loading-indicator">
+          <div class="loading-spinner"></div>
+          <div>シグナルを読み込み中...</div>
         </div>
       </div>
     </section>
@@ -1513,6 +1563,29 @@
       </div>
     </section>
 
+    <!-- Section: Report Archive (inline, not separate page) -->
+    <section class="section app-section" id="section-reports" style="display:none;">
+      <div class="section-header">
+        <h2 class="section-title">レポート一覧</h2>
+        <span class="section-subtitle">Daily Report Archive</span>
+      </div>
+      <div id="reportsArchiveContent">
+        <div class="loading-indicator">
+          <div class="loading-spinner"></div>
+          <div>レポートを読み込み中...</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section: Bookmarks -->
+    <section class="section app-section" id="section-bookmarks" style="display:none;">
+      <div class="section-header">
+        <h2 class="section-title">ブックマーク</h2>
+        <span class="section-subtitle" id="bookmarksSub"></span>
+      </div>
+      <div id="bookmarksContent"></div>
+    </section>
+
   </main>
 
   <!-- ============================================================
@@ -1543,8 +1616,8 @@
             <li><a href="app.html#section-report">日次レポート</a></li>
             <li><a href="app.html#section-news">Insight News</a></li>
             <li><a href="app.html#section-cla">因果階層分析</a></li>
+            <li><a href="app.html#section-signals">シグナル</a></li>
             <li><a href="app.html#section-papers">学術研究</a></li>
-            <li><a href="cla.html">CLA分析 全体版</a></li>
           </ul>
         </div>
         <div>
@@ -1659,8 +1732,10 @@
       renderDailyReport(dailyReport);
       renderPESTLE(latest, aiAnalysis);
       renderCLASummary(aiAnalysis);
+      renderSignals(aiAnalysis);
       renderPapers(papers);
       renderMediaSources(mediaSources);
+      renderReportsArchive(dailyReport);
       updateBookmarkUI();
     }
 
@@ -2048,61 +2123,12 @@
         <div id="claTabContent">
           ${renderCLATabContent('Overall', cla)}
         </div>
-        <div style="margin-top:1.25rem;">
-          <a href="cla.html" class="cla-link-full">CLA分析の全体を見る &rarr;</a>
-        </div>
       `;
 
-      // Weak signals section — collapsed by default
-      if (weakSignals.length > 0) {
-        html += `
-          <div style="margin-top:2.5rem;">
-            <div style="display:flex;align-items:center;gap:0.75rem;cursor:pointer;margin-bottom:1rem;" onclick="toggleWeakSignals()">
-              <h3 style="font-family:var(--font-serif);font-size:1.1rem;font-weight:700;color:var(--text);position:relative;padding-bottom:0.4rem;margin:0;">
-                弱いシグナル (${weakSignals.length}件)
-                <span style="position:absolute;left:0;bottom:0;width:2.5rem;height:3px;background:var(--accent);"></span>
-              </h3>
-              <span id="wsChevron" style="font-size:0.72rem;color:var(--text-muted);transition:transform 0.2s;">&#9654;</span>
-            </div>
-            <div id="weakSignalsContainer" style="display:none;">
-            <div class="weak-signals-grid">
-              ${weakSignals.map((ws, i) => {
-                const impactClass = (ws.potential_impact || '').toLowerCase() === 'high' ? 'ws-badge-high' :
-                                    (ws.potential_impact || '').toLowerCase() === 'medium' ? 'ws-badge-medium' : 'ws-badge-low';
-                const cats = (ws.pestle_categories || []).join(', ');
-                const wsBookmarkId = `signal-${i}`;
-                const wsIsBookmarked = bookmarks.some(b => b.id === wsBookmarkId);
-                return `
-                  <div class="ws-card" id="ws-card-${i}">
-                    <div class="ws-card-header" onclick="toggleWSCard(${i})">
-                      <div class="ws-card-title">${escapeHtml(ws.description ? ws.description.substring(0, 100) : '')}</div>
-                      <div class="ws-card-badges">
-                        <span class="ws-badge ${impactClass}">${escapeHtml(ws.potential_impact || 'N/A')}</span>
-                        ${ws.time_horizon ? `<span class="ws-badge ws-badge-horizon">${escapeHtml(ws.time_horizon)}</span>` : ''}
-                        <button class="bookmark-btn ${wsIsBookmarked ? 'bookmarked' : ''}" onclick="event.stopPropagation();toggleBookmark('${wsBookmarkId}','${escapeAttr(ws.signal || ws.description || '')}','',this)" title="ブックマーク" style="font-size:0.78rem;">&#9734;</button>
-                      </div>
-                      <span class="ws-card-chevron">&#9654;</span>
-                    </div>
-                    <div class="ws-card-body">
-                      <div class="ws-label">詳細</div>
-                      <div>${escapeHtml(ws.description || '')}</div>
-                      ${cats ? `<div class="ws-label">関連カテゴリ</div><div>${escapeHtml(cats)}</div>` : ''}
-                      ${ws.related_headlines && ws.related_headlines.length > 0 ? `
-                        <div class="ws-label">関連ヘッドライン</div>
-                        <ul>${ws.related_headlines.map(h => `<li>${escapeHtml(h)}</li>`).join('')}</ul>
-                      ` : ''}
-                      ${ws.counter_trend ? `<div class="ws-label">カウンタートレンド</div><div>${escapeHtml(ws.counter_trend)}</div>` : ''}
-                    </div>
-                  </div>
-                `;
-              }).join('')}
-            </div>
-            </div>
-          </div>
-        `;
-      }
-
       container.innerHTML = html;
+
+      // Load CLA archive data (yearly + quarterly + meta)
+      loadCLAArchive();
     }
 
     // CLA tab rendering
@@ -2182,6 +2208,199 @@
       const card = document.getElementById(`ws-card-${index}`);
       if (card) card.classList.toggle('open');
     };
+
+    // ==========================================================
+    // RENDER: SIGNALS (Separate section)
+    // ==========================================================
+    function renderSignals(aiData) {
+      const container = document.getElementById('signalsContent');
+      const weakSignals = aiData?.weak_signals || [];
+      if (weakSignals.length === 0) {
+        container.innerHTML = '<p style="color:var(--text-muted);">現在検出されているシグナルはありません。</p>';
+        return;
+      }
+      container.innerHTML = `
+        <p style="color:var(--text-secondary);font-size:0.84rem;margin-bottom:1.25rem;">
+          PESTLEニュースと学術論文の分析から検出された変化の兆し。各カードをクリックして詳細を展開できます。
+        </p>
+        <div class="weak-signals-grid">
+          ${weakSignals.map((ws, i) => {
+            const impactClass = (ws.potential_impact || '').toLowerCase() === 'high' ? 'ws-badge-high' :
+                                (ws.potential_impact || '').toLowerCase() === 'medium' ? 'ws-badge-medium' : 'ws-badge-low';
+            const cats = (ws.pestle_categories || []).join(', ');
+            const wsBookmarkId = 'signal-' + i;
+            const wsIsBookmarked = bookmarks.some(b => b.id === wsBookmarkId);
+            return '<div class="ws-card" id="ws-card-' + i + '">' +
+              '<div class="ws-card-header" onclick="toggleWSCard(' + i + ')">' +
+                '<div class="ws-card-title">' + escapeHtml(ws.description ? ws.description.substring(0, 120) : '') + '</div>' +
+                '<div class="ws-card-badges">' +
+                  '<span class="ws-badge ' + impactClass + '">' + escapeHtml(ws.potential_impact || 'N/A') + '</span>' +
+                  (ws.time_horizon ? '<span class="ws-badge ws-badge-horizon">' + escapeHtml(ws.time_horizon) + '</span>' : '') +
+                  '<button class="bookmark-btn ' + (wsIsBookmarked ? 'bookmarked' : '') + '" onclick="event.stopPropagation();toggleBookmark(\'' + wsBookmarkId + '\',\'' + escapeAttr(ws.description || '') + '\',\\'\\',this)" title="ブックマーク" style="font-size:0.78rem;">&#9734;</button>' +
+                '</div>' +
+                '<span class="ws-card-chevron">&#9654;</span>' +
+              '</div>' +
+              '<div class="ws-card-body">' +
+                '<div class="ws-label">詳細</div><div>' + escapeHtml(ws.description || '') + '</div>' +
+                (cats ? '<div class="ws-label">関連カテゴリ</div><div>' + escapeHtml(cats) + '</div>' : '') +
+                (ws.related_headlines && ws.related_headlines.length > 0 ?
+                  '<div class="ws-label">関連ヘッドライン</div><ul>' + ws.related_headlines.map(h => '<li>' + escapeHtml(h) + '</li>').join('') + '</ul>' : '') +
+                (ws.counter_trend ? '<div class="ws-label">カウンタートレンド</div><div>' + escapeHtml(ws.counter_trend) + '</div>' : '') +
+              '</div>' +
+            '</div>';
+          }).join('')}
+        </div>
+      `;
+    }
+
+    // ==========================================================
+    // CLA ARCHIVE (Yearly + Quarterly + Meta — embedded)
+    // ==========================================================
+    async function loadCLAArchive() {
+      try {
+        const v = Date.now();
+        const [yearlyData, quarterlyData, metaData] = await Promise.all([
+          fetch(DATA_BASE + '/cla_historical_yearly.json?v=' + v).then(r => r.ok ? r.json() : null).catch(() => null),
+          fetch(DATA_BASE + '/cla_historical_quarterly.json?v=' + v).then(r => r.ok ? r.json() : null).catch(() => null),
+          fetch(DATA_BASE + '/cla_meta_report.json?v=' + v).then(r => r.ok ? r.json() : null).catch(() => null),
+        ]);
+
+        // Meta report
+        if (metaData) {
+          const region = metaData[currentRegion] || metaData.japan || metaData.global;
+          const metaContainer = document.getElementById('claMetaContent');
+          if (region && region.report_text) {
+            metaContainer.innerHTML = '<div class="meta-report-body">' + renderMarkdown(region.report_text) + '</div>';
+          } else {
+            metaContainer.innerHTML = '<p style="color:var(--text-muted);">メタ分析データがありません。</p>';
+          }
+        }
+
+        // Yearly timeline
+        if (yearlyData && yearlyData.entries) {
+          const timelineEl = document.getElementById('claYearlyTimeline');
+          timelineEl.innerHTML = yearlyData.entries.map(e =>
+            '<button onclick="showCLADetail(\'yearly\',\'' + e.period + '\')" style="padding:0.25rem 0.5rem;font-size:0.7rem;border:1px solid var(--border);background:var(--card);color:var(--text-secondary);border-radius:4px;cursor:pointer;font-family:var(--font-sans);" class="cla-period-btn">' + e.period + '</button>'
+          ).join('');
+          window._claYearly = yearlyData.entries;
+        }
+
+        // Quarterly timeline
+        if (quarterlyData && quarterlyData.entries) {
+          const timelineEl = document.getElementById('claQuarterlyTimeline');
+          timelineEl.innerHTML = quarterlyData.entries.map(e =>
+            '<button onclick="showCLADetail(\'quarterly\',\'' + e.period + '\')" style="padding:0.25rem 0.5rem;font-size:0.7rem;border:1px solid var(--border);background:var(--card);color:var(--text-secondary);border-radius:4px;cursor:pointer;font-family:var(--font-sans);" class="cla-period-btn">' + e.period + '</button>'
+          ).join('');
+          window._claQuarterly = quarterlyData.entries;
+        }
+      } catch (e) {
+        console.error('CLA archive load error:', e);
+      }
+    }
+
+    window.showCLADetail = function(type, period) {
+      const entries = type === 'yearly' ? window._claYearly : window._claQuarterly;
+      const detailEl = document.getElementById(type === 'yearly' ? 'claYearlyDetail' : 'claQuarterlyDetail');
+      if (!entries || !detailEl) return;
+
+      const entry = entries.find(e => e.period === period);
+      if (!entry || !entry.categories) {
+        detailEl.innerHTML = '<p style="color:var(--text-muted);">データがありません。</p>';
+        return;
+      }
+
+      // Highlight active button
+      detailEl.parentElement.querySelectorAll('.cla-period-btn').forEach(btn => {
+        btn.style.background = btn.textContent === period ? 'var(--accent)' : 'var(--card)';
+        btn.style.color = btn.textContent === period ? '#fff' : 'var(--text-secondary)';
+      });
+
+      let html = '';
+      for (const [catKey, catData] of Object.entries(entry.categories)) {
+        const info = PESTLE_CATS[catKey] || { labelJa: catKey, color: 'var(--accent)' };
+        html += '<div style="margin-bottom:1rem;">' +
+          '<div style="font-weight:600;font-size:0.82rem;color:' + info.color + ';margin-bottom:0.4rem;">' + info.labelJa + '</div>';
+        CLA_LAYERS.forEach(layer => {
+          if (catData[layer.key]) {
+            html += '<div style="background:var(--cla-' + layer.depth + ');padding:0.5rem 0.75rem;margin-bottom:2px;border-radius:4px;">' +
+              '<span style="font-size:0.68rem;font-weight:600;color:var(--text-muted);">' + layer.labelJa + '</span>' +
+              '<div style="font-size:0.78rem;line-height:1.6;margin-top:0.15rem;">' + escapeHtml(catData[layer.key]) + '</div>' +
+            '</div>';
+          }
+        });
+        html += '</div>';
+      }
+      if (entry.cross_category_synthesis) {
+        html += '<div style="background:var(--highlight-bg);padding:0.75rem;border-radius:6px;margin-top:0.5rem;">' +
+          '<div style="font-size:0.72rem;font-weight:600;color:var(--accent);margin-bottom:0.25rem;">カテゴリ横断統合</div>' +
+          '<div style="font-size:0.82rem;line-height:1.65;">' + escapeHtml(entry.cross_category_synthesis) + '</div>' +
+        '</div>';
+      }
+      detailEl.innerHTML = html;
+    };
+
+    // ==========================================================
+    // RENDER: REPORTS ARCHIVE (inline section)
+    // ==========================================================
+    function renderReportsArchive(dailyReport) {
+      const container = document.getElementById('reportsArchiveContent');
+      if (!dailyReport) {
+        container.innerHTML = '<p style="color:var(--text-muted);">レポートデータがありません。</p>';
+        return;
+      }
+
+      const region = dailyReport[currentRegion] || dailyReport.japan || dailyReport.global;
+      if (!region) {
+        container.innerHTML = '<p style="color:var(--text-muted);">この地域のレポートはまだ生成されていません。</p>';
+        return;
+      }
+
+      const dateStr = dailyReport.generated_at ? dailyReport.generated_at.split('T')[0] : '';
+      const preview = (region.report_text || '').substring(0, 200) + '...';
+
+      let html = '<div style="display:flex;flex-direction:column;gap:1rem;">';
+      // Current report card
+      html += '<div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:1.25rem;box-shadow:var(--shadow-sm);">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.75rem;">' +
+          '<div style="font-family:var(--font-serif);font-weight:700;font-size:1rem;">' + dateStr + ' レポート</div>' +
+          '<span style="font-size:0.72rem;color:var(--text-muted);">' + (currentRegion === 'japan' ? '日本版' : 'グローバル版') + '</span>' +
+        '</div>' +
+        '<div style="font-size:0.82rem;color:var(--text-secondary);line-height:1.6;margin-bottom:0.75rem;">' + escapeHtml(preview) + '</div>';
+
+      // Observations
+      if (region.observations && region.observations.length > 0) {
+        html += '<div style="margin-bottom:0.75rem;"><div style="font-size:0.72rem;font-weight:600;color:var(--accent);margin-bottom:0.35rem;">観測</div>';
+        region.observations.forEach(o => {
+          html += '<div style="font-size:0.78rem;line-height:1.55;padding:0.35rem 0;border-bottom:1px solid var(--surface);">[' + escapeHtml(o.category) + '] ' + escapeHtml(o.observation) + '</div>';
+        });
+        html += '</div>';
+      }
+
+      // Myths
+      if (region.declining_myths || region.emerging_myths) {
+        html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">';
+        if (region.declining_myths) {
+          html += '<div><div style="font-size:0.72rem;font-weight:600;color:#8B3D2F;margin-bottom:0.3rem;">衰退する神話</div>';
+          region.declining_myths.forEach(m => { html += '<div style="font-size:0.78rem;line-height:1.5;padding:0.2rem 0;">- ' + escapeHtml(m) + '</div>'; });
+          html += '</div>';
+        }
+        if (region.emerging_myths) {
+          html += '<div><div style="font-size:0.72rem;font-weight:600;color:#2D7A6B;margin-bottom:0.3rem;">浮上する神話</div>';
+          region.emerging_myths.forEach(m => { html += '<div style="font-size:0.78rem;line-height:1.5;padding:0.2rem 0;">- ' + escapeHtml(m) + '</div>'; });
+          html += '</div>';
+        }
+        html += '</div>';
+      }
+
+      // Full text (expandable)
+      html += '<details style="margin-top:0.75rem;">' +
+        '<summary style="cursor:pointer;font-size:0.82rem;font-weight:500;color:var(--accent);">全文を読む</summary>' +
+        '<div class="meta-report-body" style="margin-top:0.75rem;">' + renderMarkdown(region.report_text || '') + '</div>' +
+      '</details>';
+
+      html += '</div></div>';
+      container.innerHTML = html;
+    }
 
     // ==========================================================
     // RENDER: ACADEMIC PAPERS (Collapsible accordion)
@@ -2502,7 +2721,7 @@
     // ==========================================================
     // SECTION ROUTING (each tab = separate URL)
     // ==========================================================
-    const VALID_SECTIONS = ['section-report', 'section-news', 'section-cla', 'section-papers', 'section-foresight', 'section-media', 'section-bookmarks'];
+    const VALID_SECTIONS = ['section-report', 'section-news', 'section-cla', 'section-signals', 'section-papers', 'section-foresight', 'section-media', 'section-reports', 'section-bookmarks'];
     const DEFAULT_SECTION = 'section-report';
 
     function showSection(sectionId) {
