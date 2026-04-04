@@ -590,10 +590,16 @@
     /* ============================================================
        RESPONSIVE
        ============================================================ */
+    .cla-main-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+    }
+
     @media (max-width: 1024px) {
       .cla-categories { grid-template-columns: 1fr 1fr; }
       .footer-grid { grid-template-columns: 1fr 1fr; }
-      #claMainGrid { grid-template-columns: 1fr !important; }
+      .cla-main-grid { grid-template-columns: 1fr; }
     }
 
     @media (max-width: 768px) {
@@ -681,7 +687,7 @@
       <!-- CLA Timeline: Yearly + Quarterly side by side -->
       <div class="section">
         <h2 class="section-title" id="claTabTitle">因果階層分析</h2>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;" id="claMainGrid">
+        <div class="cla-main-grid" id="claMainGrid">
           <!-- Yearly CLA -->
           <div>
             <h3 style="font-family:var(--font-serif);font-size:1.05rem;font-weight:700;margin-bottom:0.75rem;">年次 CLA (1990-2020)</h3>
@@ -796,19 +802,19 @@
         // Headings
         if (line.startsWith('### ')) {
           if (inList) { result.push('</ul>'); inList = false; }
-          result.push('<h3>' + line.slice(4) + '</h3>');
+          result.push('<h3>' + escHtml(line.slice(4)) + '</h3>');
           continue;
         }
         if (line.startsWith('## ')) {
           if (inList) { result.push('</ul>'); inList = false; }
-          result.push('<h2>' + line.slice(3) + '</h2>');
+          result.push('<h2>' + escHtml(line.slice(3)) + '</h2>');
           continue;
         }
 
         // List items
         if (/^[-*]\s/.test(line.trim())) {
           if (!inList) { result.push('<ul>'); inList = true; }
-          result.push('<li>' + line.trim().slice(2) + '</li>');
+          result.push('<li>' + escHtml(line.trim().slice(2)) + '</li>');
           continue;
         }
 
@@ -821,7 +827,7 @@
           continue;
         }
 
-        result.push(line);
+        result.push(escHtml(line));
       }
       if (inList) result.push('</ul>');
 
@@ -1104,9 +1110,8 @@
     }
 
     // --- Init ---
-    loadData();
-
-    // Handle URL hash for tab selection
+    // initTabFromHash sets currentCatFilter and updates tab UI.
+    // Actual CLA rendering happens after loadData resolves via buildTimelineBar auto-select.
     function initTabFromHash() {
       const hash = (location.hash || '').replace('#', '');
       const validTabs = ['overall', 'Political', 'Economic', 'Social', 'Technological', 'Legal', 'Environmental'];
@@ -1116,6 +1121,7 @@
     }
     initTabFromHash();
     window.addEventListener('hashchange', initTabFromHash);
+    loadData();
 
   })();
   </script>
