@@ -593,6 +593,7 @@
     @media (max-width: 1024px) {
       .cla-categories { grid-template-columns: 1fr 1fr; }
       .footer-grid { grid-template-columns: 1fr 1fr; }
+      #claMainGrid { grid-template-columns: 1fr !important; }
     }
 
     @media (max-width: 768px) {
@@ -637,9 +638,13 @@
     <nav class="section-nav">
       <div class="container">
         <ul>
-          <li><a class="active" data-section="meta-report">Meta Report</a></li>
-          <li><a data-section="yearly-cla">Yearly CLA (1990-2020)</a></li>
-          <li><a data-section="quarterly-cla">Quarterly CLA (2021-2026)</a></li>
+          <li><a href="#overall" class="active" data-tab="overall">全体</a></li>
+          <li><a href="#Political" data-tab="Political">政治</a></li>
+          <li><a href="#Economic" data-tab="Economic">経済</a></li>
+          <li><a href="#Social" data-tab="Social">社会</a></li>
+          <li><a href="#Technological" data-tab="Technological">技術</a></li>
+          <li><a href="#Legal" data-tab="Legal">法律</a></li>
+          <li><a href="#Environmental" data-tab="Environmental">環境</a></li>
         </ul>
       </div>
     </nav>
@@ -647,59 +652,62 @@
 
   <!-- MAIN CONTENT -->
   <main>
+    <div class="container">
 
-    <!-- SECTION 1: META REPORT -->
-    <section class="section" id="meta-report">
-      <div class="container">
-        <h2 class="section-title">Meta Report</h2>
-
-        <div id="metaReportContent" class="meta-report-content">
-          <div class="loading-indicator">
-            <div class="loading-spinner"></div>
-            <div>Loading meta report...</div>
+      <!-- Meta Report (collapsible) -->
+      <div class="section" style="border-top:none;padding-top:0;">
+        <div style="display:flex;align-items:center;gap:0.75rem;cursor:pointer;margin-bottom:1rem;" onclick="toggleMetaSection()">
+          <h2 class="section-title" style="margin-bottom:0;">メタ分析レポート</h2>
+          <span id="metaChevron" style="font-size:0.72rem;color:var(--text-muted);transition:transform 0.2s;">&#9654;</span>
+        </div>
+        <div id="metaReportSection" style="display:none;">
+          <div id="metaReportContent" class="meta-report-content">
+            <div class="loading-indicator">
+              <div class="loading-spinner"></div>
+              <div>Loading meta report...</div>
+            </div>
           </div>
-        </div>
-
-        <div class="timeline-container" id="paradigmShiftsContainer" style="display:none;">
-          <h3 class="timeline-subtitle">Paradigm Shifts</h3>
-          <div class="paradigm-timeline" id="paradigmTimeline"></div>
-        </div>
-
-        <div class="timeline-container" id="mythTimelineContainer" style="display:none;">
-          <h3 class="timeline-subtitle">Myth Timeline</h3>
-          <div class="myth-timeline" id="mythTimeline"></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- SECTION 2: YEARLY CLA -->
-    <section class="section" id="yearly-cla" style="display:none;">
-      <div class="container">
-        <h2 class="section-title">Yearly CLA (1990-2020)</h2>
-        <div class="timeline-bar" id="yearlyTimelineBar"></div>
-        <div id="yearlyDisplay">
-          <div class="loading-indicator">
-            <div class="loading-spinner"></div>
-            <div>Loading yearly CLA data...</div>
+          <div class="timeline-container" id="paradigmShiftsContainer" style="display:none;">
+            <h3 class="timeline-subtitle">Paradigm Shifts</h3>
+            <div class="paradigm-timeline" id="paradigmTimeline"></div>
+          </div>
+          <div class="timeline-container" id="mythTimelineContainer" style="display:none;">
+            <h3 class="timeline-subtitle">Myth Timeline</h3>
+            <div class="myth-timeline" id="mythTimeline"></div>
           </div>
         </div>
       </div>
-    </section>
 
-    <!-- SECTION 3: QUARTERLY CLA -->
-    <section class="section" id="quarterly-cla" style="display:none;">
-      <div class="container">
-        <h2 class="section-title">Quarterly CLA (2021-2026)</h2>
-        <div class="timeline-bar" id="quarterlyTimelineBar"></div>
-        <div id="quarterlyDisplay">
-          <div class="loading-indicator">
-            <div class="loading-spinner"></div>
-            <div>Loading quarterly CLA data...</div>
+      <!-- CLA Timeline: Yearly + Quarterly side by side -->
+      <div class="section">
+        <h2 class="section-title" id="claTabTitle">因果階層分析</h2>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;" id="claMainGrid">
+          <!-- Yearly CLA -->
+          <div>
+            <h3 style="font-family:var(--font-serif);font-size:1.05rem;font-weight:700;margin-bottom:0.75rem;">年次 CLA (1990-2020)</h3>
+            <div class="timeline-bar" id="yearlyTimelineBar"></div>
+            <div id="yearlyDisplay">
+              <div class="loading-indicator">
+                <div class="loading-spinner"></div>
+                <div>Loading...</div>
+              </div>
+            </div>
+          </div>
+          <!-- Quarterly CLA -->
+          <div>
+            <h3 style="font-family:var(--font-serif);font-size:1.05rem;font-weight:700;margin-bottom:0.75rem;">四半期 CLA (2021-2026)</h3>
+            <div class="timeline-bar" id="quarterlyTimelineBar"></div>
+            <div id="quarterlyDisplay">
+              <div class="loading-indicator">
+                <div class="loading-spinner"></div>
+                <div>Loading...</div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    </section>
 
+    </div>
   </main>
 
   <!-- FOOTER -->
@@ -830,23 +838,44 @@
       return html;
     }
 
-    // --- Section navigation ---
-    function showSection(sectionId) {
-      document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
-      const target = document.getElementById(sectionId);
-      if (target) target.style.display = 'block';
+    // --- Category filter (tab-based via URL hash) ---
+    let currentCatFilter = 'overall'; // 'overall' or PESTLE key
 
+    function switchTab(tabKey) {
+      currentCatFilter = tabKey;
       document.querySelectorAll('.section-nav a').forEach(a => {
-        a.classList.toggle('active', a.dataset.section === sectionId);
+        a.classList.toggle('active', a.dataset.tab === tabKey);
       });
+      history.replaceState(null, '', '#' + tabKey);
+      // Update title
+      const titleEl = document.getElementById('claTabTitle');
+      if (tabKey === 'overall') {
+        titleEl.textContent = '因果階層分析 - 全体';
+      } else {
+        const info = PESTLE_MAP[tabKey];
+        titleEl.textContent = `因果階層分析 - ${info ? info.nameJa : tabKey}`;
+      }
+      // Re-render current selections
+      if (selectedYear) renderClaEntry(yearlyData, selectedYear, 'yearlyDisplay');
+      if (selectedQuarter) renderClaEntry(quarterlyData, selectedQuarter, 'quarterlyDisplay');
     }
 
-    document.querySelectorAll('[data-section]').forEach(el => {
+    // Tab click handlers
+    document.querySelectorAll('.section-nav a[data-tab]').forEach(el => {
       el.addEventListener('click', function(e) {
         e.preventDefault();
-        showSection(this.dataset.section);
+        switchTab(this.dataset.tab);
       });
     });
+
+    // Toggle meta section
+    window.toggleMetaSection = function() {
+      const section = document.getElementById('metaReportSection');
+      const chevron = document.getElementById('metaChevron');
+      const isHidden = section.style.display === 'none';
+      section.style.display = isHidden ? 'block' : 'none';
+      chevron.style.transform = isHidden ? 'rotate(90deg)' : 'rotate(0deg)';
+    };
 
     // --- Region toggle ---
     document.querySelectorAll('.region-toggle button').forEach(btn => {
@@ -985,10 +1014,14 @@
         html += '</div>';
       }
 
-      // Category cards
+      // Category cards — filter by current tab
       html += '<div class="cla-categories">';
       if (categories) {
-        for (const [catKey, catData] of Object.entries(categories)) {
+        const filteredEntries = currentCatFilter === 'overall'
+          ? Object.entries(categories)
+          : Object.entries(categories).filter(([k]) => k === currentCatFilter);
+
+        for (const [catKey, catData] of filteredEntries) {
           const pestleInfo = PESTLE_MAP[catKey] || { label: catKey, badge: catKey.charAt(0), nameJa: catKey };
 
           html += '<div class="cla-category-card">';
@@ -1072,6 +1105,17 @@
 
     // --- Init ---
     loadData();
+
+    // Handle URL hash for tab selection
+    function initTabFromHash() {
+      const hash = (location.hash || '').replace('#', '');
+      const validTabs = ['overall', 'Political', 'Economic', 'Social', 'Technological', 'Legal', 'Environmental'];
+      if (hash && validTabs.includes(hash)) {
+        switchTab(hash);
+      }
+    }
+    initTabFromHash();
+    window.addEventListener('hashchange', initTabFromHash);
 
   })();
   </script>

@@ -1392,7 +1392,6 @@
           <li><a href="#pestle-news" data-nav="pestle-news">Insight News</a></li>
           <li><a href="#cla-analysis" data-nav="cla-analysis">因果階層分析</a></li>
           <li><a href="#academic-papers" data-nav="academic-papers">学術研究</a></li>
-          <li><a href="#meta-report" data-nav="meta-report">メタ分析</a></li>
           <li><a href="#insight-form" data-nav="insight-form">未来洞察</a></li>
           <li><a href="#media-sources" data-nav="media-sources">メディア</a></li>
           <li><a href="reports.html" data-nav="reports">レポート一覧</a></li>
@@ -1479,21 +1478,7 @@
       </div>
     </section>
 
-    <!-- Section 5: Meta Report -->
-    <section class="section" id="meta-report">
-      <div class="section-header">
-        <h2 class="section-title">メタ分析</h2>
-        <span class="section-subtitle">横断的深層分析レポート</span>
-      </div>
-      <div id="metaReportContent">
-        <div class="loading-indicator">
-          <div class="loading-spinner"></div>
-          <div>メタ分析を読み込み中...</div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Section 6: Insight Form -->
+    <!-- Section 5: Insight Form -->
     <section class="section" id="insight-form">
       <div class="section-header">
         <h2 class="section-title">未来洞察</h2>
@@ -1557,13 +1542,12 @@
             <li><a href="#pestle-news">Insight News</a></li>
             <li><a href="#cla-analysis">因果階層分析</a></li>
             <li><a href="#academic-papers">学術研究</a></li>
-            <li><a href="#meta-report">メタ分析</a></li>
+            <li><a href="cla.html">CLA分析 全体版</a></li>
           </ul>
         </div>
         <div>
           <div class="footer-heading">その他</div>
           <ul class="footer-links">
-            <li><a href="cla.html">CLA分析 全体版</a></li>
             <li><a href="reports.html">レポート一覧</a></li>
             <li><a href="#media-sources">メディアソース</a></li>
             <li><a href="#" onclick="auth.signOut();return false;">ログアウト</a></li>
@@ -1660,12 +1644,11 @@
       const now = new Date();
       document.getElementById('headerDate').textContent = formatDateFull(now);
 
-      const [dailyReport, latest, aiAnalysis, papers, metaReport, alerts, mediaSources] = await Promise.all([
+      const [dailyReport, latest, aiAnalysis, papers, alerts, mediaSources] = await Promise.all([
         fetchJSON('daily_report.json'),
         fetchJSON('latest.json'),
         fetchJSON('ai_analysis.json'),
         fetchJSON('daily_papers.json'),
-        fetchJSON('cla_meta_report.json'),
         fetchJSON('alerts.json'),
         fetchJSON('media_sources.json')
       ]);
@@ -1675,7 +1658,6 @@
       renderPESTLE(latest, aiAnalysis);
       renderCLASummary(aiAnalysis);
       renderPapers(papers);
-      renderMetaReport(metaReport);
       renderMediaSources(mediaSources);
       updateBookmarkUI();
     }
@@ -1719,28 +1701,37 @@
       const dateStr = data.generated_at ? data.generated_at.split('T')[0] : (data.date || '');
       document.getElementById('reportDateSub').textContent = dateStr;
 
-      // Sidebar: observations and implications
-      const observations = region.observations || [];
-      const implications = region.implications || [];
+      // Sidebar: key observations and action implications
+      const observations = region.key_observations || region.observations || [];
+      const implications = region.action_implications || region.implications || [];
       const sidebarItems = [];
       observations.slice(0, 3).forEach(o => {
-        const text = typeof o === 'string' ? o : (o.observation || o.category || '');
-        const label = typeof o === 'object' && o.category ? o.category : '注目点';
-        sidebarItems.push({ label, text: typeof o === 'string' ? o : (o.observation || '') });
+        const text = typeof o === 'string' ? o : (o.observation || o.theme || '');
+        const label = typeof o === 'object' ? (o.theme || o.category || '注目点') : '注目点';
+        const detail = typeof o === 'string' ? o : (o.observation || '');
+        sidebarItems.push({ label, text: detail });
       });
       implications.slice(0, 3).forEach(i => {
-        const text = typeof i === 'string' ? i : (i.implication || '');
-        const label = typeof i === 'object' && i.area ? i.area : '示唆';
-        sidebarItems.push({ label, text: typeof i === 'string' ? i : (i.implication || '') });
+        const text = typeof i === 'string' ? i : (i.implication || i.action || '');
+        const label = typeof i === 'object' ? (i.area || i.domain || '示唆') : '示唆';
+        sidebarItems.push({ label, text: typeof i === 'string' ? i : (i.implication || i.action || '') });
       });
 
-      // Declining/emerging myths
+      // Myth transition
+      const mythTransition = region.myth_in_transition || {};
+      if (mythTransition.fading_myth) {
+        sidebarItems.push({ label: '衰退する神話', text: mythTransition.fading_myth.substring(0, 120) });
+      }
+      if (mythTransition.emerging_myth) {
+        sidebarItems.push({ label: '台頭する神話', text: mythTransition.emerging_myth.substring(0, 120) });
+      }
+      // Fallback to declining/emerging arrays
       const declining = region.declining_myths || [];
       const emerging = region.emerging_myths || [];
-      if (declining.length > 0) {
+      if (!mythTransition.fading_myth && declining.length > 0) {
         sidebarItems.push({ label: '衰退する神話', text: declining.slice(0, 2).join(' / ') });
       }
-      if (emerging.length > 0) {
+      if (!mythTransition.emerging_myth && emerging.length > 0) {
         sidebarItems.push({ label: '台頭する神話', text: emerging.slice(0, 2).join(' / ') });
       }
 
@@ -1800,8 +1791,14 @@
         if (!catData) continue;
 
         const allArticles = catData.articles || [];
-        // Filter articles by region/lang
-        const filteredArticles = allArticles.filter(a => isJapan ? isJaSource(a) : !isJaSource(a));
+        // Filter articles by region/lang, then sort by date (newest first)
+        const filteredArticles = allArticles
+          .filter(a => isJapan ? isJaSource(a) : !isJaSource(a))
+          .sort((a, b) => {
+            const da = new Date(a.published_date || a.published || 0);
+            const db = new Date(b.published_date || b.published || 0);
+            return db - da;
+          });
         totalFiltered += filteredArticles.length;
 
         const displayArticles = filteredArticles.slice(0, 8);
@@ -1833,7 +1830,7 @@
                     </div>
                     <div class="pestle-article-title">${escapeHtml(article.title)}</div>
                     ${titleJa ? `<div class="pestle-article-summary" style="color:var(--accent-soft);font-size:0.73rem;">${escapeHtml(titleJa)}</div>` : ''}
-                    ${article.summary ? `<div class="pestle-article-summary">${escapeHtml(article.summary)}</div>` : ''}
+                    ${summaryJa ? `<div class="pestle-article-summary">${escapeHtml(summaryJa)}</div>` : (article.summary ? `<div class="pestle-article-summary">${escapeHtml(article.summary)}</div>` : '')}
                     ${article.relevance_score ? `<div class="pestle-article-score">関連度: ${article.relevance_score.toFixed(1)}</div>` : ''}
                   </div>
                 `;
@@ -1856,7 +1853,9 @@
       if (!data) return;
       const allArticles = data.pestle[catKey]?.articles || [];
       const isJapan = currentRegion === 'japan';
-      const filteredArticles = allArticles.filter(a => isJapan ? isJaSource(a) : !isJaSource(a));
+      const filteredArticles = allArticles
+        .filter(a => isJapan ? isJaSource(a) : !isJaSource(a))
+        .sort((a, b) => new Date(b.published_date || b.published || 0) - new Date(a.published_date || a.published || 0));
       const translations = aiData?.translations?.[catKey] || [];
       const container = document.getElementById(`pestle-${catKey}`);
       if (!container) return;
@@ -1865,6 +1864,7 @@
         const origIdx = allArticles.indexOf(article);
         const trans = translations.find(t => t.index === origIdx);
         const titleJa = trans ? trans.title_translated : '';
+        const summaryJa = trans ? trans.summary_translated : '';
         const bookmarkId = `pestle-${catKey}-${origIdx}`;
         const isBookmarked = bookmarks.some(b => b.id === bookmarkId);
         return `
@@ -1876,7 +1876,7 @@
             </div>
             <div class="pestle-article-title">${escapeHtml(article.title)}</div>
             ${titleJa ? `<div class="pestle-article-summary" style="color:var(--accent-soft);font-size:0.73rem;">${escapeHtml(titleJa)}</div>` : ''}
-            ${article.summary ? `<div class="pestle-article-summary">${escapeHtml(article.summary)}</div>` : ''}
+            ${summaryJa ? `<div class="pestle-article-summary">${escapeHtml(summaryJa)}</div>` : (article.summary ? `<div class="pestle-article-summary">${escapeHtml(article.summary)}</div>` : '')}
           </div>
         `;
       }).join('');
@@ -2033,57 +2033,43 @@
       const firstCat = cla[firstCatKey];
       const catInfo = PESTLE_CATS[firstCatKey] || { labelJa: firstCatKey };
 
+      // Build CLA tabs: Overall (synthesis of all) + 6 PESTLE categories
+      const claTabKeys = ['Overall', ...Object.keys(cla)];
+
       let html = `
-        <div class="cla-summary-grid">
-          <div>
-            <div style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:0.75rem;">
-              本日のCLA 4層分析 (${escapeHtml(catInfo.labelJa)}カテゴリの概要)
-            </div>
-            <div class="cla-summary-layers">
-              ${CLA_LAYERS.map(layer => `
-                <div class="cla-layer cla-layer-${layer.depth}">
-                  <div class="cla-layer-label">${layer.labelJa}</div>
-                  <div class="cla-layer-text">${escapeHtml(firstCat[layer.key] || '')}</div>
-                </div>
-              `).join('')}
-            </div>
-          </div>
-          <div>
-            <div style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:0.75rem;">
-              弱いシグナル概要 (${weakSignals.length}件検出)
-            </div>
-            ${weakSignals.slice(0, 4).map(ws => {
-              const impactClass = (ws.potential_impact || '').toLowerCase() === 'high' ? 'ws-badge-high' :
-                                  (ws.potential_impact || '').toLowerCase() === 'medium' ? 'ws-badge-medium' : 'ws-badge-low';
-              return `
-                <div style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:0.65rem 0.85rem;margin-bottom:0.5rem;border-left:3px solid var(--accent-warm);">
-                  <div style="display:flex;justify-content:space-between;align-items:center;gap:0.5rem;">
-                    <span style="font-weight:600;font-size:0.82rem;color:var(--text);">${escapeHtml(ws.description ? ws.description.substring(0, 80) + '...' : '')}</span>
-                    <span class="ws-badge ${impactClass}">${escapeHtml(ws.potential_impact || '')}</span>
-                  </div>
-                </div>
-              `;
-            }).join('')}
-          </div>
+        <div class="cla-tab-bar" style="display:flex;gap:0;margin-bottom:1.25rem;border:1px solid var(--border);border-radius:6px;overflow:hidden;background:var(--surface);">
+          ${claTabKeys.map((key, idx) => {
+            const label = key === 'Overall' ? '全体' : (PESTLE_CATS[key]?.labelJa || key);
+            return `<button class="cla-tab-btn${idx === 0 ? ' active' : ''}" data-cla-tab="${key}" onclick="switchCLATab('${key}')" style="flex:1;padding:0.5rem 0.75rem;border:none;background:${idx === 0 ? 'var(--accent)' : 'transparent'};color:${idx === 0 ? '#fff' : 'var(--text-secondary)'};cursor:pointer;font-family:var(--font-sans);font-size:0.78rem;font-weight:600;transition:all 0.2s;">${label}</button>`;
+          }).join('')}
+        </div>
+        <div id="claTabContent">
+          ${renderCLATabContent('Overall', cla)}
         </div>
         <div style="margin-top:1.25rem;">
           <a href="cla.html" class="cla-link-full">CLA分析の全体を見る &rarr;</a>
         </div>
       `;
 
-      // Weak signals full section (collapsible cards)
+      // Weak signals section — collapsed by default
       if (weakSignals.length > 0) {
         html += `
           <div style="margin-top:2.5rem;">
-            <h3 style="font-family:var(--font-serif);font-size:1.1rem;font-weight:700;margin-bottom:1rem;color:var(--text);position:relative;padding-bottom:0.4rem;">
-              弱いシグナル
-              <span style="position:absolute;left:0;bottom:0;width:2.5rem;height:3px;background:var(--accent);"></span>
-            </h3>
+            <div style="display:flex;align-items:center;gap:0.75rem;cursor:pointer;margin-bottom:1rem;" onclick="toggleWeakSignals()">
+              <h3 style="font-family:var(--font-serif);font-size:1.1rem;font-weight:700;color:var(--text);position:relative;padding-bottom:0.4rem;margin:0;">
+                弱いシグナル (${weakSignals.length}件)
+                <span style="position:absolute;left:0;bottom:0;width:2.5rem;height:3px;background:var(--accent);"></span>
+              </h3>
+              <span id="wsChevron" style="font-size:0.72rem;color:var(--text-muted);transition:transform 0.2s;">&#9654;</span>
+            </div>
+            <div id="weakSignalsContainer" style="display:none;">
             <div class="weak-signals-grid">
               ${weakSignals.map((ws, i) => {
                 const impactClass = (ws.potential_impact || '').toLowerCase() === 'high' ? 'ws-badge-high' :
                                     (ws.potential_impact || '').toLowerCase() === 'medium' ? 'ws-badge-medium' : 'ws-badge-low';
                 const cats = (ws.pestle_categories || []).join(', ');
+                const wsBookmarkId = `signal-${i}`;
+                const wsIsBookmarked = bookmarks.some(b => b.id === wsBookmarkId);
                 return `
                   <div class="ws-card" id="ws-card-${i}">
                     <div class="ws-card-header" onclick="toggleWSCard(${i})">
@@ -2091,6 +2077,7 @@
                       <div class="ws-card-badges">
                         <span class="ws-badge ${impactClass}">${escapeHtml(ws.potential_impact || 'N/A')}</span>
                         ${ws.time_horizon ? `<span class="ws-badge ws-badge-horizon">${escapeHtml(ws.time_horizon)}</span>` : ''}
+                        <button class="bookmark-btn ${wsIsBookmarked ? 'bookmarked' : ''}" onclick="event.stopPropagation();toggleBookmark('${wsBookmarkId}','${escapeAttr(ws.signal || ws.description || '')}','',this)" title="ブックマーク" style="font-size:0.78rem;">&#9734;</button>
                       </div>
                       <span class="ws-card-chevron">&#9654;</span>
                     </div>
@@ -2108,12 +2095,86 @@
                 `;
               }).join('')}
             </div>
+            </div>
           </div>
         `;
       }
 
       container.innerHTML = html;
     }
+
+    // CLA tab rendering
+    function renderCLATabContent(tabKey, claData) {
+      if (tabKey === 'Overall') {
+        // Synthesize all categories into one combined view
+        const allLayers = {};
+        CLA_LAYERS.forEach(layer => {
+          const texts = [];
+          for (const [catKey, catData] of Object.entries(claData)) {
+            if (catData[layer.key]) {
+              texts.push(`[${PESTLE_CATS[catKey]?.labelJa || catKey}] ${catData[layer.key]}`);
+            }
+          }
+          allLayers[layer.key] = texts.join('\n');
+        });
+        return `
+          <div class="cla-summary-layers">
+            ${CLA_LAYERS.map(layer => `
+              <div class="cla-layer cla-layer-${layer.depth}">
+                <div class="cla-layer-label">${layer.labelJa}</div>
+                <div class="cla-layer-text" style="-webkit-line-clamp:unset;">${escapeHtml(allLayers[layer.key] || '')}</div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      } else {
+        const catData = claData[tabKey];
+        if (!catData) return '<p style="color:var(--text-muted);">データがありません</p>';
+        return `
+          <div class="cla-summary-layers">
+            ${CLA_LAYERS.map(layer => `
+              <div class="cla-layer cla-layer-${layer.depth}">
+                <div class="cla-layer-label">${layer.labelJa}</div>
+                <div class="cla-layer-text" style="-webkit-line-clamp:unset;">${escapeHtml(catData[layer.key] || '')}</div>
+              </div>
+            `).join('')}
+            ${catData.key_tension ? `
+              <div style="padding:0.75rem 1.35rem;background:var(--highlight-bg);border-top:1px solid var(--border);">
+                <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--accent);margin-bottom:0.2rem;">Key Tension</div>
+                <div style="font-size:0.82rem;line-height:1.65;">${escapeHtml(catData.key_tension)}</div>
+              </div>
+            ` : ''}
+            ${catData.emerging_narrative ? `
+              <div style="padding:0.75rem 1.35rem;background:var(--surface);border-top:1px solid var(--border);">
+                <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--accent);margin-bottom:0.2rem;">Emerging Narrative</div>
+                <div style="font-size:0.82rem;line-height:1.65;">${escapeHtml(catData.emerging_narrative)}</div>
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }
+    }
+
+    window.switchCLATab = function(tabKey) {
+      const aiData = dataCache['ai_analysis.json'];
+      if (!aiData || !aiData.cla) return;
+      document.getElementById('claTabContent').innerHTML = renderCLATabContent(tabKey, aiData.cla);
+      document.querySelectorAll('.cla-tab-btn').forEach(btn => {
+        const isActive = btn.dataset.claTab === tabKey;
+        btn.classList.toggle('active', isActive);
+        btn.style.background = isActive ? 'var(--accent)' : 'transparent';
+        btn.style.color = isActive ? '#fff' : 'var(--text-secondary)';
+      });
+    };
+
+    window.toggleWeakSignals = function() {
+      const container = document.getElementById('weakSignalsContainer');
+      const chevron = document.getElementById('wsChevron');
+      if (!container) return;
+      const isHidden = container.style.display === 'none';
+      container.style.display = isHidden ? 'block' : 'none';
+      chevron.style.transform = isHidden ? 'rotate(90deg)' : 'rotate(0deg)';
+    };
 
     window.toggleWSCard = function(index) {
       const card = document.getElementById(`ws-card-${index}`);
@@ -2139,46 +2200,85 @@
 
       document.getElementById('papersDateSub').textContent = data.generated_at ? data.generated_at.split('T')[0] : (data.date || '');
 
+      // Helper: separate journal name from paper title
+      // If source_name equals title, it's a journal — not a paper title
+      function getPaperDisplayTitle(paper) {
+        const title = paper.title || '';
+        const sourceName = paper.source_name || '';
+        // If title equals source_name, this is a journal title, not a paper
+        if (title && sourceName && title.trim() === sourceName.trim()) {
+          return { isJournalOnly: true, journalName: sourceName, paperTitle: paper.title_ja || '' };
+        }
+        return { isJournalOnly: false, journalName: sourceName, paperTitle: title };
+      }
+
+      // Sort papers by date (newest first)
+      function sortPapersByDate(papers) {
+        return [...papers].sort((a, b) => {
+          const da = new Date(a.published_date || 0);
+          const db = new Date(b.published_date || 0);
+          return db - da;
+        });
+      }
+
       let html = '<div class="papers-accordion">';
       fieldNames.forEach((name, i) => {
         const fieldData = fields[name];
-        const papers = fieldData.papers || (Array.isArray(fieldData) ? fieldData : []);
+        let papers = fieldData.papers || (Array.isArray(fieldData) ? fieldData : []);
+        papers = sortPapersByDate(papers);
         const count = papers.length;
+        const INITIAL_SHOW = 3;
+
+        function renderPaperItem(paper, idx) {
+          const display = getPaperDisplayTitle(paper);
+          const bookmarkId = `paper-${name}-${idx}`;
+          const isBookmarked = bookmarks.some(b => b.id === bookmarkId);
+          return `
+            <div class="paper-item">
+              ${display.journalName ? `<div style="font-size:0.68rem;font-weight:600;color:var(--accent-soft);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:0.25rem;">${escapeHtml(display.journalName)}</div>` : ''}
+              <div class="paper-title" style="display:flex;justify-content:space-between;align-items:flex-start;">
+                <a href="${escapeHtml(paper.source_url || paper.doi || '#')}" target="_blank">${escapeHtml(display.isJournalOnly ? (paper.title_ja || display.journalName) : display.paperTitle)}</a>
+                <button class="bookmark-btn ${isBookmarked ? 'bookmarked' : ''}" onclick="event.stopPropagation();toggleBookmark('${bookmarkId}','${escapeAttr(display.paperTitle || display.journalName)}','${escapeAttr(paper.source_url || paper.doi || '')}',this)" title="ブックマーク" style="flex-shrink:0;">&#9734;</button>
+              </div>
+              ${(!display.isJournalOnly && paper.title_ja) ? `<div class="paper-title-ja">${escapeHtml(paper.title_ja)}</div>` : ''}
+              ${paper.authors ? `<div class="paper-authors">${escapeHtml(paper.authors)}</div>` : ''}
+              <div>
+                ${paper.field ? `<span class="paper-field-badge">${escapeHtml(paper.field)}</span>` : ''}
+                ${paper.subfield ? `<span class="paper-field-badge" style="background:var(--surface)">${escapeHtml(paper.subfield)}</span>` : ''}
+                ${paper.published_date ? `<span style="font-size:0.68rem;color:var(--text-muted)">${escapeHtml(paper.published_date)}</span>` : ''}
+              </div>
+              ${paper.summary_ja ? `<div class="paper-summary">${escapeHtml(paper.summary_ja)}</div>` : (paper.summary ? `<div class="paper-summary">${escapeHtml(paper.summary)}</div>` : '')}
+              ${paper.novelty_score ? `
+                <div class="paper-novelty">
+                  新規性: ${(paper.novelty_score * 10).toFixed(0)}/10
+                  <span class="paper-novelty-bar"><span class="paper-novelty-fill" style="width:${paper.novelty_score * 100}%"></span></span>
+                </div>
+              ` : ''}
+            </div>
+          `;
+        }
 
         html += `
-          <div class="papers-field-group" id="papers-group-${i}">
+          <div class="papers-field-group open" id="papers-group-${i}">
             <div class="papers-field-header" onclick="togglePapersGroup(${i})">
               <div style="display:flex;align-items:center;gap:0.75rem;">
                 <span class="papers-field-name">${escapeHtml(name)}</span>
                 <span class="papers-field-count">${count}</span>
               </div>
-              <span class="papers-field-chevron">&#9654;</span>
+              <span class="papers-field-chevron" style="transform:rotate(90deg);">&#9654;</span>
             </div>
-            <div class="papers-field-body">
-              <div class="paper-list">
-                ${papers.slice(0, 15).map(paper => `
-                  <div class="paper-item">
-                    <div class="paper-title">
-                      <a href="${escapeHtml(paper.source_url || paper.doi || '#')}" target="_blank">${escapeHtml(paper.title)}</a>
-                    </div>
-                    ${paper.title_ja ? `<div class="paper-title-ja">${escapeHtml(paper.title_ja)}</div>` : ''}
-                    ${paper.authors ? `<div class="paper-authors">${escapeHtml(paper.authors)}</div>` : ''}
-                    <div>
-                      ${paper.source_name ? `<span class="paper-field-badge">${escapeHtml(paper.source_name)}</span>` : ''}
-                      ${paper.field ? `<span class="paper-field-badge">${escapeHtml(paper.field)}</span>` : ''}
-                      ${paper.subfield ? `<span class="paper-field-badge" style="background:var(--surface)">${escapeHtml(paper.subfield)}</span>` : ''}
-                      ${paper.published_date ? `<span style="font-size:0.68rem;color:var(--text-muted)">${escapeHtml(paper.published_date)}</span>` : ''}
-                    </div>
-                    ${paper.summary_ja ? `<div class="paper-summary">${escapeHtml(paper.summary_ja)}</div>` : (paper.summary ? `<div class="paper-summary">${escapeHtml(paper.summary)}</div>` : '')}
-                    ${paper.novelty_score ? `
-                      <div class="paper-novelty">
-                        新規性: ${(paper.novelty_score * 10).toFixed(0)}/10
-                        <span class="paper-novelty-bar"><span class="paper-novelty-fill" style="width:${paper.novelty_score * 100}%"></span></span>
-                      </div>
-                    ` : ''}
-                  </div>
-                `).join('')}
+            <div class="papers-field-body" style="display:block;">
+              <div class="paper-list" id="papers-list-${i}">
+                ${papers.slice(0, INITIAL_SHOW).map((p, idx) => renderPaperItem(p, idx)).join('')}
               </div>
+              ${count > INITIAL_SHOW ? `
+                <div id="papers-more-${i}" style="display:none;" class="paper-list">
+                  ${papers.slice(INITIAL_SHOW).map((p, idx) => renderPaperItem(p, INITIAL_SHOW + idx)).join('')}
+                </div>
+                <div style="text-align:center;margin-top:0.75rem;">
+                  <button class="btn-secondary" id="papers-toggle-${i}" onclick="togglePapersMore(${i}, ${count})" style="font-size:0.75rem;">残り${count - INITIAL_SHOW}件を表示</button>
+                </div>
+              ` : ''}
             </div>
           </div>
         `;
@@ -2191,44 +2291,25 @@
     window.togglePapersGroup = function(index) {
       const group = document.getElementById(`papers-group-${index}`);
       if (group) group.classList.toggle('open');
+      const body = group.querySelector('.papers-field-body');
+      const chevron = group.querySelector('.papers-field-chevron');
+      if (group.classList.contains('open')) {
+        body.style.display = 'block';
+        chevron.style.transform = 'rotate(90deg)';
+      } else {
+        body.style.display = 'none';
+        chevron.style.transform = 'rotate(0deg)';
+      }
     };
 
-    // ==========================================================
-    // RENDER: META REPORT (with markdown rendering)
-    // ==========================================================
-    function renderMetaReport(data) {
-      const container = document.getElementById('metaReportContent');
-      if (!data) {
-        container.innerHTML = '<p style="color:var(--text-muted);">メタ分析データを取得できませんでした。</p>';
-        return;
-      }
-
-      const region = data[currentRegion] || data.japan || data.global;
-      if (!region) {
-        container.innerHTML = '<p style="color:var(--text-muted);">この地域のメタ分析レポートはありません。</p>';
-        return;
-      }
-
-      const reportHTML = renderMarkdown(region.report_text || '');
-      let extra = '';
-
-      if (region.paradigm_shifts && region.paradigm_shifts.length > 0) {
-        extra += `<h3 style="margin-top:1.5rem;">パラダイムシフト</h3>`;
-        region.paradigm_shifts.forEach(ps => {
-          extra += `<div style="background:var(--highlight-bg);border-left:3px solid var(--accent);padding:0.75rem 1rem;margin:0.5rem 0;border-radius:4px;">
-            <div style="font-weight:700;font-size:0.88rem;">${escapeHtml(typeof ps === 'string' ? ps : (ps.title || ps.description || JSON.stringify(ps)))}</div>
-          </div>`;
-        });
-      }
-
-      const reportId = `meta-report-${currentRegion}`;
-      container.innerHTML = `
-        <div style="margin-bottom:0.75rem;">
-          <button class="btn-icon" onclick="openReportCommentModal('${escapeAttr(reportId)}','メタ分析レポート (${currentRegion === 'japan' ? '日本版' : 'グローバル版'})')" title="コメント">&#128172; コメント</button>
-        </div>
-        <div class="meta-report-body prose">${reportHTML}${extra}</div>
-      `;
-    }
+    window.togglePapersMore = function(index, total) {
+      const more = document.getElementById(`papers-more-${index}`);
+      const btn = document.getElementById(`papers-toggle-${index}`);
+      if (!more) return;
+      const isHidden = more.style.display === 'none';
+      more.style.display = isHidden ? 'block' : 'none';
+      btn.textContent = isHidden ? '折りたたむ' : `残り${total - 3}件を表示`;
+    };
 
     // ==========================================================
     // RENDER: MEDIA SOURCES (Table format with lang filter)
@@ -2265,34 +2346,37 @@
         return;
       }
 
+      // Calculate total articles
+      const totalArticles = filtered.reduce((sum, s) => sum + (s.articles_count || 0), 0);
+
       container.innerHTML = `
+        <div style="margin-bottom:1rem;font-size:0.85rem;color:var(--text-secondary);">
+          ${filtered.length}メディアから合計 <strong style="color:var(--text);">${totalArticles.toLocaleString()}</strong> 件の記事を収集
+        </div>
         <div class="media-source-table-wrap">
           <table class="media-source-table">
             <thead>
               <tr>
                 <th>メディア名</th>
-                <th>言語</th>
                 <th>分野</th>
                 <th>Tier</th>
-                <th>収集件数</th>
-                <th>最終取得日</th>
+                <th>記事数</th>
+                <th>最終取得</th>
               </tr>
             </thead>
             <tbody>
-              ${filtered.map(s => {
+              ${filtered.sort((a, b) => (b.articles_count || 0) - (a.articles_count || 0)).map(s => {
                 const name = s.name_ja || s.name || s.title || '';
-                const lang = s.language || '';
                 const cat = s.categories || s.category || s.type || '';
                 const tier = s.tier || '-';
                 const tierClass = tier === 1 ? '' : (tier === 2 ? 'tier-badge-2' : 'tier-badge-3');
-                const count = s.articles_count || '-';
+                const count = s.articles_count || 0;
                 const lastFetched = s.last_fetched || '-';
                 return `<tr>
                   <td style="font-weight:600;">${escapeHtml(name)}</td>
-                  <td>${escapeHtml(lang)}</td>
                   <td>${escapeHtml(cat)}</td>
                   <td>${tier !== '-' ? `<span class="tier-badge ${tierClass}">Tier ${tier}</span>` : '-'}</td>
-                  <td>${escapeHtml(String(count))}</td>
+                  <td style="font-weight:600;text-align:right;">${count}</td>
                   <td style="font-size:0.75rem;color:var(--text-muted);">${escapeHtml(lastFetched)}</td>
                 </tr>`;
               }).join('')}
@@ -2318,20 +2402,62 @@
       updateBookmarkUI();
     };
 
+    // Bookmark filter: 'active' or 'archived'
+    let bookmarkFilter = 'active';
+
     function updateBookmarkUI() {
-      document.getElementById('bookmarkCount').textContent = bookmarks.length;
+      const activeCount = bookmarks.filter(b => !b.archived).length;
+      document.getElementById('bookmarkCount').textContent = activeCount;
       const list = document.getElementById('bookmarksList');
-      if (bookmarks.length === 0) {
-        list.innerHTML = '<p style="color:var(--text-muted);font-size:0.82rem;">ブックマークはまだありません。記事のブックマークアイコンをクリックして保存できます。</p>';
+
+      const filteredBookmarks = bookmarkFilter === 'active'
+        ? bookmarks.filter(b => !b.archived)
+        : bookmarks.filter(b => b.archived);
+
+      let html = `
+        <div style="display:flex;gap:0.5rem;margin-bottom:0.75rem;">
+          <button class="btn-${bookmarkFilter === 'active' ? 'primary' : 'secondary'}" onclick="setBookmarkFilter('active')" style="font-size:0.72rem;padding:0.3rem 0.75rem;">アクティブ (${bookmarks.filter(b => !b.archived).length})</button>
+          <button class="btn-${bookmarkFilter === 'archived' ? 'primary' : 'secondary'}" onclick="setBookmarkFilter('archived')" style="font-size:0.72rem;padding:0.3rem 0.75rem;">アーカイブ (${bookmarks.filter(b => b.archived).length})</button>
+        </div>
+      `;
+
+      if (filteredBookmarks.length === 0) {
+        html += `<p style="color:var(--text-muted);font-size:0.82rem;">${bookmarkFilter === 'active' ? 'ブックマークはまだありません。記事のブックマークアイコンをクリックして保存できます。' : 'アーカイブされたブックマークはありません。'}</p>`;
       } else {
-        list.innerHTML = bookmarks.map(b => `
+        html += filteredBookmarks.map(b => `
           <div class="bookmark-list-item">
-            <a href="${escapeHtml(b.url)}" target="_blank">${escapeHtml(b.title)}</a>
-            <button class="bookmark-remove" onclick="removeBookmark('${b.id}')">&times;</button>
+            <div style="flex:1;">
+              ${b.url ? `<a href="${escapeHtml(b.url)}" target="_blank">${escapeHtml(b.title)}</a>` : `<span style="font-size:0.82rem;font-weight:500;">${escapeHtml(b.title)}</span>`}
+              <div style="font-size:0.65rem;color:var(--text-muted);">${b.addedAt ? new Date(b.addedAt).toLocaleDateString('ja-JP') : ''}</div>
+            </div>
+            <div style="display:flex;gap:0.35rem;flex-shrink:0;">
+              <button class="bookmark-remove" onclick="toggleArchiveBookmark('${b.id}')" title="${b.archived ? '復元' : 'アーカイブ'}" style="font-size:0.7rem;color:var(--text-muted);">${b.archived ? '&#8634;' : '&#9744;'}</button>
+              <button class="bookmark-remove" onclick="deleteBookmark('${b.id}')" title="削除" style="color:#C0392B;">&times;</button>
+            </div>
           </div>
         `).join('');
       }
+
+      list.innerHTML = html;
     }
+
+    window.setBookmarkFilter = function(filter) {
+      bookmarkFilter = filter;
+      updateBookmarkUI();
+    };
+
+    window.toggleArchiveBookmark = function(id) {
+      const bm = bookmarks.find(b => b.id === id);
+      if (bm) bm.archived = !bm.archived;
+      localStorage.setItem('fin_bookmarks', JSON.stringify(bookmarks));
+      updateBookmarkUI();
+    };
+
+    window.deleteBookmark = function(id) {
+      bookmarks = bookmarks.filter(b => b.id !== id);
+      localStorage.setItem('fin_bookmarks', JSON.stringify(bookmarks));
+      updateBookmarkUI();
+    };
 
     window.removeBookmark = function(id) {
       bookmarks = bookmarks.filter(b => b.id !== id);
@@ -2355,7 +2481,6 @@
         // Re-render region-dependent sections
         renderDailyReport(dataCache['daily_report.json']);
         renderPESTLE(dataCache['latest.json'], dataCache['ai_analysis.json']);
-        renderMetaReport(dataCache['cla_meta_report.json']);
         renderMediaSources(dataCache['media_sources.json']);
       });
     });
