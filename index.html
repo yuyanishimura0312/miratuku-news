@@ -5,64 +5,130 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Insight News | Miratuku</title>
     <link rel="icon" href="https://esse-sense.com/favicon.ico">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Noto+Serif+JP:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, sans-serif;
-            background-color: #FDFAF7;
-            color: #2D2017;
             min-height: 100vh;
             display: flex;
+            background: #1A1410;
+        }
+
+        /* Left panel — branding hero */
+        .hero-panel {
+            flex: 1;
+            background: linear-gradient(160deg, #2D2017 0%, #7A4033 50%, #B07256 100%);
+            display: flex;
             flex-direction: column;
-            align-items: center;
             justify-content: center;
-            padding: 20px;
+            align-items: center;
+            padding: 3rem;
+            position: relative;
+            overflow: hidden;
         }
-
-        .container { width: 100%; max-width: 420px; }
-
-        .app-header {
+        .hero-panel::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: radial-gradient(ellipse at 30% 50%, rgba(255,255,255,0.06) 0%, transparent 60%);
+        }
+        .hero-brand {
+            position: relative;
+            z-index: 1;
             text-align: center;
-            margin-bottom: 32px;
+            color: #fff;
         }
-
-        .app-header h1 {
-            color: #7A4033;
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 8px;
-            letter-spacing: 0.02em;
+        .hero-brand-name {
+            font-family: 'Noto Serif JP', serif;
+            font-size: 2.4rem;
+            font-weight: 900;
+            letter-spacing: -0.03em;
+            margin-bottom: 0.5rem;
         }
-
-        .app-header .subtitle {
-            color: #7A6B5E;
-            font-size: 0.82rem;
-            line-height: 1.6;
+        .hero-brand-sub {
+            font-size: 0.72rem;
             font-weight: 300;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 2.5rem;
+        }
+        .hero-tagline {
+            font-family: 'Noto Serif JP', serif;
+            font-size: 1.15rem;
+            font-weight: 400;
+            line-height: 1.8;
+            color: rgba(255,255,255,0.85);
+            max-width: 360px;
+            text-align: center;
+        }
+        .hero-features {
+            margin-top: 2.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        .hero-feature {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.82rem;
+            color: rgba(255,255,255,0.65);
+        }
+        .hero-feature-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.35);
+            flex-shrink: 0;
         }
 
-        .card {
-            background: #ffffff;
-            border-radius: 12px;
-            padding: 36px 32px;
-            box-shadow: 0 2px 12px rgba(122, 64, 51, 0.08);
-            border: 1px solid #D9C8B8;
+        /* Right panel — login form */
+        .form-panel {
+            width: 460px;
+            flex-shrink: 0;
+            background: #FDFAF7;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 3rem 2.5rem;
+        }
+        .form-wrapper {
+            width: 100%;
+            max-width: 360px;
+        }
+        .form-header {
+            margin-bottom: 2rem;
+        }
+        .form-header h2 {
+            font-family: 'Noto Serif JP', serif;
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: #2D2017;
+            margin-bottom: 0.4rem;
+        }
+        .form-header p {
+            font-size: 0.82rem;
+            color: #7A6B5E;
         }
 
         .tab-toggle {
             display: flex;
-            margin-bottom: 28px;
+            margin-bottom: 1.75rem;
             border-bottom: 2px solid #F5EFE8;
         }
-
         .tab-toggle button {
             flex: 1;
             background: none;
             border: none;
-            padding: 10px 0;
-            font-size: 0.88rem;
+            padding: 0.65rem 0;
+            font-size: 0.85rem;
             font-weight: 500;
             color: #7A6B5E;
             cursor: pointer;
@@ -71,36 +137,32 @@
             transition: all 0.2s;
             font-family: inherit;
         }
-
         .tab-toggle button.active {
             color: #7A4033;
             border-bottom-color: #7A4033;
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 1.25rem;
         }
-
         .form-group label {
             display: block;
-            font-size: 0.8rem;
+            font-size: 0.78rem;
             font-weight: 500;
             color: #6B5445;
-            margin-bottom: 8px;
+            margin-bottom: 0.5rem;
         }
-
         .form-group input {
             width: 100%;
-            padding: 12px 16px;
+            padding: 0.75rem 1rem;
             border: 1px solid #D9C8B8;
-            border-radius: 8px;
+            border-radius: 6px;
             font-size: 0.88rem;
             color: #2D2017;
-            background: #FDFAF7;
-            transition: border-color 0.2s;
+            background: #fff;
+            transition: border-color 0.2s, box-shadow 0.2s;
             font-family: inherit;
         }
-
         .form-group input:focus {
             outline: none;
             border-color: #7A4033;
@@ -109,74 +171,111 @@
 
         .btn {
             width: 100%;
-            padding: 13px;
+            padding: 0.8rem;
             background: #7A4033;
             color: #ffffff;
             border: none;
-            border-radius: 8px;
+            border-radius: 6px;
             font-size: 0.88rem;
-            font-weight: 500;
+            font-weight: 600;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: background 0.2s, transform 0.1s;
             font-family: inherit;
+            margin-top: 0.5rem;
         }
-
         .btn:hover { background: #5E3028; }
+        .btn:active { transform: scale(0.99); }
         .btn:disabled { background: #B07256; cursor: not-allowed; }
 
         .error-msg {
             color: #8B3D2F;
             font-size: 0.78rem;
-            margin-top: 8px;
+            margin-top: 0.5rem;
             display: none;
+            background: #FFF0EB;
+            padding: 0.5rem 0.75rem;
+            border-radius: 4px;
+            border-left: 3px solid #8B3D2F;
         }
 
         .form-footer {
             text-align: center;
-            margin-top: 20px;
+            margin-top: 1.25rem;
         }
-
         .form-footer a {
             color: #7A4033;
             font-size: 0.78rem;
             text-decoration: none;
         }
-
         .form-footer a:hover { text-decoration: underline; }
 
         .trial-notice {
             text-align: center;
-            margin-top: 20px;
-            padding: 12px;
+            margin-top: 1.25rem;
+            padding: 0.75rem;
             background: #FFF5ED;
-            border-radius: 8px;
+            border-radius: 6px;
             font-size: 0.76rem;
             color: #6B5445;
             line-height: 1.5;
         }
 
         .provider-badge {
-            text-align: center;
-            margin-top: 24px;
-            font-size: 0.72rem;
-            color: #7A6B5E;
-            letter-spacing: 0.05em;
+            margin-top: 2rem;
+            font-size: 0.68rem;
+            color: #B8A898;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
         }
 
+        /* Mobile: stack panels */
+        @media (max-width: 900px) {
+            body { flex-direction: column; }
+            .hero-panel {
+                padding: 2.5rem 1.5rem;
+                min-height: auto;
+            }
+            .hero-brand-name { font-size: 1.8rem; }
+            .hero-tagline { font-size: 1rem; }
+            .hero-features { display: none; }
+            .form-panel {
+                width: 100%;
+                padding: 2rem 1.5rem;
+            }
+        }
         @media (max-width: 480px) {
-            .card { padding: 28px 24px; }
-            .app-header h1 { font-size: 1.3rem; }
+            .hero-panel { padding: 2rem 1.25rem; }
+            .hero-brand-name { font-size: 1.5rem; }
+            .form-panel { padding: 1.5rem 1.25rem; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="app-header">
-            <h1>Insight News</h1>
-            <p class="subtitle">構造的ニュースと未来洞察のプラットフォーム</p>
+    <!-- Left: Branding Hero -->
+    <div class="hero-panel">
+        <div class="hero-brand">
+            <div class="hero-brand-name">Insight News</div>
+            <div class="hero-brand-sub">Miratuku Intelligence</div>
+            <p class="hero-tagline">
+                PESTLEフレームワークによるニュース構造分析と、因果階層分析で未来の兆しを読み解く
+            </p>
+            <div class="hero-features">
+                <div class="hero-feature"><span class="hero-feature-dot"></span>PESTLE 6カテゴリのニュース自動収集</div>
+                <div class="hero-feature"><span class="hero-feature-dot"></span>因果階層分析（CLA）による深層構造の可視化</div>
+                <div class="hero-feature"><span class="hero-feature-dot"></span>学術論文の自動追跡と弱いシグナルの検出</div>
+                <div class="hero-feature"><span class="hero-feature-dot"></span>AI による未来洞察エンジン</div>
+            </div>
         </div>
+    </div>
 
-        <div class="card">
+    <!-- Right: Login Form -->
+    <div class="form-panel">
+        <div class="form-wrapper">
+            <div class="form-header">
+                <h2>ようこそ</h2>
+                <p>アカウントにログインしてニュースを確認</p>
+            </div>
+
             <div class="tab-toggle">
                 <button class="active" onclick="showTab('login')">ログイン</button>
                 <button onclick="showTab('signup')">新規登録</button>
@@ -219,9 +318,9 @@
                     アカウント作成後、7日間の無料トライアルが開始されます
                 </div>
             </form>
-        </div>
 
-        <div class="provider-badge">Provided by miratuku</div>
+            <div class="provider-badge">Provided by miratuku</div>
+        </div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
@@ -235,6 +334,16 @@
             document.querySelectorAll('.tab-toggle button').forEach((btn, i) => {
                 btn.classList.toggle('active', (tab === 'login' && i === 0) || (tab === 'signup' && i === 1));
             });
+            // Update header text
+            const h2 = document.querySelector('.form-header h2');
+            const p = document.querySelector('.form-header p');
+            if (tab === 'login') {
+                h2.textContent = 'ようこそ';
+                p.textContent = 'アカウントにログインしてニュースを確認';
+            } else {
+                h2.textContent = 'アカウント作成';
+                p.textContent = '無料トライアルで全機能をお試しください';
+            }
         }
 
         function showError(id, msg) {
@@ -245,26 +354,32 @@
 
         async function handleLogin(e) {
             e.preventDefault();
+            const btn = e.target.querySelector('.btn');
+            btn.disabled = true;
+            btn.textContent = 'ログイン中...';
+            document.getElementById('login-error').style.display = 'none';
+
             const email = document.getElementById('login-email').value;
             const password = document.getElementById('login-password').value;
             try {
                 const cred = await auth.signInWithEmailAndPassword(email, password);
-                // Check user status
                 const userDoc = await db.collection('users').doc(cred.user.uid).get();
                 if (userDoc.exists) {
                     const data = userDoc.data();
                     if (data.status === 'disabled') {
                         await auth.signOut();
                         showError('login-error', 'アカウントが無効化されています。');
+                        btn.disabled = false;
+                        btn.textContent = 'ログイン';
                         return;
                     }
-                    // Check trial expiration
                     if (data.trialExpiresAt && data.trialExpiresAt.toDate() < new Date() && data.role !== 'admin') {
                         await auth.signOut();
                         showError('login-error', 'トライアル期間が終了しました。');
+                        btn.disabled = false;
+                        btn.textContent = 'ログイン';
                         return;
                     }
-                    // Update last login
                     await db.collection('users').doc(cred.user.uid).update({
                         lastLogin: firebase.firestore.FieldValue.serverTimestamp()
                     });
@@ -276,21 +391,27 @@
                     'auth/wrong-password': 'パスワードが正しくありません',
                     'auth/invalid-email': 'メールアドレスの形式が正しくありません',
                     'auth/too-many-requests': 'ログイン試行回数が多すぎます。しばらく待ってからお試しください',
+                    'auth/invalid-credential': 'メールアドレスまたはパスワードが正しくありません',
                 };
                 showError('login-error', msgs[err.code] || err.message);
+                btn.disabled = false;
+                btn.textContent = 'ログイン';
             }
         }
 
         async function handleSignup(e) {
             e.preventDefault();
+            const btn = e.target.querySelector('.btn');
+            btn.disabled = true;
+            btn.textContent = '作成中...';
+            document.getElementById('signup-error').style.display = 'none';
+
             const name = document.getElementById('signup-name').value;
             const email = document.getElementById('signup-email').value;
             const password = document.getElementById('signup-password').value;
             try {
                 const cred = await auth.createUserWithEmailAndPassword(email, password);
                 await cred.user.updateProfile({ displayName: name });
-
-                // Create user document with 7-day trial
                 const trialEnd = new Date();
                 trialEnd.setDate(trialEnd.getDate() + 7);
                 await db.collection('users').doc(cred.user.uid).set({
@@ -302,7 +423,6 @@
                     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                     lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
                 });
-
                 window.location.href = 'app.html';
             } catch (err) {
                 const msgs = {
@@ -311,6 +431,8 @@
                     'auth/invalid-email': 'メールアドレスの形式が正しくありません',
                 };
                 showError('signup-error', msgs[err.code] || err.message);
+                btn.disabled = false;
+                btn.textContent = 'アカウント作成';
             }
         }
 

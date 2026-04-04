@@ -732,8 +732,8 @@
 
         const dateStr = formatDate(report.generated_at);
         const model = report.model || '';
-        const obsCount = (regionData.observations || []).length;
-        const implCount = (regionData.implications || []).length;
+        const obsCount = (regionData.key_observations || regionData.observations || []).length;
+        const implCount = (regionData.action_implications || regionData.implications || []).length;
 
         return `
           <div class="report-card" data-index="${idx}">
@@ -783,7 +783,7 @@
       html += '<div class="report-body">' + mdToHtml(regionData.report_text || '') + '</div>';
 
       // Observations
-      const obs = regionData.observations || [];
+      const obs = regionData.key_observations || regionData.observations || [];
       if (obs.length > 0) {
         html += '<div class="section-divider">';
         html += '<h3 class="section-title">観測 (Observations)</h3>';
@@ -799,7 +799,7 @@
       }
 
       // Implications
-      const impl = regionData.implications || [];
+      const impl = regionData.action_implications || regionData.implications || [];
       if (impl.length > 0) {
         html += '<div class="section-divider">';
         html += '<h3 class="section-title">インプリケーション (Implications)</h3>';
@@ -815,8 +815,9 @@
       }
 
       // Myths
-      const declining = regionData.declining_myths || [];
-      const emerging = regionData.emerging_myths || [];
+      const mythTr = regionData.myth_in_transition || {};
+      const declining = mythTr.declining || regionData.declining_myths || [];
+      const emerging = mythTr.emerging || regionData.emerging_myths || [];
       if (declining.length > 0 || emerging.length > 0) {
         html += '<div class="section-divider">';
         html += '<h3 class="section-title">神話の変遷 (Myth Dynamics)</h3>';

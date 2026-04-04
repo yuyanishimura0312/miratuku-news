@@ -150,8 +150,9 @@ const Foresight = {
       // Regular paragraph
       const p = document.createElement('p');
       p.className = 'foresight-paragraph';
-      // Bold text: **text**
-      p.innerHTML = trimmed
+      // Escape HTML first, then apply Markdown-like formatting
+      const escaped = trimmed.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      p.innerHTML = escaped
         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
         .replace(/\n/g, '<br>');
       container.appendChild(p);

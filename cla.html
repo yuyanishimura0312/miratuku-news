@@ -927,7 +927,7 @@
       document.getElementById('metaReportContent').innerHTML = mdToHtml(regionData.report_text || '');
 
       // Paradigm shifts
-      const shifts = regionData.paradigm_shifts || [];
+      const shifts = regionData.key_paradigm_shifts || regionData.paradigm_shifts || [];
       const psContainer = document.getElementById('paradigmShiftsContainer');
       const psTimeline = document.getElementById('paradigmTimeline');
       if (shifts.length > 0) {
@@ -944,7 +944,7 @@
       }
 
       // Myth timeline
-      const myths = regionData.myth_timeline || [];
+      const myths = regionData.dominant_myths_timeline || regionData.myth_timeline || [];
       const mythContainer = document.getElementById('mythTimelineContainer');
       const mythTimeline = document.getElementById('mythTimeline');
       if (myths.length > 0) {
@@ -987,6 +987,8 @@
     // --- Render CLA entry for a given period ---
     function renderClaEntry(dataStore, period, displayContainerId) {
       const container = document.getElementById(displayContainerId);
+      // Normalize: support both array and {entries: [...]} format
+      if (Array.isArray(dataStore)) dataStore = { entries: dataStore };
       if (!dataStore || !dataStore.entries) {
         container.innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:2rem;">No data loaded.</p>';
         return;
@@ -1085,8 +1087,12 @@
         }
 
         // Build yearly timeline
-        if (yearlyData && yearlyData.entries) {
-          buildTimelineBar(yearlyData.entries, 'yearlyTimelineBar', function(period) {
+        // Support both top-level array and {entries: [...]} format
+        const yearlyEntries = Array.isArray(yearlyData) ? yearlyData : (yearlyData && yearlyData.entries ? yearlyData.entries : []);
+        if (yearlyEntries.length > 0) {
+          // Normalize to {entries: [...]} for renderClaEntry
+          if (!yearlyData.entries) yearlyData = { entries: yearlyEntries };
+          buildTimelineBar(yearlyEntries, 'yearlyTimelineBar', function(period) {
             selectedYear = period;
             renderClaEntry(yearlyData, period, 'yearlyDisplay');
           });
@@ -1095,8 +1101,11 @@
         }
 
         // Build quarterly timeline
-        if (quarterlyData && quarterlyData.entries) {
-          buildTimelineBar(quarterlyData.entries, 'quarterlyTimelineBar', function(period) {
+        // Support both top-level array and {entries: [...]} format
+        const quarterlyEntries = Array.isArray(quarterlyData) ? quarterlyData : (quarterlyData && quarterlyData.entries ? quarterlyData.entries : []);
+        if (quarterlyEntries.length > 0) {
+          if (!quarterlyData.entries) quarterlyData = { entries: quarterlyEntries };
+          buildTimelineBar(quarterlyEntries, 'quarterlyTimelineBar', function(period) {
             selectedQuarter = period;
             renderClaEntry(quarterlyData, period, 'quarterlyDisplay');
           });

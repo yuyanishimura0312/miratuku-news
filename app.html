@@ -113,22 +113,24 @@
        HEADER
        ============================================================ */
     .site-header {
-      background: var(--accent);
+      background: linear-gradient(135deg, #2D2017 0%, #4A3020 100%);
       color: #fff;
       position: sticky;
       top: 0;
       z-index: 200;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
     }
 
     [data-theme="dark"] .site-header {
-      background: #2D2017;
+      background: linear-gradient(135deg, #110D08 0%, #1A1410 100%);
+      border-bottom-color: rgba(255,255,255,0.06);
     }
 
     .header-main {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0.65rem 0;
+      padding: 0.75rem 0;
     }
 
     .header-left {
@@ -139,10 +141,10 @@
 
     .site-logo {
       font-family: var(--font-serif);
-      font-size: 1.55rem;
+      font-size: 1.65rem;
       font-weight: 900;
       color: #fff;
-      letter-spacing: -0.03em;
+      letter-spacing: -0.04em;
       white-space: nowrap;
       text-decoration: none;
     }
@@ -150,20 +152,22 @@
 
     .site-logo-sub {
       font-family: var(--font-sans);
-      font-size: 0.68rem;
+      font-size: 0.62rem;
       font-weight: 300;
-      color: rgba(255,255,255,0.7);
-      letter-spacing: 0.15em;
+      color: rgba(255,255,255,0.5);
+      letter-spacing: 0.2em;
       text-transform: uppercase;
       display: block;
-      margin-top: -2px;
+      margin-top: -1px;
     }
 
     .header-date {
-      font-size: 0.78rem;
-      color: rgba(255,255,255,0.65);
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.45);
       font-weight: 300;
       white-space: nowrap;
+      border-left: 1px solid rgba(255,255,255,0.15);
+      padding-left: 1.25rem;
     }
 
     .header-right {
@@ -264,25 +268,31 @@
 
     .site-nav a {
       display: block;
-      padding: 0.65rem 1rem;
-      font-size: 0.82rem;
+      padding: 0.72rem 1.15rem;
+      font-size: 0.8rem;
       font-weight: 500;
-      color: var(--text-secondary);
-      border-bottom: 3px solid transparent;
+      color: var(--text-muted);
+      border-bottom: 2px solid transparent;
       transition: all 0.2s;
+      letter-spacing: 0.01em;
     }
-    .site-nav a:hover,
+    .site-nav a:hover {
+      color: var(--text);
+      text-decoration: none;
+      background: var(--surface);
+    }
     .site-nav a.active {
       color: var(--accent);
       text-decoration: none;
       border-bottom-color: var(--accent);
+      font-weight: 600;
     }
 
     /* ============================================================
        ALERTS BAR
        ============================================================ */
     .alerts-bar {
-      background: var(--highlight-bg);
+      background: linear-gradient(90deg, var(--highlight-bg) 0%, #FFF0E6 100%);
       border-bottom: 1px solid var(--border);
       padding: 0.5rem 0;
       overflow: hidden;
@@ -332,11 +342,11 @@
     /* ============================================================
        MAIN CONTENT
        ============================================================ */
-    main { padding: 2rem 0 3rem; }
+    main { padding: 2.5rem 0 3rem; }
 
     .section {
-      margin-bottom: 3rem;
-      padding-top: 2rem;
+      margin-bottom: 3.5rem;
+      padding-top: 2.5rem;
       border-top: 1px solid var(--border);
     }
     .section:first-child { border-top: none; padding-top: 0; }
@@ -345,15 +355,15 @@
       display: flex;
       align-items: baseline;
       justify-content: space-between;
-      margin-bottom: 1.25rem;
+      margin-bottom: 1.5rem;
     }
 
     .section-title {
       font-family: var(--font-serif);
-      font-size: 1.35rem;
+      font-size: 1.4rem;
       font-weight: 900;
       color: var(--text);
-      letter-spacing: -0.02em;
+      letter-spacing: -0.025em;
       position: relative;
       padding-bottom: 0.4rem;
     }
@@ -368,7 +378,7 @@
     }
 
     .section-subtitle {
-      font-size: 0.78rem;
+      font-size: 0.82rem;
       color: var(--text-muted);
       font-weight: 400;
     }
@@ -385,7 +395,7 @@
     }
     .card:hover {
       box-shadow: var(--shadow-md);
-      transform: translateY(-1px);
+      transform: translateY(-2px);
     }
     .card-body { padding: 1.5rem; }
 
@@ -449,8 +459,8 @@
     }
 
     .report-body {
-      font-size: 0.92rem;
-      line-height: 1.95;
+      font-size: 0.95rem;
+      line-height: 2.0;
       color: var(--text);
       max-height: 520px;
       overflow-y: auto;
@@ -501,8 +511,8 @@
        ============================================================ */
     .pestle-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1.25rem;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
     }
 
     .pestle-card {
@@ -515,7 +525,7 @@
     }
     .pestle-card:hover {
       box-shadow: var(--shadow-md);
-      transform: translateY(-1px);
+      transform: translateY(-2px);
     }
 
     .pestle-card-top { height: 4px; }
@@ -565,7 +575,7 @@
       margin-bottom: 0.15rem;
     }
     .pestle-article-source {
-      font-size: 0.68rem;
+      font-size: 0.72rem;
       font-weight: 700;
       color: var(--text-muted);
       text-transform: uppercase;
@@ -576,15 +586,15 @@
       color: var(--text-muted);
     }
     .pestle-article-title {
-      font-size: 0.82rem;
-      font-weight: 500;
-      line-height: 1.45;
+      font-size: 0.9rem;
+      font-weight: 600;
+      line-height: 1.55;
       color: var(--text);
     }
     .pestle-article-summary {
-      font-size: 0.73rem;
+      font-size: 0.8rem;
       color: var(--text-secondary);
-      line-height: 1.5;
+      line-height: 1.6;
       margin-top: 0.2rem;
       display: -webkit-box;
       -webkit-line-clamp: 2;
@@ -937,8 +947,8 @@
       margin: 1.5rem 0 0.6rem;
     }
     .meta-report-body p {
-      font-size: 0.92rem;
-      line-height: 1.95;
+      font-size: 0.95rem;
+      line-height: 2.0;
       margin-bottom: 0.85rem;
       text-align: justify;
     }
@@ -947,55 +957,67 @@
        SECTION: INSIGHT FORM
        ============================================================ */
     .insight-form-wrapper {
-      background: var(--highlight-bg);
+      background: linear-gradient(135deg, var(--highlight-bg) 0%, var(--card) 100%);
       border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 2rem;
+      border-radius: 8px;
+      padding: 2.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .insight-form-wrapper::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-warm));
     }
     .insight-form-wrapper h3 {
       font-family: var(--font-serif);
-      font-size: 1.1rem;
+      font-size: 1.15rem;
       margin-bottom: 0.75rem;
+      color: var(--text);
     }
     .insight-form-wrapper p {
       font-size: 0.85rem;
       color: var(--text-secondary);
-      margin-bottom: 1rem;
+      margin-bottom: 1.25rem;
       line-height: 1.7;
     }
     .insight-form textarea {
       width: 100%;
-      min-height: 100px;
+      min-height: 120px;
       border: 1px solid var(--border);
-      border-radius: 5px;
-      padding: 0.85rem;
+      border-radius: 6px;
+      padding: 1rem;
       font-family: var(--font-sans);
       font-size: 0.88rem;
-      line-height: 1.6;
+      line-height: 1.7;
       background: var(--card);
       color: var(--text);
       resize: vertical;
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
-    .insight-form textarea:focus { outline: none; border-color: var(--accent); }
+    .insight-form textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(122,64,51,0.08); }
     .insight-form-actions {
       display: flex;
       justify-content: flex-end;
       gap: 0.75rem;
-      margin-top: 0.75rem;
+      margin-top: 1rem;
     }
     .btn-primary {
       background: var(--accent);
       color: #fff;
       border: none;
-      border-radius: 5px;
-      padding: 0.5rem 1.25rem;
+      border-radius: 6px;
+      padding: 0.55rem 1.35rem;
       font-family: var(--font-sans);
       font-size: 0.82rem;
       font-weight: 600;
       cursor: pointer;
-      transition: background 0.2s;
+      transition: background 0.2s, transform 0.1s;
     }
     .btn-primary:hover { background: var(--accent-soft); }
+    .btn-primary:active { transform: scale(0.98); }
     .btn-secondary {
       background: var(--surface);
       color: var(--text-secondary);
@@ -1223,10 +1245,11 @@
        FOOTER
        ============================================================ */
     .site-footer {
-      background: #2D2017;
+      background: linear-gradient(180deg, #2D2017 0%, #1A1410 100%);
       color: rgba(255,255,255,0.7);
-      padding: 2.5rem 0 1.5rem;
-      margin-top: 3rem;
+      padding: 3rem 0 1.5rem;
+      margin-top: 4rem;
+      border-top: 3px solid var(--accent);
     }
     .footer-grid {
       display: grid;
@@ -1298,6 +1321,8 @@
       height: 28px;
       border: 3px solid var(--border);
       border-top-color: var(--accent);
+      display: block;
+      margin: 0 auto;
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
       margin-bottom: 0.75rem;
@@ -2008,7 +2033,7 @@
     <section class="section app-section" id="section-reports" style="display:none;">
       <div class="section-header">
         <h2 class="section-title">レポート一覧</h2>
-        <span class="section-subtitle">Daily Report Archive</span>
+        <span class="section-subtitle">日次レポートアーカイブ</span>
       </div>
       <div id="reportsArchiveContent">
         <div class="loading-indicator">
@@ -2256,7 +2281,7 @@
 
       // --- 4. Academic papers (latest 10: 3 shown, 7 folded) ---
       const allPapers = [];
-      const fields = papers?.by_field || papers?.fields || {};
+      const fields = papers?.fields || papers?.by_field || {};
       Object.entries(fields).forEach(([field, list]) => {
         // Handle both array and object ({papers: [...]}) formats
         const arr = Array.isArray(list) ? list : (list && Array.isArray(list.papers) ? list.papers : []);
@@ -2279,21 +2304,23 @@
           '<summary style="padding:1rem 1.25rem;cursor:pointer;list-style:none;display:flex;align-items:center;gap:0.5rem;">' +
             '<span style="color:var(--accent);font-size:0.72rem;">&#9654;</span>' +
             '<span style="font-weight:600;font-size:0.88rem;">日本メディアの視点</span>' +
-            '<span style="font-size:0.72rem;color:var(--text-muted);margin-left:auto;">' + (jpReport.observations?.length || 0) + '件の観測</span>' +
+            '<span style="font-size:0.72rem;color:var(--text-muted);margin-left:auto;">' + ((jpReport.key_observations || jpReport.observations || []).length || 0) + '件の観測</span>' +
           '</summary>' +
           '<div style="padding:0 1.25rem 1.25rem;">' +
             '<div style="font-size:0.84rem;line-height:1.75;color:var(--text-secondary);margin-bottom:1rem;">' + escapeHtml(jpPreview) + '...</div>';
-        // Declining/Emerging myths
-        if (Array.isArray(jpReport.declining_myths) || Array.isArray(jpReport.emerging_myths)) {
+        // Declining/Emerging myths — support both myth_in_transition.declining and legacy declining_myths
+        const jpDeclining = (jpReport.myth_in_transition?.declining) || jpReport.declining_myths || [];
+        const jpEmerging = (jpReport.myth_in_transition?.emerging) || jpReport.emerging_myths || [];
+        if ((Array.isArray(jpDeclining) && jpDeclining.length > 0) || (Array.isArray(jpEmerging) && jpEmerging.length > 0)) {
           html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">';
-          if (Array.isArray(jpReport.declining_myths) && jpReport.declining_myths.length > 0) {
+          if (Array.isArray(jpDeclining) && jpDeclining.length > 0) {
             html += '<div style="padding:0.75rem;background:var(--cla-1);border-radius:6px;"><div style="font-size:0.68rem;font-weight:600;color:#8B3D2F;margin-bottom:0.3rem;">衰退する神話</div>';
-            jpReport.declining_myths.slice(0,3).forEach(m => { html += '<div style="font-size:0.75rem;line-height:1.5;">- ' + escapeHtml(String(m)) + '</div>'; });
+            jpDeclining.slice(0,3).forEach(m => { html += '<div style="font-size:0.75rem;line-height:1.5;">- ' + escapeHtml(String(m)) + '</div>'; });
             html += '</div>';
           }
-          if (Array.isArray(jpReport.emerging_myths) && jpReport.emerging_myths.length > 0) {
+          if (Array.isArray(jpEmerging) && jpEmerging.length > 0) {
             html += '<div style="padding:0.75rem;background:var(--cla-1);border-radius:6px;"><div style="font-size:0.68rem;font-weight:600;color:#2D7A6B;margin-bottom:0.3rem;">浮上する神話</div>';
-            jpReport.emerging_myths.slice(0,3).forEach(m => { html += '<div style="font-size:0.75rem;line-height:1.5;">- ' + escapeHtml(String(m)) + '</div>'; });
+            jpEmerging.slice(0,3).forEach(m => { html += '<div style="font-size:0.75rem;line-height:1.5;">- ' + escapeHtml(String(m)) + '</div>'; });
             html += '</div>';
           }
           html += '</div>';
@@ -2311,20 +2338,23 @@
           '<summary style="padding:1rem 1.25rem;cursor:pointer;list-style:none;display:flex;align-items:center;gap:0.5rem;">' +
             '<span style="color:var(--accent);font-size:0.72rem;">&#9654;</span>' +
             '<span style="font-weight:600;font-size:0.88rem;">海外メディアの視点</span>' +
-            '<span style="font-size:0.72rem;color:var(--text-muted);margin-left:auto;">' + (glReport.observations?.length || 0) + '件の観測</span>' +
+            '<span style="font-size:0.72rem;color:var(--text-muted);margin-left:auto;">' + ((glReport.key_observations || glReport.observations || []).length || 0) + '件の観測</span>' +
           '</summary>' +
           '<div style="padding:0 1.25rem 1.25rem;">' +
             '<div style="font-size:0.84rem;line-height:1.75;color:var(--text-secondary);margin-bottom:1rem;">' + escapeHtml(glPreview) + '...</div>';
-        if (Array.isArray(glReport.declining_myths) || Array.isArray(glReport.emerging_myths)) {
+        // Declining/Emerging myths — support myth_in_transition.declining and legacy declining_myths
+        const glDeclining = (glReport.myth_in_transition?.declining) || glReport.declining_myths || [];
+        const glEmerging = (glReport.myth_in_transition?.emerging) || glReport.emerging_myths || [];
+        if ((Array.isArray(glDeclining) && glDeclining.length > 0) || (Array.isArray(glEmerging) && glEmerging.length > 0)) {
           html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">';
-          if (Array.isArray(glReport.declining_myths) && glReport.declining_myths.length > 0) {
+          if (Array.isArray(glDeclining) && glDeclining.length > 0) {
             html += '<div style="padding:0.75rem;background:var(--cla-1);border-radius:6px;"><div style="font-size:0.68rem;font-weight:600;color:#8B3D2F;margin-bottom:0.3rem;">衰退する神話</div>';
-            glReport.declining_myths.slice(0,3).forEach(m => { html += '<div style="font-size:0.75rem;line-height:1.5;">- ' + escapeHtml(String(m)) + '</div>'; });
+            glDeclining.slice(0,3).forEach(m => { html += '<div style="font-size:0.75rem;line-height:1.5;">- ' + escapeHtml(String(m)) + '</div>'; });
             html += '</div>';
           }
-          if (Array.isArray(glReport.emerging_myths) && glReport.emerging_myths.length > 0) {
+          if (Array.isArray(glEmerging) && glEmerging.length > 0) {
             html += '<div style="padding:0.75rem;background:var(--cla-1);border-radius:6px;"><div style="font-size:0.68rem;font-weight:600;color:#2D7A6B;margin-bottom:0.3rem;">浮上する神話</div>';
-            glReport.emerging_myths.slice(0,3).forEach(m => { html += '<div style="font-size:0.75rem;line-height:1.5;">- ' + escapeHtml(String(m)) + '</div>'; });
+            glEmerging.slice(0,3).forEach(m => { html += '<div style="font-size:0.75rem;line-height:1.5;">- ' + escapeHtml(String(m)) + '</div>'; });
             html += '</div>';
           }
           html += '</div>';
@@ -2399,6 +2429,7 @@
               '<span class="ws-badge ' + impactClass + '">' + escapeHtml(ws.potential_impact || '') + '</span>' +
               (ws.time_horizon ? '<span class="ws-badge ws-badge-horizon">' + escapeHtml(ws.time_horizon) + '</span>' : '') +
             '</div>' +
+            (ws.signal ? '<div style="font-size:0.88rem;font-weight:600;line-height:1.45;margin-bottom:0.2rem;">' + escapeHtml(ws.signal) + '</div>' : '') +
             '<div style="font-size:0.84rem;line-height:1.6;">' + escapeHtml(ws.description || '') + '</div>' +
           '</div>';
         });
@@ -2452,7 +2483,7 @@
         '<div style="display:flex;align-items:center;gap:0.4rem;margin-bottom:0.15rem;">' +
           '<span style="font-size:0.62rem;font-weight:600;color:' + color + ';background:' + color + '15;padding:0.1rem 0.3rem;border-radius:3px;">' + escapeHtml(p._field || '') + '</span>' +
           '<span style="font-size:0.68rem;color:var(--text-muted);">' + escapeHtml(p.source_name || '') + '</span>' +
-          (p.novelty_score ? '<span style="font-size:0.62rem;color:var(--accent-warm);margin-left:auto;">Novelty: ' + p.novelty_score + '</span>' : '') +
+          (p.novelty_score ? '<span style="font-size:0.62rem;color:var(--accent-warm);margin-left:auto;">新規性: ' + p.novelty_score + '</span>' : '') +
         '</div>' +
         '<div style="font-size:0.84rem;font-weight:500;line-height:1.45;">' + escapeHtml(p.title_ja || p.title || '') + '</div>' +
         (p.title_ja && p.title ? '<div style="font-size:0.72rem;color:var(--text-muted);line-height:1.35;margin-top:0.1rem;">' + escapeHtml(p.title) + '</div>' : '') +
@@ -2477,92 +2508,6 @@
         showSection('section-foresight');
       }, 1500);
     };
-
-    // ==========================================================
-    // RENDER: DAILY REPORT (kept for report-archive use)
-    // ==========================================================
-    function renderDailyReport(data) {
-      const container = document.getElementById('dailyReportContent');
-      if (!data) {
-        container.innerHTML = '<p style="color:var(--text-muted);">日次レポートデータを取得できませんでした。</p>';
-        return;
-      }
-
-      const region = data[currentRegion] || data.japan || data.global;
-      if (!region) {
-        container.innerHTML = '<p style="color:var(--text-muted);">この地域のレポートはまだ生成されていません。</p>';
-        return;
-      }
-
-      const dateStr = data.generated_at ? data.generated_at.split('T')[0] : (data.date || '');
-      document.getElementById('reportDateSub').textContent = dateStr;
-
-      // Sidebar: key observations and action implications
-      const observations = region.key_observations || region.observations || [];
-      const implications = region.action_implications || region.implications || [];
-      const sidebarItems = [];
-      observations.slice(0, 3).forEach(o => {
-        const text = typeof o === 'string' ? o : (o.observation || o.theme || '');
-        const label = typeof o === 'object' ? (o.theme || o.category || '注目点') : '注目点';
-        const detail = typeof o === 'string' ? o : (o.observation || '');
-        sidebarItems.push({ label, text: detail });
-      });
-      implications.slice(0, 3).forEach(i => {
-        const text = typeof i === 'string' ? i : (i.implication || i.action || '');
-        const label = typeof i === 'object' ? (i.area || i.domain || '示唆') : '示唆';
-        sidebarItems.push({ label, text: typeof i === 'string' ? i : (i.implication || i.action || '') });
-      });
-
-      // Myth transition
-      const mythTransition = region.myth_in_transition || {};
-      if (mythTransition.fading_myth) {
-        sidebarItems.push({ label: '衰退する神話', text: mythTransition.fading_myth.substring(0, 120) });
-      }
-      if (mythTransition.emerging_myth) {
-        sidebarItems.push({ label: '台頭する神話', text: mythTransition.emerging_myth.substring(0, 120) });
-      }
-      // Fallback to declining/emerging arrays
-      const declining = region.declining_myths || [];
-      const emerging = region.emerging_myths || [];
-      if (!mythTransition.fading_myth && declining.length > 0) {
-        sidebarItems.push({ label: '衰退する神話', text: declining.slice(0, 2).join(' / ') });
-      }
-      if (!mythTransition.emerging_myth && emerging.length > 0) {
-        sidebarItems.push({ label: '台頭する神話', text: emerging.slice(0, 2).join(' / ') });
-      }
-
-      const sidebarHTML = sidebarItems.length > 0 ? `
-        <div class="daily-report-sidebar">
-          ${sidebarItems.slice(0, 6).map(item => `
-            <div class="insight-card">
-              <div class="insight-card-label">${escapeHtml(item.label)}</div>
-              <div class="insight-card-text">${escapeHtml(item.text)}</div>
-            </div>
-          `).join('')}
-        </div>
-      ` : '';
-
-      const reportText = renderMarkdown(region.report_text || '');
-      const reportId = `daily-report-${currentRegion}-${dateStr}`;
-
-      container.innerHTML = `
-        <div class="daily-report-wrapper">
-          <div class="daily-report-main">
-            <div class="report-header">
-              <div>
-                <h3 class="report-title">${currentRegion === 'japan' ? '日本メディアの視点から' : 'グローバルメディアの視点から'}</h3>
-                <div class="report-actions">
-                  <span class="report-date">${escapeHtml(dateStr)}</span>
-                  <button class="btn-icon" onclick="openReportCommentModal('${escapeAttr(reportId)}','日次レポート (${currentRegion === 'japan' ? '日本版' : 'グローバル版'})')" title="コメント">&#128172; コメント</button>
-                </div>
-              </div>
-            </div>
-            <div class="report-body prose">${reportText}</div>
-          </div>
-          ${sidebarHTML}
-        </div>
-      `;
-    }
 
     // ==========================================================
     // RENDER: PESTLE NEWS (with lang filter)
@@ -2887,13 +2832,13 @@
             `).join('')}
             ${catData.key_tension ? `
               <div style="padding:0.75rem 1.35rem;background:var(--highlight-bg);border-top:1px solid var(--border);">
-                <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--accent);margin-bottom:0.2rem;">Key Tension</div>
+                <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--accent);margin-bottom:0.2rem;">主要な緊張</div>
                 <div style="font-size:0.82rem;line-height:1.65;">${escapeHtml(catData.key_tension)}</div>
               </div>
             ` : ''}
             ${catData.emerging_narrative ? `
               <div style="padding:0.75rem 1.35rem;background:var(--surface);border-top:1px solid var(--border);">
-                <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--accent);margin-bottom:0.2rem;">Emerging Narrative</div>
+                <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--accent);margin-bottom:0.2rem;">浮上する物語</div>
                 <div style="font-size:0.82rem;line-height:1.65;">${escapeHtml(catData.emerging_narrative)}</div>
               </div>
             ` : ''}
@@ -2951,7 +2896,7 @@
             const wsIsBookmarked = bookmarks.some(b => b.id === wsBookmarkId);
             return '<div class="ws-card" id="ws-card-' + i + '">' +
               '<div class="ws-card-header" onclick="toggleWSCard(' + i + ')">' +
-                '<div class="ws-card-title">' + escapeHtml(ws.description ? ws.description.substring(0, 120) : '') + '</div>' +
+                '<div class="ws-card-title">' + escapeHtml(ws.signal || (ws.description ? ws.description.substring(0, 120) : '')) + '</div>' +
                 '<div class="ws-card-badges">' +
                   '<span class="ws-badge ' + impactClass + '">' + escapeHtml(ws.potential_impact || 'N/A') + '</span>' +
                   (ws.time_horizon ? '<span class="ws-badge ws-badge-horizon">' + escapeHtml(ws.time_horizon) + '</span>' : '') +
@@ -2962,7 +2907,7 @@
               '<div class="ws-card-body">' +
                 '<div class="ws-label">詳細</div><div>' + escapeHtml(ws.description || '') + '</div>' +
                 (cats ? '<div class="ws-label">関連カテゴリ</div><div>' + escapeHtml(cats) + '</div>' : '') +
-                (ws.related_headlines && ws.related_headlines.length > 0 ?
+                (Array.isArray(ws.related_headlines) && ws.related_headlines.length > 0 ?
                   '<div class="ws-label">関連ヘッドライン</div><ul>' + ws.related_headlines.map(h => '<li>' + escapeHtml(h) + '</li>').join('') + '</ul>' : '') +
                 (ws.counter_trend ? '<div class="ws-label">カウンタートレンド</div><div>' + escapeHtml(ws.counter_trend) + '</div>' : '') +
               '</div>' +
@@ -2997,26 +2942,28 @@
           }
         }
 
-        // Yearly timeline
-        if (yearlyData && yearlyData.entries) {
+        // Yearly timeline (support both top-level array and {entries: [...]} format)
+        const yearlyEntries = Array.isArray(yearlyData) ? yearlyData : (yearlyData && yearlyData.entries ? yearlyData.entries : []);
+        if (yearlyEntries.length > 0) {
           const timelineEl = document.getElementById('claYearlyTimeline');
           if (timelineEl) {
-            timelineEl.innerHTML = yearlyData.entries.map(e =>
+            timelineEl.innerHTML = yearlyEntries.map(e =>
               '<button onclick="showCLADetail(\'yearly\',\'' + e.period + '\')" style="padding:0.25rem 0.5rem;font-size:0.7rem;border:1px solid var(--border);background:var(--card);color:var(--text-secondary);border-radius:4px;cursor:pointer;font-family:var(--font-sans);" class="cla-period-btn">' + e.period + '</button>'
             ).join('');
           }
-          window._claYearly = yearlyData.entries;
+          window._claYearly = yearlyEntries;
         }
 
-        // Quarterly timeline
-        if (quarterlyData && quarterlyData.entries) {
+        // Quarterly timeline (support both top-level array and {entries: [...]} format)
+        const quarterlyEntries = Array.isArray(quarterlyData) ? quarterlyData : (quarterlyData && quarterlyData.entries ? quarterlyData.entries : []);
+        if (quarterlyEntries.length > 0) {
           const timelineEl = document.getElementById('claQuarterlyTimeline');
           if (timelineEl) {
-            timelineEl.innerHTML = quarterlyData.entries.map(e =>
+            timelineEl.innerHTML = quarterlyEntries.map(e =>
               '<button onclick="showCLADetail(\'quarterly\',\'' + e.period + '\')" style="padding:0.25rem 0.5rem;font-size:0.7rem;border:1px solid var(--border);background:var(--card);color:var(--text-secondary);border-radius:4px;cursor:pointer;font-family:var(--font-sans);" class="cla-period-btn">' + e.period + '</button>'
             ).join('');
           }
-          window._claQuarterly = quarterlyData.entries;
+          window._claQuarterly = quarterlyEntries;
         }
       } catch (e) {
         console.error('CLA archive load error:', e);
@@ -3092,26 +3039,32 @@
         '</div>' +
         '<div style="font-size:0.82rem;color:var(--text-secondary);line-height:1.6;margin-bottom:0.75rem;">' + escapeHtml(preview) + '</div>';
 
-      // Observations
-      if (region.observations && region.observations.length > 0) {
+      // Observations (support both key_observations and legacy observations)
+      const regionObs = region.key_observations || region.observations || [];
+      if (regionObs.length > 0) {
         html += '<div style="margin-bottom:0.75rem;"><div style="font-size:0.72rem;font-weight:600;color:var(--accent);margin-bottom:0.35rem;">観測</div>';
-        region.observations.forEach(o => {
+        regionObs.forEach(o => {
           html += '<div style="font-size:0.78rem;line-height:1.55;padding:0.35rem 0;border-bottom:1px solid var(--surface);">[' + escapeHtml(o.category || '') + '] ' + escapeHtml(o.observation || '') + '</div>';
         });
         html += '</div>';
       }
 
-      // Myths
-      if (region.declining_myths || region.emerging_myths) {
+      // Myths (support both myth_in_transition and legacy declining_myths/emerging_myths)
+      const detailMythTr = region.myth_in_transition || {};
+      const detailDecliningRaw = detailMythTr.declining || region.declining_myths || [];
+      const detailEmergingRaw = detailMythTr.emerging || region.emerging_myths || [];
+      const detailDeclining = Array.isArray(detailDecliningRaw) ? detailDecliningRaw : [];
+      const detailEmerging = Array.isArray(detailEmergingRaw) ? detailEmergingRaw : [];
+      if (detailDeclining.length > 0 || detailEmerging.length > 0) {
         html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">';
-        if (region.declining_myths) {
+        if (detailDeclining.length > 0) {
           html += '<div><div style="font-size:0.72rem;font-weight:600;color:#8B3D2F;margin-bottom:0.3rem;">衰退する神話</div>';
-          region.declining_myths.forEach(m => { html += '<div style="font-size:0.78rem;line-height:1.5;padding:0.2rem 0;">- ' + escapeHtml(m) + '</div>'; });
+          detailDeclining.forEach(m => { html += '<div style="font-size:0.78rem;line-height:1.5;padding:0.2rem 0;">- ' + escapeHtml(m) + '</div>'; });
           html += '</div>';
         }
-        if (region.emerging_myths) {
+        if (detailEmerging.length > 0) {
           html += '<div><div style="font-size:0.72rem;font-weight:600;color:#2D7A6B;margin-bottom:0.3rem;">浮上する神話</div>';
-          region.emerging_myths.forEach(m => { html += '<div style="font-size:0.78rem;line-height:1.5;padding:0.2rem 0;">- ' + escapeHtml(m) + '</div>'; });
+          detailEmerging.forEach(m => { html += '<div style="font-size:0.78rem;line-height:1.5;padding:0.2rem 0;">- ' + escapeHtml(m) + '</div>'; });
           html += '</div>';
         }
         html += '</div>';
@@ -3137,8 +3090,8 @@
         return;
       }
 
-      // Prefer by_field (primary key in data spec), fallback to fields
-      const fields = data.by_field || data.fields || {};
+      // Prefer fields (actual API key), fallback to by_field
+      const fields = data.fields || data.by_field || {};
       const fieldNames = Object.keys(fields);
       if (fieldNames.length === 0) {
         container.innerHTML = '<p style="color:var(--text-muted);">論文データがありません。</p>';
