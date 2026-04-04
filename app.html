@@ -209,7 +209,7 @@
       background: rgba(255,255,255,0.1);
     }
     .region-toggle-desc {
-      font-size: 0.6rem;
+      font-size: 0.7rem;
       color: rgba(255,255,255,0.5);
       white-space: nowrap;
     }
@@ -555,7 +555,9 @@
       max-height: 320px;
       overflow-y: auto;
     }
-    .pestle-articles::-webkit-scrollbar { width: 3px; }
+    scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+    }
+    .pestle-articles::-webkit-scrollbar { width: 3px; 
     .pestle-articles::-webkit-scrollbar-track { background: transparent; }
     .pestle-articles::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
@@ -602,7 +604,7 @@
       overflow: hidden;
     }
     .pestle-article-score {
-      font-size: 0.62rem;
+      font-size: 0.72rem;
       color: var(--accent-soft);
       margin-top: 0.15rem;
     }
@@ -1856,14 +1858,14 @@
             </div>
             <span class="region-toggle-desc" id="regionDesc">日本メディアの視点</span>
           </div>
-          <button class="theme-toggle" id="themeToggle" title="ダークモード切替">&#9789;</button>
+          <button class="theme-toggle" id="themeToggle" title="ダークモード切替" aria-label="ダークモード切替">&#9789;</button>
           <div class="auth-area" id="authArea">
             <span>読み込み中...</span>
           </div>
         </div>
       </div>
     </div>
-    <nav class="site-nav">
+    <nav class="site-nav" aria-label="メインナビゲーション">
       <div class="container">
         <ul>
           <li><a href="app.html#section-home" data-nav="section-home">ホーム</a></li>
@@ -2057,9 +2059,9 @@
   <!-- ============================================================
        ARTICLE MODAL (for detail view + per-article comments)
        ============================================================ -->
-  <div class="modal-overlay" id="articleModal">
+  <div class="modal-overlay" id="articleModal" role="dialog" aria-modal="true">
     <div class="modal-box">
-      <button class="modal-close" onclick="closeArticleModal()">&times;</button>
+      <button class="modal-close" onclick="closeArticleModal()" aria-label="閉じる">&times;</button>
       <div id="articleModalContent"></div>
     </div>
   </div>
@@ -2300,7 +2302,7 @@
       // Japan report
       if (jpReport) {
         const jpPreview = (jpReport.report_text || '').substring(0, 300);
-        html += '<details style="margin-bottom:1rem;background:var(--card);border:1px solid var(--border);border-radius:8px;box-shadow:var(--shadow-sm);">' +
+        html += '<details open style="margin-bottom:1rem;background:var(--card);border:1px solid var(--border);border-radius:8px;box-shadow:var(--shadow-sm);">' +
           '<summary style="padding:1rem 1.25rem;cursor:pointer;list-style:none;display:flex;align-items:center;gap:0.5rem;">' +
             '<span style="color:var(--accent);font-size:0.72rem;">&#9654;</span>' +
             '<span style="font-weight:600;font-size:0.88rem;">日本メディアの視点</span>' +
@@ -2334,7 +2336,7 @@
       // Global report
       if (glReport) {
         const glPreview = (glReport.report_text || '').substring(0, 300);
-        html += '<details style="margin-bottom:1rem;background:var(--card);border:1px solid var(--border);border-radius:8px;box-shadow:var(--shadow-sm);">' +
+        html += '<details open style="margin-bottom:1rem;background:var(--card);border:1px solid var(--border);border-radius:8px;box-shadow:var(--shadow-sm);">' +
           '<summary style="padding:1rem 1.25rem;cursor:pointer;list-style:none;display:flex;align-items:center;gap:0.5rem;">' +
             '<span style="color:var(--accent);font-size:0.72rem;">&#9654;</span>' +
             '<span style="font-weight:600;font-size:0.88rem;">海外メディアの視点</span>' +
@@ -2365,57 +2367,11 @@
       }
       html += '</div>';
 
-      // ===== 2. Insight News Preview =====
+      // ===== 2. Insight News (Full PESTLE grid embedded in home) =====
       html += '<div>';
       html += '<h2 class="section-title" style="margin-bottom:1rem;">Insight News</h2>';
-      html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">';
-
-      // Japan news
-      html += '<div>';
-      html += '<div style="font-weight:600;font-size:0.82rem;color:var(--accent);margin-bottom:0.5rem;padding-bottom:0.35rem;border-bottom:2px solid var(--accent);">日本メディア</div>';
-      if (jpArticles.length > 0) {
-        jpArticles.forEach(a => {
-          const catInfo = PESTLE_CATS[a._pestleCat] || {};
-          html += '<div style="padding:0.5rem 0;border-bottom:1px solid var(--surface);cursor:pointer;" onclick="window.open(\'' + escapeAttr(safeUrl(a.url)) + '\',\'_blank\')">' +
-            '<div style="display:flex;align-items:center;gap:0.4rem;margin-bottom:0.15rem;">' +
-              '<span style="font-size:0.62rem;font-weight:600;color:' + (catInfo.color||'var(--accent)') + ';background:' + (catInfo.color||'var(--accent)') + '15;padding:0.1rem 0.3rem;border-radius:3px;">' + (catInfo.labelJa||a._pestleCat) + '</span>' +
-              '<span style="font-size:0.68rem;color:var(--text-muted);">' + escapeHtml(a.source || '') + '</span>' +
-            '</div>' +
-            '<div style="font-size:0.82rem;font-weight:500;line-height:1.45;">' + escapeHtml(a.title) + '</div>' +
-          '</div>';
-        });
-      } else {
-        html += '<div style="color:var(--text-muted);font-size:0.82rem;">日本語ソースの記事がありません</div>';
-      }
-      html += '<a href="app.html#section-news" style="display:block;margin-top:0.5rem;font-size:0.78rem;font-weight:500;" onclick="event.preventDefault();showSection(\'section-news\');history.pushState(null,\'\',\'app.html#section-news\')">もっと見る &rarr;</a>';
+      html += '<div id="homePestleGrid"></div>';
       html += '</div>';
-
-      // Global news
-      html += '<div>';
-      html += '<div style="font-weight:600;font-size:0.82rem;color:var(--accent);margin-bottom:0.5rem;padding-bottom:0.35rem;border-bottom:2px solid var(--accent);">海外メディア</div>';
-      if (glArticles.length > 0) {
-        glArticles.forEach((a, idx) => {
-          const catInfo = PESTLE_CATS[a._pestleCat] || {};
-          // Try to find translation
-          const catTranslations = translations[a._pestleCat] || [];
-          const trans = catTranslations.find(t => t.index === a._origIdx);
-          const titleJa = trans?.title_translated || '';
-          html += '<div style="padding:0.5rem 0;border-bottom:1px solid var(--surface);cursor:pointer;" onclick="window.open(\'' + escapeAttr(safeUrl(a.url)) + '\',\'_blank\')">' +
-            '<div style="display:flex;align-items:center;gap:0.4rem;margin-bottom:0.15rem;">' +
-              '<span style="font-size:0.62rem;font-weight:600;color:' + (catInfo.color||'var(--accent)') + ';background:' + (catInfo.color||'var(--accent)') + '15;padding:0.1rem 0.3rem;border-radius:3px;">' + (catInfo.labelJa||a._pestleCat) + '</span>' +
-              '<span style="font-size:0.68rem;color:var(--text-muted);">' + escapeHtml(a.source || '') + '</span>' +
-            '</div>' +
-            '<div style="font-size:0.82rem;font-weight:500;line-height:1.45;">' + escapeHtml(a.title) + '</div>' +
-            (titleJa ? '<div style="font-size:0.75rem;color:var(--accent-soft);line-height:1.4;margin-top:0.1rem;">' + escapeHtml(titleJa) + '</div>' : '') +
-          '</div>';
-        });
-      } else {
-        html += '<div style="color:var(--text-muted);font-size:0.82rem;">英語ソースの記事がありません</div>';
-      }
-      html += '<a href="app.html#section-news" style="display:block;margin-top:0.5rem;font-size:0.78rem;font-weight:500;" onclick="event.preventDefault();showSection(\'section-news\');history.pushState(null,\'\',\'app.html#section-news\')">もっと見る &rarr;</a>';
-      html += '</div>';
-
-      html += '</div></div>';
 
       // ===== 3. Latest Signals =====
       if (signals.length > 0) {
@@ -2711,6 +2667,7 @@
       const input = document.getElementById('modalCommentInput');
       const text = input.value.trim();
       if (!text) return;
+      if (text.length > 1000) { alert('コメントは1000文字以内で入力してください。'); return; }
       const user = auth.currentUser;
       if (!user) { showToast('コメントするにはログインが必要です。', 'error'); return; }
 
@@ -3190,7 +3147,8 @@
 
     window.togglePapersGroup = function(index) {
       const group = document.getElementById(`papers-group-${index}`);
-      if (group) group.classList.toggle('open');
+      if (!group) return;
+      group.classList.toggle('open');
       const body = group.querySelector('.papers-field-body');
       const chevron = group.querySelector('.papers-field-chevron');
       if (group.classList.contains('open')) {
