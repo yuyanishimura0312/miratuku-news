@@ -2305,6 +2305,18 @@
     // RENDER: INSIGHT REPORTS HERO + CAROUSEL
     // ==============================================================
 
+    // Strip markdown syntax for plain-text previews
+    function stripMarkdown(text) {
+      return (text || '')
+        .replace(/^#{1,6}\s+/gm, '')       // headings
+        .replace(/\*\*([^*]+)\*\*/g, '$1')  // bold
+        .replace(/\*([^*]+)\*/g, '$1')      // italic
+        .replace(/`([^`]+)`/g, '$1')        // inline code
+        .replace(/^\s*[-*]\s+/gm, '')       // list items
+        .replace(/\n{2,}/g, '\n')           // excess newlines
+        .trim();
+    }
+
     // Store reports data globally for interactive switching
     let _insightReportsData = null;
     let _insightHeroIndex = 0;
@@ -2351,7 +2363,7 @@
           var catInfo = PESTLE_CATS[r.article?.pestle_category] || { labelJa: '', color: 'var(--accent)' };
           var mythLabel = r.myth_relation === 'strengthens' ? '強化' : '変革';
           var mythClass = r.myth_relation === 'strengthens' ? 'ir-myth-badge-strengthens' : 'ir-myth-badge-transforms';
-          var preview = (r.report_text || '').substring(0, 120);
+          var preview = stripMarkdown(r.report_text || '').substring(0, 120);
           html += '<div class="ir-carousel-card" onclick="openInsightReport(' + realIdx + ')">' +
             '<div class="ir-carousel-accent" style="background:' + catInfo.color + '"></div>' +
             '<div class="ir-carousel-body">' +
@@ -2377,7 +2389,7 @@
       var catInfo = PESTLE_CATS[report.article?.pestle_category] || { labelJa: '', color: 'var(--accent)' };
       var mythLabel = report.myth_relation === 'strengthens' ? '神話を強化' : '神話を変革';
       var mythClass = report.myth_relation === 'strengthens' ? 'ir-myth-badge-strengthens' : 'ir-myth-badge-transforms';
-      var preview = (report.report_text || '').substring(0, 300);
+      var preview = stripMarkdown(report.report_text || '').substring(0, 300);
 
       return '<div class="ir-hero-card" onclick="openInsightReport(' + index + ')">' +
         '<div class="ir-hero-accent" style="background:' + catInfo.color + '"></div>' +
@@ -2472,178 +2484,6 @@
       if (carousel) {
         carousel.scrollBy({ left: direction * 320, behavior: 'smooth' });
       }
-    };
-
-    // ==============================================================
-    // RENDER: INSIGHT REPORTS HERO + CAROUSEL
-    // ==============================================================
-    let __irData = null; // cached insight reports data
-
-    function getPestleColor(cat) {
-      return PESTLE_CATS[cat]?.color || 'var(--accent)';
-    }
-    function getPestleLabel(cat) {
-      return PESTLE_CATS[cat]?.labelJa || cat;
-    }
-    function mythBadgeHtml(relation, cls) {
-      const isChange = relation === 'changes';
-      const label = isChange ? '神話を変革' : '神話を強化';
-      const badgeCls = isChange ? 'ir-myth-badge-transforms' : 'ir-myth-badge-strengthens';
-      return '<span class="' + cls + ' ' + badgeCls + '">' + label + '</span>';
-    }
-
-    function renderInsightReportsHero(data) {
-      __irData = data;
-      const reports = data.reports || [];
-      if (reports.length === 0) return '';
-      const hero = reports[0];
-      const heroColor = getPestleColor(hero.article?.pestle_category);
-
-      let html = '<div class="ir-section"><h2 class="section-title">Insight Reports <span class="section-date">' + escapeHtml(data.date || '') + '</span></h2>';
-
-      // Hero layout: hero card + side panel
-      html += '<div class="ir-hero-layout">';
-
-      // Hero card
-      html += '<div class="ir-hero-card" id="irHeroCard" onclick="openInsightReport(0)">' +
-        '<div class="ir-hero-accent" id="irHeroAccent" style="background:' + heroColor + '"></div>' +
-        '<div class="ir-hero-body" id="irHeroBody">' +
-          '<span class="ir-hero-cat-badge" id="irHeroCat" style="background:' + heroColor + '">' + escapeHtml(getPestleLabel(hero.article?.pestle_category)) + '</span>' +
-          '<div class="ir-hero-title" id="irHeroTitle">' + escapeHtml(hero.report_title || '') + '</div>' +
-          mythBadgeHtml(hero.myth_relation, 'ir-myth-badge') +
-          '<div class="ir-myth-text" id="irHeroMyth">' + escapeHtml(hero.related_myth || '') + '</div>' +
-          '<div class="ir-hero-preview" id="irHeroPreview">' + escapeHtml((hero.report_text || '').substring(0, 300)) + '...</div>' +
-          '<div class="ir-hero-read-more">続きを読む</div>' +
-          '<div class="ir-hero-source" id="irHeroSource">' + escapeHtml(hero.article?.source || '') + ' / ' + escapeHtml(hero.article?.published_date || '') + '</div>' +
-        '</div></div>';
-
-      // Side panel
-      html += '<div class="ir-side-panel"><div class="ir-side-panel-title">全レポート</div>';
-      reports.forEach((r, i) => {
-        const color = getPestleColor(r.article?.pestle_category);
-        const isChange = r.myth_relation === 'changes';
-        const mythCls = isChange ? 'ir-myth-badge-transforms' : 'ir-myth-badge-strengthens';
-        const mythLabel = isChange ? '変革' : '強化';
-        html += '<div class="ir-side-item' + (i === 0 ? ' active' : '') + '" data-ir-index="' + i + '" onclick="switchHeroReport(' + i + ')">' +
-          '<div class="ir-side-dot" style="background:' + color + '"></div>' +
-          '<div class="ir-side-text">' +
-            '<div class="ir-side-title">' + escapeHtml(r.report_title || '') + '</div>' +
-            '<span class="ir-side-myth ' + mythCls + '">' + mythLabel + '</span>' +
-          '</div></div>';
-      });
-      html += '</div>';
-      html += '</div>'; // end hero-layout
-
-      // Carousel (remaining reports)
-      if (reports.length > 1) {
-        html += '<div class="ir-carousel-wrap">' +
-          '<button class="ir-carousel-btn ir-carousel-btn-left" onclick="scrollInsightCarousel(-1)">&#9664;</button>' +
-          '<div class="ir-carousel" id="irCarousel">';
-        reports.slice(1).forEach((r, i) => {
-          const idx = i + 1;
-          const color = getPestleColor(r.article?.pestle_category);
-          html += '<div class="ir-carousel-card" onclick="openInsightReport(' + idx + ')">' +
-            '<div class="ir-carousel-accent" style="background:' + color + '"></div>' +
-            '<div class="ir-carousel-body">' +
-              '<div class="ir-carousel-header"><div class="ir-carousel-dot" style="background:' + color + '"></div>' +
-              '<span class="ir-carousel-cat">' + escapeHtml(getPestleLabel(r.article?.pestle_category)) + '</span></div>' +
-              '<div class="ir-carousel-title">' + escapeHtml(r.report_title || '') + '</div>' +
-              mythBadgeHtml(r.myth_relation, 'ir-carousel-myth') +
-              '<div class="ir-carousel-preview">' + escapeHtml((r.report_text || '').substring(0, 120)) + '...</div>' +
-            '</div></div>';
-        });
-        html += '</div>' +
-          '<button class="ir-carousel-btn ir-carousel-btn-right" onclick="scrollInsightCarousel(1)">&#9654;</button>' +
-          '</div>';
-      }
-
-      html += '</div>'; // end ir-section
-      return html;
-    }
-
-    window.switchHeroReport = function(index) {
-      if (!__irData?.reports?.[index]) return;
-      const r = __irData.reports[index];
-      const color = getPestleColor(r.article?.pestle_category);
-
-      const accent = document.getElementById('irHeroAccent');
-      const cat = document.getElementById('irHeroCat');
-      const title = document.getElementById('irHeroTitle');
-      const myth = document.getElementById('irHeroMyth');
-      const preview = document.getElementById('irHeroPreview');
-      const source = document.getElementById('irHeroSource');
-      const card = document.getElementById('irHeroCard');
-
-      if (accent) accent.style.background = color;
-      if (cat) { cat.style.background = color; cat.textContent = getPestleLabel(r.article?.pestle_category); }
-      if (title) title.textContent = r.report_title || '';
-      if (myth) myth.textContent = r.related_myth || '';
-      if (preview) preview.textContent = (r.report_text || '').substring(0, 300) + '...';
-      if (source) source.textContent = (r.article?.source || '') + ' / ' + (r.article?.published_date || '');
-      if (card) card.onclick = function() { openInsightReport(index); };
-
-      // Update myth badge
-      const heroBody = document.getElementById('irHeroBody');
-      if (heroBody) {
-        const oldBadge = heroBody.querySelector('.ir-myth-badge');
-        if (oldBadge) {
-          const tmp = document.createElement('div');
-          tmp.innerHTML = mythBadgeHtml(r.myth_relation, 'ir-myth-badge');
-          oldBadge.replaceWith(tmp.firstChild);
-        }
-      }
-
-      // Update side panel active state
-      document.querySelectorAll('.ir-side-item').forEach((el, i) => {
-        el.classList.toggle('active', i === index);
-      });
-    };
-
-    window.openInsightReport = function(index) {
-      if (!__irData?.reports?.[index]) return;
-      const r = __irData.reports[index];
-      const color = getPestleColor(r.article?.pestle_category);
-      const modal = document.getElementById('articleModal');
-      const content = document.getElementById('articleModalContent');
-      if (!modal || !content) return;
-
-      let html = '<div style="border-top:4px solid ' + color + ';padding-top:16px">' +
-        '<span class="ir-hero-cat-badge" style="background:' + color + '">' + escapeHtml(getPestleLabel(r.article?.pestle_category)) + '</span> ' +
-        mythBadgeHtml(r.myth_relation, 'ir-myth-badge') +
-        '<h2 style="margin:12px 0 8px;font-size:1.3rem;line-height:1.4">' + escapeHtml(r.report_title || '') + '</h2>' +
-        '<div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:6px">' +
-          escapeHtml(r.article?.source || '') + ' / ' + escapeHtml(r.article?.published_date || '') +
-          (r.article?.url ? ' &mdash; <a href="' + escapeAttr(safeUrl(r.article.url)) + '" target="_blank" style="color:var(--accent)">元記事を読む</a>' : '') +
-        '</div>' +
-        '<div style="font-style:italic;color:var(--text-secondary);font-size:0.84rem;margin-bottom:16px">関連する神話: ' + escapeHtml(r.related_myth || '') + '</div>' +
-        '<div class="md-body" style="font-size:0.9rem;line-height:1.85">' + renderMarkdown(r.report_text || '') + '</div>';
-
-      // Collapsible detail sections
-      const sections = [
-        { key: 'historical_context', label: '歴史的経緯' },
-        { key: 'future_signals', label: '未来へのシグナル分析' },
-        { key: 'watch_points', label: '今後ウォッチすべき観点' },
-        { key: 'related_research', label: '関連する学術成果' }
-      ];
-      sections.forEach(s => {
-        if (r[s.key]) {
-          html += '<div class="ir-modal-section open">' +
-            '<div class="ir-modal-section-header" onclick="this.parentElement.classList.toggle(\'open\')">' +
-              '<span>' + s.label + '</span><span class="ir-modal-section-chevron">&#9654;</span>' +
-            '</div>' +
-            '<div class="ir-modal-section-body">' + escapeHtml(r[s.key]) + '</div></div>';
-        }
-      });
-
-      html += '</div>';
-      content.innerHTML = html;
-      modal.classList.add('open');
-      document.body.style.overflow = 'hidden';
-    };
-
-    window.scrollInsightCarousel = function(direction) {
-      const el = document.getElementById('irCarousel');
-      if (el) el.scrollBy({ left: direction * 320, behavior: 'smooth' });
     };
 
     function renderHomePaperCard(p) {
@@ -3177,6 +3017,20 @@
         }).join('') + '</tbody></table></div>';
     }
 
+    // Shared helpers for PESTLE category display
+    function getPestleColor(cat) {
+      return PESTLE_CATS[cat]?.color || 'var(--accent)';
+    }
+    function getPestleLabel(cat) {
+      return PESTLE_CATS[cat]?.labelJa || cat;
+    }
+    function mythBadgeHtml(relation, cls) {
+      var isChange = relation === 'changes';
+      var label = isChange ? '神話を変革' : '神話を強化';
+      var badgeCls = isChange ? 'ir-myth-badge-transforms' : 'ir-myth-badge-strengthens';
+      return '<span class="' + cls + ' ' + badgeCls + '">' + label + '</span>';
+    }
+
     // ==============================================================
     // RENDER: REPORTS ARCHIVE
     // ==============================================================
@@ -3201,7 +3055,7 @@
               '<span class="ir-carousel-cat">' + escapeHtml(getPestleLabel(r.article?.pestle_category)) + '</span></div>' +
               '<div class="ir-carousel-title" style="-webkit-line-clamp:3">' + escapeHtml(r.report_title || '') + '</div>' +
               mythBadgeHtml(r.myth_relation, 'ir-carousel-myth') +
-              '<div class="ir-carousel-preview">' + escapeHtml((r.report_text || '').substring(0, 150)) + '...</div>' +
+              '<div class="ir-carousel-preview">' + escapeHtml(stripMarkdown(r.report_text || '').substring(0, 150)) + '...</div>' +
             '</div></div>';
         });
         html += '</div>';
@@ -3319,11 +3173,11 @@
     window.openArchivedInsightReport = function(dateKey, index) {
       const data = dataCache['insight_reports_' + dateKey + '.json'];
       if (!data?.reports?.[index]) return;
-      // Temporarily set as __irData for modal reuse
-      const prevData = __irData;
-      __irData = data;
+      // Temporarily set data for modal reuse
+      const prevData = _insightReportsData;
+      _insightReportsData = data;
       openInsightReport(index);
-      __irData = prevData;
+      _insightReportsData = prevData;
     };
 
     // ==============================================================
