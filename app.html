@@ -1441,6 +1441,331 @@
     }
 
     /* ================================================================
+       INSIGHT REPORTS HERO + CAROUSEL
+       ================================================================ */
+    .ir-section { margin-bottom: 0; }
+    .ir-hero-layout {
+      display: grid;
+      grid-template-columns: 1fr 280px;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    .ir-hero-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+      transition: border-color 0.2s;
+      cursor: pointer;
+    }
+    .ir-hero-card:hover { border-color: var(--accent); }
+    .ir-hero-accent { height: 5px; }
+    .ir-hero-body { padding: 24px 28px; }
+    .ir-hero-cat-badge {
+      display: inline-block;
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 2px 10px;
+      border-radius: 4px;
+      color: #fff;
+      margin-bottom: 10px;
+    }
+    .ir-hero-title {
+      font-size: 1.35rem;
+      font-weight: 700;
+      line-height: 1.4;
+      color: var(--text);
+      margin-bottom: 10px;
+      letter-spacing: -0.02em;
+    }
+    .ir-myth-badge {
+      display: inline-block;
+      font-size: 0.68rem;
+      font-weight: 600;
+      padding: 2px 10px;
+      border-radius: 12px;
+      margin-bottom: 10px;
+    }
+    .ir-myth-badge-strengthens {
+      background: rgba(91,110,79,0.12);
+      color: var(--S);
+    }
+    .ir-myth-badge-transforms {
+      background: rgba(220,135,102,0.12);
+      color: var(--accent-warm);
+    }
+    .ir-myth-text {
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+      font-style: italic;
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+    .ir-hero-preview {
+      font-size: 0.88rem;
+      line-height: 1.75;
+      color: var(--text-secondary);
+      margin-bottom: 14px;
+      display: -webkit-box;
+      -webkit-line-clamp: 4;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .ir-hero-read-more {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--accent);
+      cursor: pointer;
+      display: inline-block;
+      margin-bottom: 14px;
+    }
+    .ir-hero-read-more:hover { color: var(--accent-warm); }
+    .ir-hero-source {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border-light);
+      padding-top: 10px;
+    }
+    .ir-hero-source a { color: var(--text-muted); }
+    .ir-hero-source a:hover { color: var(--accent); }
+
+    /* Side panel */
+    .ir-side-panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow-y: auto;
+      max-height: 520px;
+    }
+    .ir-side-panel-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      padding: 14px 16px 8px;
+    }
+    .ir-side-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 16px;
+      cursor: pointer;
+      transition: background 0.15s;
+      border-left: 3px solid transparent;
+    }
+    .ir-side-item:hover { background: var(--card-hover); }
+    .ir-side-item.active {
+      background: var(--accent-light);
+      border-left-color: var(--accent);
+    }
+    .ir-side-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      margin-top: 5px;
+    }
+    .ir-side-text {
+      flex: 1;
+      min-width: 0;
+    }
+    .ir-side-title {
+      font-size: 0.78rem;
+      font-weight: 500;
+      line-height: 1.4;
+      color: var(--text);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .ir-side-myth {
+      display: inline-block;
+      font-size: 0.6rem;
+      font-weight: 600;
+      padding: 1px 6px;
+      border-radius: 8px;
+      margin-top: 3px;
+    }
+
+    /* Carousel */
+    .ir-carousel-wrap {
+      position: relative;
+    }
+    .ir-carousel {
+      display: flex;
+      gap: 16px;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      padding: 4px 0 12px;
+      scrollbar-width: none;
+    }
+    .ir-carousel::-webkit-scrollbar { height: 0; }
+    .ir-carousel-card {
+      flex: 0 0 300px;
+      scroll-snap-align: start;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      cursor: pointer;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .ir-carousel-card:hover {
+      border-color: var(--accent);
+      box-shadow: var(--shadow-md);
+    }
+    .ir-carousel-accent { height: 4px; }
+    .ir-carousel-body { padding: 14px 16px; }
+    .ir-carousel-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .ir-carousel-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .ir-carousel-cat {
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+    }
+    .ir-carousel-title {
+      font-size: 0.84rem;
+      font-weight: 600;
+      line-height: 1.4;
+      color: var(--text);
+      margin-bottom: 6px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .ir-carousel-myth {
+      display: inline-block;
+      font-size: 0.6rem;
+      font-weight: 600;
+      padding: 1px 6px;
+      border-radius: 8px;
+      margin-bottom: 6px;
+    }
+    .ir-carousel-preview {
+      font-size: 0.78rem;
+      line-height: 1.55;
+      color: var(--text-secondary);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .ir-carousel-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--card);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      z-index: 2;
+      transition: all 0.2s;
+    }
+    .ir-carousel-btn:hover {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+    .ir-carousel-btn-left { left: -12px; }
+    .ir-carousel-btn-right { right: -12px; }
+
+    /* Insight Report modal sections */
+    .ir-modal-section {
+      margin-top: 20px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xs);
+      overflow: hidden;
+    }
+    .ir-modal-section-header {
+      padding: 10px 16px;
+      background: var(--surface);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      user-select: none;
+    }
+    .ir-modal-section-header:hover { background: var(--surface2); }
+    .ir-modal-section-chevron {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      transition: transform 0.2s;
+    }
+    .ir-modal-section.open .ir-modal-section-chevron { transform: rotate(90deg); }
+    .ir-modal-section-body {
+      display: none;
+      padding: 14px 16px;
+      font-size: 0.84rem;
+      line-height: 1.75;
+      color: var(--text-secondary);
+    }
+    .ir-modal-section.open .ir-modal-section-body { display: block; }
+
+    @media (max-width: 768px) {
+      .ir-hero-layout {
+        grid-template-columns: 1fr;
+      }
+      .ir-side-panel {
+        max-height: none;
+        overflow-x: auto;
+        overflow-y: hidden;
+        display: flex;
+        gap: 0;
+        flex-wrap: nowrap;
+      }
+      .ir-side-panel-title { display: none; }
+      .ir-side-item {
+        flex: 0 0 auto;
+        white-space: nowrap;
+        max-width: 220px;
+        border-left: none;
+        border-bottom: 3px solid transparent;
+        padding: 10px 14px;
+      }
+      .ir-side-item.active {
+        border-left-color: transparent;
+        border-bottom-color: var(--accent);
+      }
+      .ir-side-title {
+        white-space: normal;
+      }
+      .ir-hero-body { padding: 16px; }
+      .ir-hero-title { font-size: 1.1rem; }
+      .ir-carousel-card { flex: 0 0 260px; }
+      .ir-carousel-btn { display: none; }
+    }
+
+    /* ================================================================
        PRINT
        ================================================================ */
     @media print {
@@ -1811,17 +2136,18 @@
     async function loadAllData() {
       try {
         document.getElementById('headerDate').textContent = formatDateFull(new Date());
-        const [dailyReport, latest, aiAnalysis, papers, alerts, mediaSources] = await Promise.all([
+        const [dailyReport, latest, aiAnalysis, papers, alerts, mediaSources, insightReports] = await Promise.all([
           fetchJSON('daily_report.json'),
           fetchJSON('latest.json'),
           fetchJSON('ai_analysis.json'),
           fetchJSON('daily_papers.json'),
           fetchJSON('alerts.json'),
-          fetchJSON('media_sources.json')
+          fetchJSON('media_sources.json'),
+          fetchJSON('insight_reports.json')
         ]);
         try {
           renderAlerts(alerts);
-          renderHomeDashboard(dailyReport, latest, aiAnalysis, papers);
+          renderHomeDashboard(dailyReport, latest, aiAnalysis, papers, insightReports);
           renderCLASummary(aiAnalysis);
           renderSignals(aiAnalysis);
           renderPapers(papers);
@@ -1859,7 +2185,7 @@
     // ==============================================================
     // RENDER: HOME DASHBOARD
     // ==============================================================
-    function renderHomeDashboard(dailyReport, latest, aiData, papers) {
+    function renderHomeDashboard(dailyReport, latest, aiData, papers, insightReports) {
       const container = document.getElementById('homeDashboard');
       const dateStr = dailyReport?.generated_at ? dailyReport.generated_at.split('T')[0] : new Date().toISOString().split('T')[0];
 
@@ -1878,6 +2204,11 @@
       const topPapers = allPapers.slice(0, 10);
 
       let html = '<div class="home-stack">';
+
+      // 0. Insight Reports Hero + Carousel (top of page)
+      if (insightReports?.reports?.length > 0) {
+        html += renderInsightReportsHero(insightReports);
+      }
 
       // 1. Daily Report
       html += '<div><h2 class="section-title">日次分析レポート <span class="section-date">' + dateStr + '</span></h2>';
@@ -1969,6 +2300,351 @@
       html += '</div></details>';
       return html;
     }
+
+    // ==============================================================
+    // RENDER: INSIGHT REPORTS HERO + CAROUSEL
+    // ==============================================================
+
+    // Store reports data globally for interactive switching
+    let _insightReportsData = null;
+    let _insightHeroIndex = 0;
+
+    function renderInsightReportsHero(data) {
+      if (!data?.reports?.length) return '';
+      _insightReportsData = data;
+      _insightHeroIndex = 0;
+      const reports = data.reports;
+      const hero = reports[0];
+      const dateStr = data.date || '';
+
+      let html = '<div class="ir-section">';
+      html += '<h2 class="section-title">Insight Reports <span class="section-date">' + escapeHtml(dateStr) + '</span></h2>';
+
+      // Hero layout: hero card + side panel
+      html += '<div class="ir-hero-layout">';
+      html += '<div id="irHeroCard">' + renderIRHeroCard(hero, 0) + '</div>';
+
+      // Side panel with all report titles
+      html += '<div class="ir-side-panel" id="irSidePanel">';
+      html += '<div class="ir-side-panel-title">全レポート</div>';
+      reports.forEach(function(r, i) {
+        var catInfo = PESTLE_CATS[r.article?.pestle_category] || { labelJa: '', color: 'var(--accent)' };
+        var mythLabel = r.myth_relation === 'strengthens' ? '強化' : '変革';
+        var mythClass = r.myth_relation === 'strengthens' ? 'ir-myth-badge-strengthens' : 'ir-myth-badge-transforms';
+        html += '<div class="ir-side-item' + (i === 0 ? ' active' : '') + '" onclick="switchHeroReport(' + i + ')" data-ir-index="' + i + '">' +
+          '<div class="ir-side-dot" style="background:' + catInfo.color + '"></div>' +
+          '<div class="ir-side-text">' +
+            '<div class="ir-side-title">' + escapeHtml(r.report_title || '') + '</div>' +
+            '<span class="ir-side-myth ' + mythClass + '">' + mythLabel + '</span>' +
+          '</div></div>';
+      });
+      html += '</div>'; // side panel
+      html += '</div>'; // hero layout
+
+      // Carousel with remaining reports
+      if (reports.length > 1) {
+        html += '<div class="ir-carousel-wrap">';
+        html += '<button class="ir-carousel-btn ir-carousel-btn-left" onclick="scrollInsightCarousel(-1)" aria-label="前へ">&#9664;</button>';
+        html += '<div class="ir-carousel" id="irCarousel">';
+        reports.slice(1).forEach(function(r, idx) {
+          var realIdx = idx + 1;
+          var catInfo = PESTLE_CATS[r.article?.pestle_category] || { labelJa: '', color: 'var(--accent)' };
+          var mythLabel = r.myth_relation === 'strengthens' ? '強化' : '変革';
+          var mythClass = r.myth_relation === 'strengthens' ? 'ir-myth-badge-strengthens' : 'ir-myth-badge-transforms';
+          var preview = (r.report_text || '').substring(0, 120);
+          html += '<div class="ir-carousel-card" onclick="openInsightReport(' + realIdx + ')">' +
+            '<div class="ir-carousel-accent" style="background:' + catInfo.color + '"></div>' +
+            '<div class="ir-carousel-body">' +
+              '<div class="ir-carousel-header">' +
+                '<div class="ir-carousel-dot" style="background:' + catInfo.color + '"></div>' +
+                '<span class="ir-carousel-cat">' + escapeHtml(catInfo.labelJa || r.article?.pestle_category || '') + '</span>' +
+              '</div>' +
+              '<div class="ir-carousel-title">' + escapeHtml(r.report_title || '') + '</div>' +
+              '<span class="ir-carousel-myth ' + mythClass + '">' + mythLabel + '</span>' +
+              '<div class="ir-carousel-preview">' + escapeHtml(preview) + '</div>' +
+            '</div></div>';
+        });
+        html += '</div>'; // carousel
+        html += '<button class="ir-carousel-btn ir-carousel-btn-right" onclick="scrollInsightCarousel(1)" aria-label="次へ">&#9654;</button>';
+        html += '</div>'; // carousel wrap
+      }
+
+      html += '</div>'; // ir-section
+      return html;
+    }
+
+    function renderIRHeroCard(report, index) {
+      var catInfo = PESTLE_CATS[report.article?.pestle_category] || { labelJa: '', color: 'var(--accent)' };
+      var mythLabel = report.myth_relation === 'strengthens' ? '神話を強化' : '神話を変革';
+      var mythClass = report.myth_relation === 'strengthens' ? 'ir-myth-badge-strengthens' : 'ir-myth-badge-transforms';
+      var preview = (report.report_text || '').substring(0, 300);
+
+      return '<div class="ir-hero-card" onclick="openInsightReport(' + index + ')">' +
+        '<div class="ir-hero-accent" style="background:' + catInfo.color + '"></div>' +
+        '<div class="ir-hero-body">' +
+          '<span class="ir-hero-cat-badge" style="background:' + catInfo.color + '">' + escapeHtml(catInfo.labelJa || report.article?.pestle_category || '') + '</span>' +
+          '<div class="ir-hero-title">' + escapeHtml(report.report_title || '') + '</div>' +
+          '<span class="ir-myth-badge ' + mythClass + '">' + mythLabel + '</span>' +
+          (report.related_myth ? '<div class="ir-myth-text">' + escapeHtml(report.related_myth) + '</div>' : '') +
+          '<div class="ir-hero-preview">' + escapeHtml(preview) + '</div>' +
+          '<span class="ir-hero-read-more" onclick="event.stopPropagation();openInsightReport(' + index + ')">続きを読む &rarr;</span>' +
+          '<div class="ir-hero-source">' +
+            escapeHtml(report.article?.source || '') + ' | ' + escapeHtml(report.article?.published_date || '') +
+            (report.article?.url ? ' | <a href="' + escapeAttr(safeUrl(report.article.url)) + '" target="_blank" onclick="event.stopPropagation()">元記事</a>' : '') +
+          '</div>' +
+        '</div></div>';
+    }
+
+    window.switchHeroReport = function(index) {
+      if (!_insightReportsData?.reports?.[index]) return;
+      _insightHeroIndex = index;
+      var heroContainer = document.getElementById('irHeroCard');
+      if (heroContainer) {
+        heroContainer.innerHTML = renderIRHeroCard(_insightReportsData.reports[index], index);
+      }
+      // Update active state in side panel
+      var items = document.querySelectorAll('#irSidePanel .ir-side-item');
+      items.forEach(function(item) {
+        var itemIdx = parseInt(item.getAttribute('data-ir-index'), 10);
+        if (itemIdx === index) {
+          item.classList.add('active');
+        } else {
+          item.classList.remove('active');
+        }
+      });
+    };
+
+    window.openInsightReport = function(reportIndex) {
+      if (!_insightReportsData?.reports?.[reportIndex]) return;
+      var r = _insightReportsData.reports[reportIndex];
+      var catInfo = PESTLE_CATS[r.article?.pestle_category] || { labelJa: '', color: 'var(--accent)' };
+      var mythLabel = r.myth_relation === 'strengthens' ? '神話を強化' : '神話を変革';
+      var mythClass = r.myth_relation === 'strengthens' ? 'ir-myth-badge-strengthens' : 'ir-myth-badge-transforms';
+
+      var content = document.getElementById('articleModalContent');
+      var modalHtml = '<div class="modal-title">' + escapeHtml(r.report_title || '') + '</div>' +
+        '<div class="modal-meta" style="margin-bottom:12px">' +
+          '<span class="ir-hero-cat-badge" style="background:' + catInfo.color + ';font-size:0.65rem">' + escapeHtml(catInfo.labelJa || '') + '</span> ' +
+          '<span class="ir-myth-badge ' + mythClass + '">' + mythLabel + '</span>' +
+        '</div>';
+
+      if (r.related_myth) {
+        modalHtml += '<div style="font-style:italic;color:var(--text-secondary);margin-bottom:14px;font-size:0.88rem">' + escapeHtml(r.related_myth) + '</div>';
+      }
+
+      // Source article link
+      if (r.article) {
+        modalHtml += '<div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:16px;padding:10px 14px;background:var(--surface);border-radius:var(--radius-xs)">' +
+          '元記事: ' + escapeHtml(r.article.title_ja || r.article.title || '') +
+          ' (' + escapeHtml(r.article.source || '') + ', ' + escapeHtml(r.article.published_date || '') + ')' +
+          (r.article.url ? ' <a href="' + escapeAttr(safeUrl(r.article.url)) + '" target="_blank">記事を読む &rarr;</a>' : '') +
+        '</div>';
+      }
+
+      // Full report text
+      modalHtml += '<div class="md-body">' + renderMarkdown(r.report_text || '') + '</div>';
+
+      // Collapsible sections
+      var sections = [
+        { key: 'historical_context', label: '歴史的経緯' },
+        { key: 'future_signals', label: '未来へのシグナル' },
+        { key: 'watch_points', label: 'ウォッチポイント' },
+        { key: 'related_research', label: '関連学術成果' }
+      ];
+      sections.forEach(function(sec) {
+        if (r[sec.key]) {
+          modalHtml += '<div class="ir-modal-section" onclick="this.classList.toggle(\'open\')">' +
+            '<div class="ir-modal-section-header">' + sec.label + '<span class="ir-modal-section-chevron">&#9654;</span></div>' +
+            '<div class="ir-modal-section-body md-body">' + renderMarkdown(r[sec.key]) + '</div>' +
+          '</div>';
+        }
+      });
+
+      content.innerHTML = modalHtml;
+      window._modalReturnFocus = document.activeElement;
+      document.getElementById('articleModal').classList.add('visible');
+      document.body.style.overflow = 'hidden';
+      setTimeout(function() { var btn = document.querySelector('#articleModal .modal-close'); if (btn) btn.focus(); }, 100);
+    };
+
+    window.scrollInsightCarousel = function(direction) {
+      var carousel = document.getElementById('irCarousel');
+      if (carousel) {
+        carousel.scrollBy({ left: direction * 320, behavior: 'smooth' });
+      }
+    };
+
+    // ==============================================================
+    // RENDER: INSIGHT REPORTS HERO + CAROUSEL
+    // ==============================================================
+    let __irData = null; // cached insight reports data
+
+    function getPestleColor(cat) {
+      return PESTLE_CATS[cat]?.color || 'var(--accent)';
+    }
+    function getPestleLabel(cat) {
+      return PESTLE_CATS[cat]?.labelJa || cat;
+    }
+    function mythBadgeHtml(relation, cls) {
+      const isChange = relation === 'changes';
+      const label = isChange ? '神話を変革' : '神話を強化';
+      const badgeCls = isChange ? 'ir-myth-badge-transforms' : 'ir-myth-badge-strengthens';
+      return '<span class="' + cls + ' ' + badgeCls + '">' + label + '</span>';
+    }
+
+    function renderInsightReportsHero(data) {
+      __irData = data;
+      const reports = data.reports || [];
+      if (reports.length === 0) return '';
+      const hero = reports[0];
+      const heroColor = getPestleColor(hero.article?.pestle_category);
+
+      let html = '<div class="ir-section"><h2 class="section-title">Insight Reports <span class="section-date">' + escapeHtml(data.date || '') + '</span></h2>';
+
+      // Hero layout: hero card + side panel
+      html += '<div class="ir-hero-layout">';
+
+      // Hero card
+      html += '<div class="ir-hero-card" id="irHeroCard" onclick="openInsightReport(0)">' +
+        '<div class="ir-hero-accent" id="irHeroAccent" style="background:' + heroColor + '"></div>' +
+        '<div class="ir-hero-body" id="irHeroBody">' +
+          '<span class="ir-hero-cat-badge" id="irHeroCat" style="background:' + heroColor + '">' + escapeHtml(getPestleLabel(hero.article?.pestle_category)) + '</span>' +
+          '<div class="ir-hero-title" id="irHeroTitle">' + escapeHtml(hero.report_title || '') + '</div>' +
+          mythBadgeHtml(hero.myth_relation, 'ir-myth-badge') +
+          '<div class="ir-myth-text" id="irHeroMyth">' + escapeHtml(hero.related_myth || '') + '</div>' +
+          '<div class="ir-hero-preview" id="irHeroPreview">' + escapeHtml((hero.report_text || '').substring(0, 300)) + '...</div>' +
+          '<div class="ir-hero-read-more">続きを読む</div>' +
+          '<div class="ir-hero-source" id="irHeroSource">' + escapeHtml(hero.article?.source || '') + ' / ' + escapeHtml(hero.article?.published_date || '') + '</div>' +
+        '</div></div>';
+
+      // Side panel
+      html += '<div class="ir-side-panel"><div class="ir-side-panel-title">全レポート</div>';
+      reports.forEach((r, i) => {
+        const color = getPestleColor(r.article?.pestle_category);
+        const isChange = r.myth_relation === 'changes';
+        const mythCls = isChange ? 'ir-myth-badge-transforms' : 'ir-myth-badge-strengthens';
+        const mythLabel = isChange ? '変革' : '強化';
+        html += '<div class="ir-side-item' + (i === 0 ? ' active' : '') + '" data-ir-index="' + i + '" onclick="switchHeroReport(' + i + ')">' +
+          '<div class="ir-side-dot" style="background:' + color + '"></div>' +
+          '<div class="ir-side-text">' +
+            '<div class="ir-side-title">' + escapeHtml(r.report_title || '') + '</div>' +
+            '<span class="ir-side-myth ' + mythCls + '">' + mythLabel + '</span>' +
+          '</div></div>';
+      });
+      html += '</div>';
+      html += '</div>'; // end hero-layout
+
+      // Carousel (remaining reports)
+      if (reports.length > 1) {
+        html += '<div class="ir-carousel-wrap">' +
+          '<button class="ir-carousel-btn ir-carousel-btn-left" onclick="scrollInsightCarousel(-1)">&#9664;</button>' +
+          '<div class="ir-carousel" id="irCarousel">';
+        reports.slice(1).forEach((r, i) => {
+          const idx = i + 1;
+          const color = getPestleColor(r.article?.pestle_category);
+          html += '<div class="ir-carousel-card" onclick="openInsightReport(' + idx + ')">' +
+            '<div class="ir-carousel-accent" style="background:' + color + '"></div>' +
+            '<div class="ir-carousel-body">' +
+              '<div class="ir-carousel-header"><div class="ir-carousel-dot" style="background:' + color + '"></div>' +
+              '<span class="ir-carousel-cat">' + escapeHtml(getPestleLabel(r.article?.pestle_category)) + '</span></div>' +
+              '<div class="ir-carousel-title">' + escapeHtml(r.report_title || '') + '</div>' +
+              mythBadgeHtml(r.myth_relation, 'ir-carousel-myth') +
+              '<div class="ir-carousel-preview">' + escapeHtml((r.report_text || '').substring(0, 120)) + '...</div>' +
+            '</div></div>';
+        });
+        html += '</div>' +
+          '<button class="ir-carousel-btn ir-carousel-btn-right" onclick="scrollInsightCarousel(1)">&#9654;</button>' +
+          '</div>';
+      }
+
+      html += '</div>'; // end ir-section
+      return html;
+    }
+
+    window.switchHeroReport = function(index) {
+      if (!__irData?.reports?.[index]) return;
+      const r = __irData.reports[index];
+      const color = getPestleColor(r.article?.pestle_category);
+
+      const accent = document.getElementById('irHeroAccent');
+      const cat = document.getElementById('irHeroCat');
+      const title = document.getElementById('irHeroTitle');
+      const myth = document.getElementById('irHeroMyth');
+      const preview = document.getElementById('irHeroPreview');
+      const source = document.getElementById('irHeroSource');
+      const card = document.getElementById('irHeroCard');
+
+      if (accent) accent.style.background = color;
+      if (cat) { cat.style.background = color; cat.textContent = getPestleLabel(r.article?.pestle_category); }
+      if (title) title.textContent = r.report_title || '';
+      if (myth) myth.textContent = r.related_myth || '';
+      if (preview) preview.textContent = (r.report_text || '').substring(0, 300) + '...';
+      if (source) source.textContent = (r.article?.source || '') + ' / ' + (r.article?.published_date || '');
+      if (card) card.onclick = function() { openInsightReport(index); };
+
+      // Update myth badge
+      const heroBody = document.getElementById('irHeroBody');
+      if (heroBody) {
+        const oldBadge = heroBody.querySelector('.ir-myth-badge');
+        if (oldBadge) {
+          const tmp = document.createElement('div');
+          tmp.innerHTML = mythBadgeHtml(r.myth_relation, 'ir-myth-badge');
+          oldBadge.replaceWith(tmp.firstChild);
+        }
+      }
+
+      // Update side panel active state
+      document.querySelectorAll('.ir-side-item').forEach((el, i) => {
+        el.classList.toggle('active', i === index);
+      });
+    };
+
+    window.openInsightReport = function(index) {
+      if (!__irData?.reports?.[index]) return;
+      const r = __irData.reports[index];
+      const color = getPestleColor(r.article?.pestle_category);
+      const modal = document.getElementById('articleModal');
+      const content = document.getElementById('articleModalContent');
+      if (!modal || !content) return;
+
+      let html = '<div style="border-top:4px solid ' + color + ';padding-top:16px">' +
+        '<span class="ir-hero-cat-badge" style="background:' + color + '">' + escapeHtml(getPestleLabel(r.article?.pestle_category)) + '</span> ' +
+        mythBadgeHtml(r.myth_relation, 'ir-myth-badge') +
+        '<h2 style="margin:12px 0 8px;font-size:1.3rem;line-height:1.4">' + escapeHtml(r.report_title || '') + '</h2>' +
+        '<div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:6px">' +
+          escapeHtml(r.article?.source || '') + ' / ' + escapeHtml(r.article?.published_date || '') +
+          (r.article?.url ? ' &mdash; <a href="' + escapeAttr(safeUrl(r.article.url)) + '" target="_blank" style="color:var(--accent)">元記事を読む</a>' : '') +
+        '</div>' +
+        '<div style="font-style:italic;color:var(--text-secondary);font-size:0.84rem;margin-bottom:16px">関連する神話: ' + escapeHtml(r.related_myth || '') + '</div>' +
+        '<div class="md-body" style="font-size:0.9rem;line-height:1.85">' + renderMarkdown(r.report_text || '') + '</div>';
+
+      // Collapsible detail sections
+      const sections = [
+        { key: 'historical_context', label: '歴史的経緯' },
+        { key: 'future_signals', label: '未来へのシグナル分析' },
+        { key: 'watch_points', label: '今後ウォッチすべき観点' },
+        { key: 'related_research', label: '関連する学術成果' }
+      ];
+      sections.forEach(s => {
+        if (r[s.key]) {
+          html += '<div class="ir-modal-section open">' +
+            '<div class="ir-modal-section-header" onclick="this.parentElement.classList.toggle(\'open\')">' +
+              '<span>' + s.label + '</span><span class="ir-modal-section-chevron">&#9654;</span>' +
+            '</div>' +
+            '<div class="ir-modal-section-body">' + escapeHtml(r[s.key]) + '</div></div>';
+        }
+      });
+
+      html += '</div>';
+      content.innerHTML = html;
+      modal.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    };
+
+    window.scrollInsightCarousel = function(direction) {
+      const el = document.getElementById('irCarousel');
+      if (el) el.scrollBy({ left: direction * 320, behavior: 'smooth' });
+    };
 
     function renderHomePaperCard(p) {
       const fieldColors = { '自然科学': 'var(--T)', '工学': 'var(--L)', '社会科学': 'var(--S)', '人文学': 'var(--E)', '芸術': 'var(--P)' };
@@ -2510,6 +3186,40 @@
       const dateStr = dailyReport.generated_at ? dailyReport.generated_at.split('T')[0] : '';
 
       let html = '';
+
+      // Insight Reports section
+      const irData = dataCache['insight_reports.json'];
+      if (irData?.reports?.length > 0) {
+        html += '<h3 class="section-title" style="margin-bottom:12px">インサイトレポート <span class="section-date">' + escapeHtml(irData.date || '') + '</span></h3>';
+        html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;margin-bottom:28px">';
+        irData.reports.forEach((r, i) => {
+          const color = getPestleColor(r.article?.pestle_category);
+          html += '<div class="ir-carousel-card" onclick="openInsightReport(' + i + ')" style="flex:none;width:auto">' +
+            '<div class="ir-carousel-accent" style="background:' + color + '"></div>' +
+            '<div class="ir-carousel-body">' +
+              '<div class="ir-carousel-header"><div class="ir-carousel-dot" style="background:' + color + '"></div>' +
+              '<span class="ir-carousel-cat">' + escapeHtml(getPestleLabel(r.article?.pestle_category)) + '</span></div>' +
+              '<div class="ir-carousel-title" style="-webkit-line-clamp:3">' + escapeHtml(r.report_title || '') + '</div>' +
+              mythBadgeHtml(r.myth_relation, 'ir-carousel-myth') +
+              '<div class="ir-carousel-preview">' + escapeHtml((r.report_text || '').substring(0, 150)) + '...</div>' +
+            '</div></div>';
+        });
+        html += '</div>';
+
+        // Load and render index for past dates
+        if (!dataCache['insight_reports_index.json']) {
+          fetchJSON('insight_reports_index.json').then(idx => {
+            if (idx) renderInsightReportIndex(idx, irData.date);
+          });
+        } else {
+          setTimeout(() => renderInsightReportIndex(dataCache['insight_reports_index.json'], irData.date), 0);
+        }
+        html += '<div id="irArchiveIndex"></div>';
+      }
+
+      // Separator
+      html += '<h3 class="section-title" style="margin-bottom:12px">日次分析レポート</h3>';
+
       ['japan', 'global'].forEach(regionKey => {
         const region = dailyReport[regionKey];
         if (!region) return;
@@ -2551,8 +3261,70 @@
         html += '</div>';
       });
 
-      container.innerHTML = html || '<p class="text-muted">レポートデータがありません。</p>';
+      container.innerHTML = html || '<p class="text-muted">レポートデー��がありません。</p>';
     }
+
+    function renderInsightReportIndex(indexData, currentDate) {
+      const el = document.getElementById('irArchiveIndex');
+      if (!el || !indexData?.dates) return;
+      const pastDates = indexData.dates.filter(d => d.date !== currentDate);
+      if (pastDates.length === 0) return;
+
+      let html = '<h4 style="font-size:0.85rem;color:var(--text-secondary);margin:16px 0 8px">過去のインサイト��ポート</h4>';
+      pastDates.forEach(d => {
+        html += '<details class="report-card" style="margin-bottom:8px">' +
+          '<summary class="report-summary" style="cursor:pointer;padding:10px 14px;font-size:0.84rem">' +
+            '<span class="report-chevron">&#9654;</span>' +
+            '<span style="font-weight:600">' + escapeHtml(d.date) + '</span>' +
+            '<span class="report-count">' + d.count + '件</span>' +
+          '</summary>' +
+          '<div class="report-body" id="irArchive-' + d.date + '">' +
+            '<div class="loading-indicator" style="padding:12px"><div class="loading-spinner loading-spinner-sm"></div><span>読み込み中...</span></div>' +
+          '</div></details>';
+      });
+      el.innerHTML = html;
+
+      // Load past reports on expand
+      el.querySelectorAll('details').forEach(det => {
+        det.addEventListener('toggle', function() {
+          if (!this.open) return;
+          const dateKey = this.querySelector('[id^="irArchive-"]')?.id?.replace('irArchive-', '');
+          if (!dateKey) return;
+          const target = document.getElementById('irArchive-' + dateKey);
+          if (target.dataset.loaded) return;
+          target.dataset.loaded = 'true';
+          fetchJSON('insight_reports_' + dateKey + '.json').then(data => {
+            if (!data?.reports) { target.innerHTML = '<p class="text-muted">データがありま��ん。</p>'; return; }
+            // Cache for modal use
+            dataCache['insight_reports_' + dateKey + '.json'] = data;
+            let inner = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px">';
+            data.reports.forEach((r, i) => {
+              const color = getPestleColor(r.article?.pestle_category);
+              inner += '<div class="ir-carousel-card" style="flex:none;width:auto;cursor:pointer" onclick="openArchivedInsightReport(\'' + dateKey + '\',' + i + ')">' +
+                '<div class="ir-carousel-accent" style="background:' + color + '"></div>' +
+                '<div class="ir-carousel-body">' +
+                  '<div class="ir-carousel-header"><div class="ir-carousel-dot" style="background:' + color + '"></div>' +
+                  '<span class="ir-carousel-cat">' + escapeHtml(getPestleLabel(r.article?.pestle_category)) + '</span></div>' +
+                  '<div class="ir-carousel-title">' + escapeHtml(r.report_title || '') + '</div>' +
+                  mythBadgeHtml(r.myth_relation, 'ir-carousel-myth') +
+                '</div></div>';
+            });
+            inner += '</div>';
+            target.innerHTML = inner;
+          });
+        });
+      });
+    }
+
+    window.openArchivedInsightReport = function(dateKey, index) {
+      const data = dataCache['insight_reports_' + dateKey + '.json'];
+      if (!data?.reports?.[index]) return;
+      // Temporarily set as __irData for modal reuse
+      const prevData = __irData;
+      __irData = data;
+      openInsightReport(index);
+      __irData = prevData;
+    };
 
     // ==============================================================
     // ARTICLE MODAL
