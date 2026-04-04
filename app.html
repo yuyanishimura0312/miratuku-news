@@ -1874,7 +1874,7 @@
         const arr = Array.isArray(list) ? list : (list?.papers || []);
         arr.forEach(p => { p._field = field; allPapers.push(p); });
       });
-      allPapers.sort((a, b) => (b.published_date || '').localeCompare(a.published_date || ''));
+      allPapers.sort((a, b) => new Date(b.published_date || 0) - new Date(a.published_date || 0));
       const topPapers = allPapers.slice(0, 10);
 
       let html = '<div class="home-stack">';
@@ -1998,7 +1998,7 @@
         if (!catData) return;
         const catInfo = PESTLE_CATS[catKey];
         let articles = [...(catData.articles || [])];
-        articles.sort((a, b) => (b.published_date || '').localeCompare(a.published_date || ''));
+        articles.sort((a, b) => new Date(b.published_date || 0) - new Date(a.published_date || 0));
         const allArticles = [...articles];
         articles = currentRegion === 'japan' ? articles.filter(a => isJaSource(a)) : articles.filter(a => !isJaSource(a));
         const display = articles.slice(0, 5);
@@ -2048,7 +2048,7 @@
       const aiData = dataCache['ai_analysis.json'];
       if (!data?.pestle?.[catKey]) return;
       const articles = [...(data.pestle[catKey].articles || [])];
-      articles.sort((a, b) => (b.published_date || '').localeCompare(a.published_date || ''));
+      articles.sort((a, b) => new Date(b.published_date || 0) - new Date(a.published_date || 0));
       const filtered = currentRegion === 'japan' ? articles.filter(a => isJaSource(a)) : articles.filter(a => !isJaSource(a));
       const catTrans = (aiData?.translations || {})[catKey] || [];
       const cards = document.querySelectorAll('#homePestleGrid .pestle-card');
