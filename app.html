@@ -1805,7 +1805,8 @@
       const allPapers = [];
       const fields = papers?.by_field || papers?.fields || {};
       Object.entries(fields).forEach(([field, list]) => {
-        (list || []).forEach(p => { p._field = field; allPapers.push(p); });
+        const arr = Array.isArray(list) ? list : [];
+        arr.forEach(p => { p._field = field; allPapers.push(p); });
       });
       allPapers.sort((a,b) => (b.published_date||'').localeCompare(a.published_date||''));
       const topPapers = allPapers.slice(0, 10);
