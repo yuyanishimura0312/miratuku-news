@@ -1353,6 +1353,459 @@
     .prose ul, .prose ol { margin: 0.5rem 0 0.8rem 1.5rem; }
     .prose li { margin-bottom: 0.3rem; font-size: 0.88rem; line-height: 1.7; }
     .prose strong { font-weight: 700; }
+
+    /* ============================================================
+       DETAILS / SUMMARY — Custom Styling (FT-grade)
+       Remove browser default triangle, use custom chevron
+       ============================================================ */
+    details { border-radius: 8px; }
+    details summary {
+      list-style: none;
+      cursor: pointer;
+      user-select: none;
+    }
+    /* Remove default marker for all browsers */
+    details summary::-webkit-details-marker { display: none; }
+    details summary::marker { content: ''; display: none; }
+
+    /* Custom chevron icon in summaries that use the triangle span pattern */
+    details summary > span:first-child {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 1.1em;
+      height: 1.1em;
+      font-size: 0.65em;
+      transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      flex-shrink: 0;
+    }
+    details[open] > summary > span:first-child {
+      transform: rotate(90deg);
+    }
+
+    /* Subtle hover on summary rows */
+    details > summary:hover {
+      background: var(--highlight-bg);
+    }
+    /* Transition for details content reveal */
+    details > summary ~ * {
+      animation: detailsReveal 0.3s ease-out;
+    }
+    @keyframes detailsReveal {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ============================================================
+       GLOBAL SCROLLBAR — Unified premium style
+       ============================================================ */
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 3px;
+      transition: background 0.2s;
+    }
+    ::-webkit-scrollbar-thumb:hover { background: var(--accent-soft); }
+
+    /* ============================================================
+       TOAST NOTIFICATION — Replaces alert()
+       ============================================================ */
+    .toast-container {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      pointer-events: none;
+    }
+    .toast {
+      background: var(--card);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--accent);
+      border-radius: 6px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15), 0 8px 32px rgba(0,0,0,0.08);
+      padding: 0.85rem 1.25rem;
+      font-size: 0.84rem;
+      font-family: var(--font-sans);
+      line-height: 1.5;
+      max-width: 380px;
+      pointer-events: auto;
+      animation: toastIn 0.35s cubic-bezier(0.21, 1.02, 0.73, 1) forwards;
+      transform: translateX(120%);
+    }
+    .toast.toast-success { border-left-color: #27AE60; }
+    .toast.toast-error { border-left-color: #C0392B; }
+    .toast.toast-out { animation: toastOut 0.3s ease-in forwards; }
+    @keyframes toastIn { to { transform: translateX(0); } }
+    @keyframes toastOut { to { transform: translateX(120%); opacity: 0; } }
+
+    /* ============================================================
+       MODAL — Enhanced animation & backdrop-filter
+       ============================================================ */
+    .modal-overlay {
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+    }
+    .modal-overlay.visible {
+      animation: modalOverlayIn 0.25s ease-out;
+    }
+    @keyframes modalOverlayIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    .modal-overlay.visible .modal-box {
+      animation: modalBoxIn 0.3s cubic-bezier(0.21, 1.02, 0.73, 1);
+    }
+    @keyframes modalBoxIn {
+      from { opacity: 0; transform: translateY(20px) scale(0.97); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .modal-box {
+      border: 1px solid var(--border);
+    }
+    .modal-close {
+      width: 2rem;
+      height: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: background 0.2s, color 0.2s;
+    }
+    .modal-close:hover {
+      background: var(--surface);
+      color: var(--accent);
+    }
+
+    /* ============================================================
+       HEADER — Enhanced weight & spacing
+       ============================================================ */
+    .site-header {
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    }
+    .site-logo {
+      font-size: 1.6rem;
+      letter-spacing: -0.04em;
+    }
+    /* Add subtle divider between logo and date */
+    .header-date {
+      padding-left: 1rem;
+      border-left: 1px solid rgba(255,255,255,0.2);
+    }
+
+    /* ============================================================
+       NAVIGATION — FT-style animated underline tabs
+       ============================================================ */
+    .site-nav {
+      box-shadow: 0 1px 0 var(--border);
+    }
+    .site-nav a {
+      position: relative;
+      letter-spacing: 0.01em;
+      padding: 0.7rem 1.1rem;
+    }
+    .site-nav a::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      bottom: 0;
+      width: 0;
+      height: 3px;
+      background: var(--accent);
+      transition: width 0.25s ease, left 0.25s ease;
+      border-radius: 1.5px 1.5px 0 0;
+    }
+    .site-nav a:hover::after,
+    .site-nav a.active::after {
+      width: 100%;
+      left: 0;
+    }
+    .site-nav a:hover,
+    .site-nav a.active {
+      border-bottom-color: transparent;
+    }
+
+    /* ============================================================
+       SECTION TITLE — Gradient underline accent
+       ============================================================ */
+    .section-title {
+      font-size: 1.4rem;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+    }
+    .section-title::after {
+      width: 3rem;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-warm));
+      border-radius: 1.5px;
+    }
+
+    /* ============================================================
+       CARDS — Refined transition curves
+       ============================================================ */
+    .card, .pestle-card, .ws-card, .paper-item, .papers-field-group {
+      transition: box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                  transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* ============================================================
+       PESTLE NEWS — Enhanced article hover
+       ============================================================ */
+    .pestle-article {
+      transition: background 0.2s, padding-left 0.2s, border-radius 0.2s;
+      border-radius: 4px;
+    }
+    .pestle-article:hover {
+      padding-left: 0.75rem;
+      background: var(--highlight-bg);
+    }
+
+    /* ============================================================
+       CLA LAYERS — Depth indicator bar on left edge
+       ============================================================ */
+    .cla-layer {
+      position: relative;
+    }
+    .cla-layer-1::before,
+    .cla-layer-2::before,
+    .cla-layer-3::before,
+    .cla-layer-4::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 4px;
+    }
+    .cla-layer-1::before { background: var(--accent-warm); }
+    .cla-layer-2::before { background: var(--accent-soft); }
+    .cla-layer-3::before { background: var(--accent); }
+    .cla-layer-4::before { background: var(--P); }
+
+    /* CLA Tab buttons — refined */
+    .cla-tab-btn {
+      border: 1px solid var(--border) !important;
+      border-radius: 6px !important;
+      font-weight: 500 !important;
+      transition: all 0.2s !important;
+    }
+    .cla-tab-btn:hover {
+      background: var(--highlight-bg) !important;
+    }
+    .cla-tab-btn.active {
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+    }
+
+    /* CLA Archive timeline buttons */
+    .cla-period-btn {
+      transition: all 0.2s !important;
+      border: 1px solid var(--border) !important;
+    }
+    .cla-period-btn:hover {
+      background: var(--highlight-bg) !important;
+      border-color: var(--accent) !important;
+      color: var(--accent) !important;
+    }
+
+    /* ============================================================
+       WEAK SIGNALS — Smooth expand/collapse
+       ============================================================ */
+    .ws-card-body {
+      overflow: hidden;
+    }
+    .ws-card.open .ws-card-body {
+      animation: wsExpand 0.3s ease-out;
+    }
+    @keyframes wsExpand {
+      from { opacity: 0; max-height: 0; }
+      to { opacity: 1; max-height: 500px; }
+    }
+    .ws-card-chevron {
+      transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    /* Impact badges — refined colors */
+    .ws-badge-high { background: #C0392B; }
+    .ws-badge-medium { background: #D4760A; }
+    .ws-badge-low { background: #1E8449; }
+
+    /* ============================================================
+       ACADEMIC PAPERS — Journal / title visual hierarchy
+       ============================================================ */
+    .paper-item {
+      border-left: 3px solid var(--accent-soft);
+    }
+    .paper-title {
+      font-family: var(--font-serif);
+    }
+    .paper-authors {
+      font-style: italic;
+    }
+    .paper-novelty-bar {
+      background: var(--border);
+    }
+    .paper-novelty-fill {
+      background: linear-gradient(90deg, var(--accent-warm), var(--accent));
+    }
+
+    /* ============================================================
+       FOOTER — Enhanced gravitas with top accent line
+       ============================================================ */
+    .site-footer {
+      border-top: 4px solid var(--accent);
+    }
+    .footer-brand {
+      font-size: 1.35rem;
+      letter-spacing: -0.03em;
+    }
+    .footer-links a {
+      position: relative;
+      display: inline-block;
+      padding-bottom: 1px;
+    }
+    .footer-links a::after {
+      content: '';
+      position: absolute;
+      left: 0; bottom: 0;
+      width: 0;
+      height: 1px;
+      background: rgba(255,255,255,0.5);
+      transition: width 0.2s;
+    }
+    .footer-links a:hover::after { width: 100%; }
+
+    /* ============================================================
+       LOADING SPINNER — Refined
+       ============================================================ */
+    .loading-spinner {
+      border-width: 2.5px;
+      border-color: var(--surface);
+      border-top-color: var(--accent);
+    }
+
+    /* ============================================================
+       DARK MODE — Contrast & readability enhancements
+       ============================================================ */
+    [data-theme="dark"] .site-nav {
+      background: #1E1812;
+      border-bottom-color: #3D342B;
+    }
+    [data-theme="dark"] .card,
+    [data-theme="dark"] .pestle-card,
+    [data-theme="dark"] .ws-card,
+    [data-theme="dark"] .papers-field-group {
+      border-color: #3D342B;
+    }
+    [data-theme="dark"] .card:hover,
+    [data-theme="dark"] .pestle-card:hover,
+    [data-theme="dark"] .ws-card:hover {
+      box-shadow: 0 4px 16px rgba(0,0,0,0.3), 0 8px 32px rgba(0,0,0,0.2);
+    }
+    [data-theme="dark"] .daily-report-main {
+      border-color: #3D342B;
+    }
+    [data-theme="dark"] .insight-form textarea {
+      background: #1A1410;
+      border-color: #3D342B;
+    }
+    [data-theme="dark"] .insight-form textarea:focus {
+      border-color: var(--accent);
+    }
+    [data-theme="dark"] .toast {
+      background: #2A231C;
+      border-color: #3D342B;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    }
+    [data-theme="dark"] .pestle-article-title {
+      color: var(--text);
+    }
+    [data-theme="dark"] .paper-title a {
+      color: var(--text);
+    }
+    [data-theme="dark"] .modal-box {
+      border-color: #3D342B;
+    }
+    [data-theme="dark"] .site-footer {
+      background: #110D08;
+      border-top-color: var(--accent);
+    }
+    [data-theme="dark"] ::-webkit-scrollbar-thumb {
+      background: #4A3F36;
+    }
+    [data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+      background: var(--accent-soft);
+    }
+
+    /* ============================================================
+       RESPONSIVE — Additional mobile refinements
+       ============================================================ */
+    @media (max-width: 375px) {
+      .container { padding: 0 0.75rem; }
+      .site-logo { font-size: 1.2rem; }
+      .site-logo-sub { font-size: 0.6rem; }
+      .header-date { display: none; }
+      .section-title { font-size: 1.05rem; }
+      .report-title { font-size: 1.05rem; }
+      .daily-report-main { padding: 1rem; }
+      .card-body { padding: 1rem; }
+      .pestle-card-header { padding: 0.65rem 0.85rem 0.45rem; }
+      .pestle-articles { padding: 0 0.85rem 0.65rem; }
+    }
+
+    /* Navigation horizontal scroll fade indicator */
+    @media (max-width: 768px) {
+      .site-nav {
+        position: relative;
+      }
+      .site-nav::after {
+        content: '';
+        position: absolute;
+        right: 0; top: 0; bottom: 0;
+        width: 2rem;
+        background: linear-gradient(90deg, transparent, var(--card));
+        pointer-events: none;
+        z-index: 1;
+      }
+      .site-nav ul {
+        padding-right: 2rem;
+      }
+      /* Toast position on mobile */
+      .toast-container {
+        left: 1rem;
+        right: 1rem;
+        bottom: 1rem;
+      }
+      .toast { max-width: 100%; }
+    }
+
+    /* ============================================================
+       FOCUS STATES — Accessibility
+       ============================================================ */
+    a:focus-visible,
+    button:focus-visible,
+    input:focus-visible,
+    textarea:focus-visible,
+    summary:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+      border-radius: 4px;
+    }
+
+    /* ============================================================
+       PRINT STYLES
+       ============================================================ */
+    @media print {
+      .site-header, .site-nav, .site-footer, .alerts-bar,
+      .theme-toggle, .auth-area, .region-toggle-wrapper,
+      .bookmark-btn, .btn-primary, .btn-secondary, .btn-icon { display: none !important; }
+      body { background: #fff; color: #000; }
+      .card, .pestle-card { box-shadow: none; border: 1px solid #ccc; }
+    }
   </style>
 </head>
 <body>
@@ -1416,14 +1869,6 @@
        MAIN CONTENT
        ============================================================ -->
   <main class="container">
-
-    <!-- Section: Bookmarks -->
-    <section class="section app-section" id="section-bookmarks" style="display:none;">
-      <div class="section-header">
-        <h2 class="section-title">ブックマーク</h2>
-      </div>
-      <div id="bookmarksList"></div>
-    </section>
 
     <!-- Section HOME: Dashboard -->
     <section class="section app-section" id="section-home">
@@ -1594,6 +2039,9 @@
     </div>
   </div>
 
+  <!-- Toast notification container -->
+  <div class="toast-container" id="toastContainer"></div>
+
   <!-- ============================================================
        FOOTER
        ============================================================ -->
@@ -1737,13 +2185,13 @@
         updateBookmarkUI();
       } catch (renderErr) {
         console.error('Render error:', renderErr);
-        document.getElementById('homeDashboard').innerHTML = '<div style="color:red;padding:2rem;">' +
-          '<h3>レンダリングエラー</h3><pre>' + renderErr.message + '\n' + renderErr.stack + '</pre></div>';
+        document.getElementById('homeDashboard').innerHTML = '<div style="color:var(--text-muted);padding:2rem;text-align:center;">' +
+          '<p style="font-size:0.92rem;">データの表示中にエラーが発生しました。ページを再読み込みしてください。</p></div>';
       }
       } catch (loadErr) {
         console.error('Data load error:', loadErr);
-        document.getElementById('homeDashboard').innerHTML = '<div style="color:red;padding:2rem;">' +
-          '<h3>データ読み込みエラー</h3><pre>' + loadErr.message + '\n' + loadErr.stack + '</pre></div>';
+        document.getElementById('homeDashboard').innerHTML = '<div style="color:var(--text-muted);padding:2rem;text-align:center;">' +
+          '<p style="font-size:0.92rem;">データの読み込みに失敗しました。ページを再読み込みしてください。</p></div>';
       }
     }
 
@@ -1757,13 +2205,17 @@
       bar.style.display = '';
 
       const items = data.alerts.slice(0, 10);
-      const typeMap = { emergence: '新出現', surge: '急増', crossover: '横断' };
-      const html = items.map(a => `
-        <span class="alert-item">
-          <span class="alert-type">${escapeHtml(typeMap[a.type] || a.type)}</span>
-          ${escapeHtml(a.topic || a.alert_title || a.alert_title_en || a.description || '')}
-        </span>
-      `).join('');
+      const typeMap = { emergence: '新出現', surge: '急増', crossover: '横断', EMERGENCE: '新出現', SURGE: '急増', CROSSOVER: '横断' };
+      const html = items.map(a => {
+        const typeLabel = typeMap[a.type] || a.type || '';
+        const title = a.alert_title || a.alert_title_en || a.description || a.topic || '';
+        return `
+          <span class="alert-item">
+            <span class="alert-type">${escapeHtml(typeLabel)}</span>
+            ${escapeHtml(title)}
+          </span>
+        `;
+      }).join('');
       ticker.innerHTML = html + html;
     }
 
@@ -1787,11 +2239,12 @@
       let jpArticles = [], glArticles = [];
       catKeys.forEach(catKey => {
         const articles = (pestle[catKey]?.articles || []);
-        articles.forEach(a => {
+        articles.forEach((a, origIdx) => {
           a._pestleCat = catKey;
+          a._origIdx = origIdx; // Store original index for translation lookup
         });
-        const jaArts = articles.filter(a => a.lang === 'ja').slice(0, 2);
-        const enArts = articles.filter(a => a.lang === 'en').slice(0, 2);
+        const jaArts = articles.filter(a => isJaSource(a)).slice(0, 2);
+        const enArts = articles.filter(a => !isJaSource(a)).slice(0, 2);
         jpArticles.push(...jaArts);
         glArticles.push(...enArts);
       });
@@ -1805,7 +2258,8 @@
       const allPapers = [];
       const fields = papers?.by_field || papers?.fields || {};
       Object.entries(fields).forEach(([field, list]) => {
-        const arr = Array.isArray(list) ? list : [];
+        // Handle both array and object ({papers: [...]}) formats
+        const arr = Array.isArray(list) ? list : (list && Array.isArray(list.papers) ? list.papers : []);
         arr.forEach(p => { p._field = field; allPapers.push(p); });
       });
       allPapers.sort((a,b) => (b.published_date||'').localeCompare(a.published_date||''));
@@ -1830,16 +2284,16 @@
           '<div style="padding:0 1.25rem 1.25rem;">' +
             '<div style="font-size:0.84rem;line-height:1.75;color:var(--text-secondary);margin-bottom:1rem;">' + escapeHtml(jpPreview) + '...</div>';
         // Declining/Emerging myths
-        if (jpReport.declining_myths || jpReport.emerging_myths) {
+        if (Array.isArray(jpReport.declining_myths) || Array.isArray(jpReport.emerging_myths)) {
           html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">';
-          if (jpReport.declining_myths) {
+          if (Array.isArray(jpReport.declining_myths) && jpReport.declining_myths.length > 0) {
             html += '<div style="padding:0.75rem;background:var(--cla-1);border-radius:6px;"><div style="font-size:0.68rem;font-weight:600;color:#8B3D2F;margin-bottom:0.3rem;">衰退する神話</div>';
-            jpReport.declining_myths.slice(0,3).forEach(m => { html += '<div style="font-size:0.75rem;line-height:1.5;">- ' + escapeHtml(m) + '</div>'; });
+            jpReport.declining_myths.slice(0,3).forEach(m => { html += '<div style="font-size:0.75rem;line-height:1.5;">- ' + escapeHtml(String(m)) + '</div>'; });
             html += '</div>';
           }
-          if (jpReport.emerging_myths) {
+          if (Array.isArray(jpReport.emerging_myths) && jpReport.emerging_myths.length > 0) {
             html += '<div style="padding:0.75rem;background:var(--cla-1);border-radius:6px;"><div style="font-size:0.68rem;font-weight:600;color:#2D7A6B;margin-bottom:0.3rem;">浮上する神話</div>';
-            jpReport.emerging_myths.slice(0,3).forEach(m => { html += '<div style="font-size:0.75rem;line-height:1.5;">- ' + escapeHtml(m) + '</div>'; });
+            jpReport.emerging_myths.slice(0,3).forEach(m => { html += '<div style="font-size:0.75rem;line-height:1.5;">- ' + escapeHtml(String(m)) + '</div>'; });
             html += '</div>';
           }
           html += '</div>';
@@ -1861,16 +2315,16 @@
           '</summary>' +
           '<div style="padding:0 1.25rem 1.25rem;">' +
             '<div style="font-size:0.84rem;line-height:1.75;color:var(--text-secondary);margin-bottom:1rem;">' + escapeHtml(glPreview) + '...</div>';
-        if (glReport.declining_myths || glReport.emerging_myths) {
+        if (Array.isArray(glReport.declining_myths) || Array.isArray(glReport.emerging_myths)) {
           html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">';
-          if (glReport.declining_myths) {
+          if (Array.isArray(glReport.declining_myths) && glReport.declining_myths.length > 0) {
             html += '<div style="padding:0.75rem;background:var(--cla-1);border-radius:6px;"><div style="font-size:0.68rem;font-weight:600;color:#8B3D2F;margin-bottom:0.3rem;">衰退する神話</div>';
-            glReport.declining_myths.slice(0,3).forEach(m => { html += '<div style="font-size:0.75rem;line-height:1.5;">- ' + escapeHtml(m) + '</div>'; });
+            glReport.declining_myths.slice(0,3).forEach(m => { html += '<div style="font-size:0.75rem;line-height:1.5;">- ' + escapeHtml(String(m)) + '</div>'; });
             html += '</div>';
           }
-          if (glReport.emerging_myths) {
+          if (Array.isArray(glReport.emerging_myths) && glReport.emerging_myths.length > 0) {
             html += '<div style="padding:0.75rem;background:var(--cla-1);border-radius:6px;"><div style="font-size:0.68rem;font-weight:600;color:#2D7A6B;margin-bottom:0.3rem;">浮上する神話</div>';
-            glReport.emerging_myths.slice(0,3).forEach(m => { html += '<div style="font-size:0.75rem;line-height:1.5;">- ' + escapeHtml(m) + '</div>'; });
+            glReport.emerging_myths.slice(0,3).forEach(m => { html += '<div style="font-size:0.75rem;line-height:1.5;">- ' + escapeHtml(String(m)) + '</div>'; });
             html += '</div>';
           }
           html += '</div>';
@@ -1892,7 +2346,7 @@
       if (jpArticles.length > 0) {
         jpArticles.forEach(a => {
           const catInfo = PESTLE_CATS[a._pestleCat] || {};
-          html += '<div style="padding:0.5rem 0;border-bottom:1px solid var(--surface);cursor:pointer;" onclick="window.open(\'' + escapeAttr(a.url) + '\',\'_blank\')">' +
+          html += '<div style="padding:0.5rem 0;border-bottom:1px solid var(--surface);cursor:pointer;" onclick="window.open(\'' + escapeAttr(safeUrl(a.url)) + '\',\'_blank\')">' +
             '<div style="display:flex;align-items:center;gap:0.4rem;margin-bottom:0.15rem;">' +
               '<span style="font-size:0.62rem;font-weight:600;color:' + (catInfo.color||'var(--accent)') + ';background:' + (catInfo.color||'var(--accent)') + '15;padding:0.1rem 0.3rem;border-radius:3px;">' + (catInfo.labelJa||a._pestleCat) + '</span>' +
               '<span style="font-size:0.68rem;color:var(--text-muted);">' + escapeHtml(a.source || '') + '</span>' +
@@ -1903,7 +2357,7 @@
       } else {
         html += '<div style="color:var(--text-muted);font-size:0.82rem;">日本語ソースの記事がありません</div>';
       }
-      html += '<a href="app.html#section-news" style="display:block;margin-top:0.5rem;font-size:0.78rem;font-weight:500;" onclick="showSection(\'section-news\')">もっと見る &rarr;</a>';
+      html += '<a href="app.html#section-news" style="display:block;margin-top:0.5rem;font-size:0.78rem;font-weight:500;" onclick="event.preventDefault();showSection(\'section-news\');history.pushState(null,\'\',\'app.html#section-news\')">もっと見る &rarr;</a>';
       html += '</div>';
 
       // Global news
@@ -1914,9 +2368,9 @@
           const catInfo = PESTLE_CATS[a._pestleCat] || {};
           // Try to find translation
           const catTranslations = translations[a._pestleCat] || [];
-          const trans = catTranslations.find(t => t.index === idx);
+          const trans = catTranslations.find(t => t.index === a._origIdx);
           const titleJa = trans?.title_translated || '';
-          html += '<div style="padding:0.5rem 0;border-bottom:1px solid var(--surface);cursor:pointer;" onclick="window.open(\'' + escapeAttr(a.url) + '\',\'_blank\')">' +
+          html += '<div style="padding:0.5rem 0;border-bottom:1px solid var(--surface);cursor:pointer;" onclick="window.open(\'' + escapeAttr(safeUrl(a.url)) + '\',\'_blank\')">' +
             '<div style="display:flex;align-items:center;gap:0.4rem;margin-bottom:0.15rem;">' +
               '<span style="font-size:0.62rem;font-weight:600;color:' + (catInfo.color||'var(--accent)') + ';background:' + (catInfo.color||'var(--accent)') + '15;padding:0.1rem 0.3rem;border-radius:3px;">' + (catInfo.labelJa||a._pestleCat) + '</span>' +
               '<span style="font-size:0.68rem;color:var(--text-muted);">' + escapeHtml(a.source || '') + '</span>' +
@@ -1928,7 +2382,7 @@
       } else {
         html += '<div style="color:var(--text-muted);font-size:0.82rem;">英語ソースの記事がありません</div>';
       }
-      html += '<a href="app.html#section-news" style="display:block;margin-top:0.5rem;font-size:0.78rem;font-weight:500;" onclick="showSection(\'section-news\')">もっと見る &rarr;</a>';
+      html += '<a href="app.html#section-news" style="display:block;margin-top:0.5rem;font-size:0.78rem;font-weight:500;" onclick="event.preventDefault();showSection(\'section-news\');history.pushState(null,\'\',\'app.html#section-news\')">もっと見る &rarr;</a>';
       html += '</div>';
 
       html += '</div></div>';
@@ -1948,7 +2402,7 @@
             '<div style="font-size:0.84rem;line-height:1.6;">' + escapeHtml(ws.description || '') + '</div>' +
           '</div>';
         });
-        html += '<a href="app.html#section-signals" style="display:block;margin-top:0.5rem;font-size:0.78rem;font-weight:500;" onclick="showSection(\'section-signals\')">全シグナルを見る &rarr;</a>';
+        html += '<a href="app.html#section-signals" style="display:block;margin-top:0.5rem;font-size:0.78rem;font-weight:500;" onclick="event.preventDefault();showSection(\'section-signals\');history.pushState(null,\'\',\'app.html#section-signals\')">全シグナルを見る &rarr;</a>';
         html += '</div>';
       }
 
@@ -1971,7 +2425,7 @@
           html += '</div></details>';
         }
 
-        html += '<a href="app.html#section-papers" style="display:block;margin-top:0.75rem;font-size:0.78rem;font-weight:500;" onclick="showSection(\'section-papers\')">全分野を見る &rarr;</a>';
+        html += '<a href="app.html#section-papers" style="display:block;margin-top:0.75rem;font-size:0.78rem;font-weight:500;" onclick="event.preventDefault();showSection(\'section-papers\');history.pushState(null,\'\',\'app.html#section-papers\')">全分野を見る &rarr;</a>';
         html += '</div>';
       }
 
@@ -2018,6 +2472,10 @@
       // Navigate to foresight tab with the question
       document.getElementById('insightText').value = question;
       input.value = '';
+      setTimeout(() => {
+        history.pushState(null, '', 'app.html#section-foresight');
+        showSection('section-foresight');
+      }, 1500);
     };
 
     // ==========================================================
@@ -2169,7 +2627,7 @@
                     <div class="pestle-article-title">${escapeHtml(article.title)}</div>
                     ${titleJa ? `<div class="pestle-article-summary" style="color:var(--accent-soft);font-size:0.73rem;">${escapeHtml(titleJa)}</div>` : ''}
                     ${summaryJa ? `<div class="pestle-article-summary">${escapeHtml(summaryJa)}</div>` : (article.summary ? `<div class="pestle-article-summary">${escapeHtml(article.summary)}</div>` : '')}
-                    ${article.relevance_score ? `<div class="pestle-article-score">関連度: ${article.relevance_score.toFixed(1)}</div>` : ''}
+                    ${article.relevance_score ? `<div class="pestle-article-score">関連度: ${Number(article.relevance_score).toFixed(1)}</div>` : ''}
                   </div>
                 `;
               }).join('')}
@@ -2246,7 +2704,7 @@
         ${titleJa ? `<div style="font-size:0.92rem;color:var(--accent-soft);margin-bottom:0.5rem;">${escapeHtml(titleJa)}</div>` : ''}
         <div class="modal-meta">
           ${escapeHtml(article.source || '')} | ${escapeHtml(article.published_date || '')}
-          ${article.relevance_score ? ` | 関連度: ${article.relevance_score.toFixed(1)}` : ''}
+          ${article.relevance_score ? ` | 関連度: ${Number(article.relevance_score).toFixed(1)}` : ''}
           ${article.tier ? ` | Tier ${article.tier}` : ''}
         </div>
         <div class="modal-summary">
@@ -2309,7 +2767,7 @@
       const text = input.value.trim();
       if (!text) return;
       const user = auth.currentUser;
-      if (!user) { alert('コメントするにはログインが必要です。'); return; }
+      if (!user) { showToast('コメントするにはログインが必要です。', 'error'); return; }
 
       try {
         await db.collection('news_comments').add({
@@ -2323,7 +2781,7 @@
         loadArticleComments(articleId);
       } catch (err) {
         console.error('Failed to post comment:', err);
-        alert('コメントの投稿に失敗しました。');
+        showToast('コメントの投稿に失敗しました。', 'error');
       }
     };
 
@@ -2530,28 +2988,34 @@
         if (metaData) {
           const region = metaData[currentRegion] || metaData.japan || metaData.global;
           const metaContainer = document.getElementById('claMetaContent');
-          if (region && region.report_text) {
-            metaContainer.innerHTML = '<div class="meta-report-body">' + renderMarkdown(region.report_text) + '</div>';
-          } else {
-            metaContainer.innerHTML = '<p style="color:var(--text-muted);">メタ分析データがありません。</p>';
+          if (metaContainer) {
+            if (region && region.report_text) {
+              metaContainer.innerHTML = '<div class="meta-report-body">' + renderMarkdown(region.report_text) + '</div>';
+            } else {
+              metaContainer.innerHTML = '<p style="color:var(--text-muted);">メタ分析データがありません。</p>';
+            }
           }
         }
 
         // Yearly timeline
         if (yearlyData && yearlyData.entries) {
           const timelineEl = document.getElementById('claYearlyTimeline');
-          timelineEl.innerHTML = yearlyData.entries.map(e =>
-            '<button onclick="showCLADetail(\'yearly\',\'' + e.period + '\')" style="padding:0.25rem 0.5rem;font-size:0.7rem;border:1px solid var(--border);background:var(--card);color:var(--text-secondary);border-radius:4px;cursor:pointer;font-family:var(--font-sans);" class="cla-period-btn">' + e.period + '</button>'
-          ).join('');
+          if (timelineEl) {
+            timelineEl.innerHTML = yearlyData.entries.map(e =>
+              '<button onclick="showCLADetail(\'yearly\',\'' + e.period + '\')" style="padding:0.25rem 0.5rem;font-size:0.7rem;border:1px solid var(--border);background:var(--card);color:var(--text-secondary);border-radius:4px;cursor:pointer;font-family:var(--font-sans);" class="cla-period-btn">' + e.period + '</button>'
+            ).join('');
+          }
           window._claYearly = yearlyData.entries;
         }
 
         // Quarterly timeline
         if (quarterlyData && quarterlyData.entries) {
           const timelineEl = document.getElementById('claQuarterlyTimeline');
-          timelineEl.innerHTML = quarterlyData.entries.map(e =>
-            '<button onclick="showCLADetail(\'quarterly\',\'' + e.period + '\')" style="padding:0.25rem 0.5rem;font-size:0.7rem;border:1px solid var(--border);background:var(--card);color:var(--text-secondary);border-radius:4px;cursor:pointer;font-family:var(--font-sans);" class="cla-period-btn">' + e.period + '</button>'
-          ).join('');
+          if (timelineEl) {
+            timelineEl.innerHTML = quarterlyData.entries.map(e =>
+              '<button onclick="showCLADetail(\'quarterly\',\'' + e.period + '\')" style="padding:0.25rem 0.5rem;font-size:0.7rem;border:1px solid var(--border);background:var(--card);color:var(--text-secondary);border-radius:4px;cursor:pointer;font-family:var(--font-sans);" class="cla-period-btn">' + e.period + '</button>'
+            ).join('');
+          }
           window._claQuarterly = quarterlyData.entries;
         }
       } catch (e) {
@@ -2632,7 +3096,7 @@
       if (region.observations && region.observations.length > 0) {
         html += '<div style="margin-bottom:0.75rem;"><div style="font-size:0.72rem;font-weight:600;color:var(--accent);margin-bottom:0.35rem;">観測</div>';
         region.observations.forEach(o => {
-          html += '<div style="font-size:0.78rem;line-height:1.55;padding:0.35rem 0;border-bottom:1px solid var(--surface);">[' + escapeHtml(o.category) + '] ' + escapeHtml(o.observation) + '</div>';
+          html += '<div style="font-size:0.78rem;line-height:1.55;padding:0.35rem 0;border-bottom:1px solid var(--surface);">[' + escapeHtml(o.category || '') + '] ' + escapeHtml(o.observation || '') + '</div>';
         });
         html += '</div>';
       }
@@ -2673,7 +3137,8 @@
         return;
       }
 
-      const fields = data.fields || data.by_field || {};
+      // Prefer by_field (primary key in data spec), fallback to fields
+      const fields = data.by_field || data.fields || {};
       const fieldNames = Object.keys(fields);
       if (fieldNames.length === 0) {
         container.innerHTML = '<p style="color:var(--text-muted);">論文データがありません。</p>';
@@ -2732,8 +3197,8 @@
               ${paper.summary_ja ? `<div class="paper-summary">${escapeHtml(paper.summary_ja)}</div>` : (paper.summary ? `<div class="paper-summary">${escapeHtml(paper.summary)}</div>` : '')}
               ${paper.novelty_score ? `
                 <div class="paper-novelty">
-                  新規性: ${(paper.novelty_score * 10).toFixed(0)}/10
-                  <span class="paper-novelty-bar"><span class="paper-novelty-fill" style="width:${paper.novelty_score * 100}%"></span></span>
+                  新規性: ${Math.round(Number(paper.novelty_score))}/10
+                  <span class="paper-novelty-bar"><span class="paper-novelty-fill" style="width:${Number(paper.novelty_score) * 10}%"></span></span>
                 </div>
               ` : ''}
             </div>
@@ -2849,7 +3314,8 @@
             <tbody>
               ${filtered.sort((a, b) => (b.articles_count || 0) - (a.articles_count || 0)).map(s => {
                 const name = s.name_ja || s.name || s.title || '';
-                const cat = s.categories || s.category || s.type || '';
+                const rawCat = s.categories || s.category || s.type || '';
+                const cat = Array.isArray(rawCat) ? rawCat.join(', ') : rawCat;
                 const tier = s.tier || '-';
                 const tierClass = tier === 1 ? '' : (tier === 2 ? 'tier-badge-2' : 'tier-badge-3');
                 const count = s.articles_count || 0;
@@ -2890,7 +3356,7 @@
     function updateBookmarkUI() {
       const activeCount = bookmarks.filter(b => !b.archived).length;
       document.getElementById('bookmarkCount').textContent = activeCount;
-      const list = document.getElementById('bookmarksList');
+      const list = document.getElementById('bookmarksContent');
 
       const filteredBookmarks = bookmarkFilter === 'active'
         ? bookmarks.filter(b => !b.archived)
@@ -2956,9 +3422,11 @@
           currentRegion === 'japan' ? '日本メディアの視点' : '海外メディアの視点';
 
         // Re-render region-dependent sections
-        renderDailyReport(dataCache['daily_report.json']);
+        renderHomeDashboard(dataCache['daily_report.json'], dataCache['latest.json'], dataCache['ai_analysis.json'], dataCache['daily_papers.json']);
         renderPESTLE(dataCache['latest.json'], dataCache['ai_analysis.json']);
         renderMediaSources(dataCache['media_sources.json']);
+        renderReportsArchive(dataCache['daily_report.json']);
+        loadCLAArchive();
       });
     });
 
@@ -2985,7 +3453,7 @@
     const VALID_SECTIONS = ['section-home', 'section-news', 'section-cla', 'section-signals', 'section-papers', 'section-foresight', 'section-media', 'section-reports', 'section-bookmarks'];
     const DEFAULT_SECTION = 'section-home';
 
-    function showSection(sectionId) {
+    window.showSection = function showSection(sectionId) {
       if (!VALID_SECTIONS.includes(sectionId)) sectionId = DEFAULT_SECTION;
       // Hide all sections
       document.querySelectorAll('.app-section').forEach(s => s.style.display = 'none');
@@ -2998,7 +3466,7 @@
       });
       // Scroll to top
       window.scrollTo(0, 0);
-    }
+    };
 
     function initSectionFromHash() {
       const hash = (location.hash || '').replace('#', '');
@@ -3032,7 +3500,7 @@
       if (!text) return;
 
       const user = auth.currentUser;
-      if (!user) { alert('投稿するにはログインが必要です。'); return; }
+      if (!user) { showToast('投稿するにはログインが必要です。', 'error'); return; }
 
       try {
         await db.collection('insights').add({
@@ -3043,26 +3511,51 @@
           region: currentRegion
         });
         document.getElementById('insightText').value = '';
-        alert('洞察を投稿しました。ありがとうございます。');
+        showToast('洞察を投稿しました。ありがとうございます。', 'success');
       } catch (err) {
         console.error('Failed to save insight:', err);
-        alert('投稿に失敗しました。もう一度お試しください。');
+        showToast('投稿に失敗しました。もう一度お試しください。', 'error');
       }
     });
 
     // ==========================================================
     // UTILITIES
     // ==========================================================
+
+    // Toast notification (replaces alert())
+    function showToast(message, type) {
+      type = type || '';
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = 'toast' + (type ? ' toast-' + type : '');
+      toast.textContent = message;
+      container.appendChild(toast);
+      setTimeout(function() {
+        toast.classList.add('toast-out');
+        setTimeout(function() { toast.remove(); }, 300);
+      }, 3500);
+    }
+
     function escapeHtml(str) {
-      if (!str) return '';
+      if (str == null) return '';
       const div = document.createElement('div');
-      div.textContent = str;
+      div.textContent = String(str);
       return div.innerHTML;
     }
 
     function escapeAttr(str) {
-      if (!str) return '';
-      return str.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+      if (str == null) return '';
+      str = String(str);
+      return str.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/\n/g, ' ').replace(/\r/g, '');
+    }
+
+    // Validate URL scheme to prevent javascript: XSS
+    function safeUrl(url) {
+      if (!url) return '#';
+      try {
+        const u = new URL(url, location.href);
+        return (u.protocol === 'http:' || u.protocol === 'https:') ? url : '#';
+      } catch { return '#'; }
     }
 
     function formatDateFull(date) {
