@@ -2019,7 +2019,7 @@
     <section class="app-section section-hidden" id="section-reports">
       <div class="section-header">
         <h2 class="section-title">レポート一覧</h2>
-        <span class="section-subtitle">日次レポートアーカイブ</span>
+        <span class="section-subtitle">月次レポートアーカイブ</span>
       </div>
       <div id="reportsArchiveContent">
         <div class="loading-indicator"><div class="loading-spinner"></div><div>レポートを読み込み中...</div></div>
@@ -2298,7 +2298,7 @@
       }
 
       // 1. Daily Report
-      html += '<div><h2 class="section-title">日次分析レポート <span class="section-date">' + dateStr + '</span></h2>';
+      html += '<div><h2 class="section-title">月次分析レポート <span class="section-date">' + dateStr + '</span></h2>';
       if (jpReport) html += renderDailyReportCard('日本メディアの視点', jpReport);
       if (glReport) html += renderDailyReportCard('海外メディアの視点', glReport);
       html += '</div>';
@@ -2612,12 +2612,6 @@
           '</div>';
         }
       }
-
-      // Generate user report button
-      modalHtml += '<div style="margin:16px 0;padding:14px;background:var(--surface);border-radius:var(--radius-xs);border:1px solid var(--border-light)">' +
-        '<button class="btn-primary" style="width:100%" onclick="generateUserReport(' + reportIndex + ')">\u3053\u306e\u8a18\u4e8b\u304b\u3089\u30ec\u30dd\u30fc\u30c8\u3092\u751f\u6210</button>' +
-        '<div id="userReportResult-' + reportIndex + '" style="margin-top:12px"></div>' +
-      '</div>';
 
       // Full report text (deep-dive content at the bottom)
       modalHtml += '<h4 style="font-size:0.9rem;font-weight:600;margin:24px 0 12px;padding-top:16px;border-top:1px solid var(--border)">全文レポート</h4>';
@@ -3223,7 +3217,7 @@
       }
 
       // Separator
-      html += '<h3 class="section-title" style="margin-bottom:12px">日次分析レポート</h3>';
+      html += '<h3 class="section-title" style="margin-bottom:12px">月次分析レポート</h3>';
 
       ['japan', 'global'].forEach(regionKey => {
         const region = dailyReport[regionKey];
@@ -3356,6 +3350,8 @@
           (article.summary ? '<p>' + escapeHtml(article.summary) + '</p>' : '') +
         '</div>' +
         (article.url ? '<a class="modal-link" href="' + escapeHtml(article.url) + '" target="_blank">元記事を読む &rarr;</a>' : '') +
+        '<div style="margin:16px 0"><button class="btn-primary" style="width:100%" onclick="generateNewsReport(\'' + escapeAttr(catKey) + '\',' + index + ')">この記事からレポートを生成</button>' +
+        '<div id="newsReportResult-' + catKey + '-' + index + '"></div></div>' +
         '<div class="comment-section"><h4 class="comment-heading">コメント</h4>' +
           '<div class="comment-input-row"><input type="text" class="comment-input" placeholder="この記事にコメント..." id="modalCommentInput">' +
           '<button class="btn-primary" onclick="submitArticleComment(\'' + escapeAttr(articleId) + '\')">投稿</button></div>' +
@@ -3523,21 +3519,30 @@
     // ==============================================================
     // USER REPORT GENERATION
     // ==============================================================
-    window.generateUserReport = async function(index) {
-      var r = _insightReportsData?.reports?.[index];
-      if (!r) { showToast('\u30ec\u30dd\u30fc\u30c8\u30c7\u30fc\u30bf\u304c\u898b\u3064\u304b\u308a\u307e\u305b\u3093\u3002', 'error'); return; }
+    window.generateNewsReport = async function(catKey, index) {
+      var data = dataCache['latest.json'];
+      var aiData = dataCache['ai_analysis.json'];
+      if (!data) { showToast('ニュースデータがありません。', 'error'); return; }
+      var article = data.pestle?.[catKey]?.articles?.[index];
+      if (!article) { showToast('記事が見つかりません。', 'error'); return; }
       var user = auth.currentUser;
-      if (!user) { showToast('\u30ec\u30dd\u30fc\u30c8\u3092\u751f\u6210\u3059\u308b\u306b\u306f\u30ed\u30b0\u30a4\u30f3\u304c\u5fc5\u8981\u3067\u3059\u3002', 'error'); return; }
+      if (!user) { showToast('レポートを生成するにはログインが必要です。', 'error'); return; }
 
-      var resultEl = document.getElementById('userReportResult-' + index);
+      var resultEl = document.getElementById('newsReportResult-' + catKey + '-' + index);
       if (!resultEl) return;
-      resultEl.innerHTML = '<div class="loading-indicator" style="padding:12px 0"><div class="loading-spinner loading-spinner-sm"></div><div>\u30ec\u30dd\u30fc\u30c8\u3092\u751f\u6210\u4e2d\u3067\u3059\u3002\u3057\u3070\u3089\u304f\u304a\u5f85\u3061\u304f\u3060\u3055\u3044...</div></div>';
+      resultEl.innerHTML = '<div class="loading-indicator" style="padding:12px 0"><div class="loading-spinner loading-spinner-sm"></div><div>レポートを生成中です。しばらくお待ちください...</div></div>';
 
-      var question = '\u4ee5\u4e0b\u306e\u30a4\u30f3\u30b5\u30a4\u30c8\u30ec\u30dd\u30fc\u30c8\u306b\u3064\u3044\u3066\u3001\u7d4c\u55b6\u8005\u30fb\u30b3\u30f3\u30b5\u30eb\u30bf\u30f3\u30c8\u306e\u8996\u70b9\u304b\u3089\u72ec\u81ea\u306e\u30ec\u30dd\u30fc\u30c8\u3092\u751f\u6210\u3057\u3066\u304f\u3060\u3055\u3044: ' +
-        (r.report_title || '') + '\n\n' + (r.summary || '') +
-        (r.historical_context ? '\n\n\u6b74\u53f2\u7684\u7d4c\u7def: ' + r.historical_context : '') +
-        (r.future_signals ? '\n\n\u672a\u6765\u3078\u306e\u30b7\u30b0\u30ca\u30eb: ' + r.future_signals : '') +
-        (r.watch_points ? '\n\n\u30a6\u30a9\u30c3\u30c1\u30dd\u30a4\u30f3\u30c8: ' + r.watch_points : '');
+      var trans = aiData?.translations?.[catKey]?.find(function(t) { return t.index === index; });
+      var titleJa = trans?.title_translated || '';
+      var summaryJa = trans?.summary_translated || '';
+
+      var question = '以下のニュース記事について、経営者・コンサルタントの視点から独自のレポートを生成してください。歴史的経緯、未来へのシグナル、注目すべきポイントを含めてください。\n\n' +
+        'タイトル: ' + (article.title || '') +
+        (titleJa ? '\n日本語タイトル: ' + titleJa : '') +
+        '\n出典: ' + (article.source || '') + ' (' + (article.published_date || '') + ')' +
+        '\n要約: ' + (article.summary || '') +
+        (summaryJa ? '\n日本語要約: ' + summaryJa : '') +
+        '\nカテゴリ: ' + catKey;
 
       var WORKER_BASE = 'https://future-insight-workspace.nishimura-69a.workers.dev';
       try {
@@ -3552,31 +3557,31 @@
           })
         });
         if (!resp.ok) { var err = await resp.json().catch(function() { return {}; }); throw new Error(err.error || 'HTTP ' + resp.status); }
-        var data = await resp.json();
-        var generatedText = data.answer || '';
+        var respData = await resp.json();
+        var generatedText = respData.answer || '';
 
         resultEl.innerHTML = '<div class="md-body" style="padding:12px 0;border-top:1px solid var(--border-light);margin-top:8px">' +
-          '<h4 style="font-size:0.88rem;font-weight:600;margin-bottom:8px;color:var(--accent)">\u751f\u6210\u3055\u308c\u305f\u30ec\u30dd\u30fc\u30c8</h4>' +
+          '<h4 style="font-size:0.88rem;font-weight:600;margin-bottom:8px;color:var(--accent)">生成されたレポート</h4>' +
           renderMarkdown(generatedText) + '</div>';
 
-        // Save to Firestore
         try {
           await db.collection('user_reports').add({
             userId: user.uid,
             userName: user.displayName || user.email || '',
-            sourceReportTitle: r.report_title || '',
-            sourceReportId: index.toString(),
+            sourceReportTitle: titleJa || article.title || '',
+            sourceCategory: catKey,
+            sourceUrl: article.url || '',
             generatedText: generatedText,
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
           });
-          showToast('\u30ec\u30dd\u30fc\u30c8\u3092\u4fdd\u5b58\u3057\u307e\u3057\u305f\u3002', 'success');
+          showToast('レポートを保存しました。', 'success');
         } catch (saveErr) {
           console.warn('User report save failed:', saveErr);
-          showToast('\u30ec\u30dd\u30fc\u30c8\u306e\u4fdd\u5b58\u306b\u5931\u6557\u3057\u307e\u3057\u305f\u3002', 'error');
+          showToast('レポートの保存に失敗しました。', 'error');
         }
       } catch (err) {
-        console.error('User report generation error:', err);
-        resultEl.innerHTML = '<div style="color:var(--highlight);padding:8px 0;font-size:0.85rem">\u30ec\u30dd\u30fc\u30c8\u306e\u751f\u6210\u306b\u5931\u6557\u3057\u307e\u3057\u305f: ' + escapeHtml(err.message) + '</div>';
+        console.error('News report generation error:', err);
+        resultEl.innerHTML = '<div style="color:var(--highlight);padding:8px 0;font-size:0.85rem">レポートの生成に失敗しました: ' + escapeHtml(err.message) + '</div>';
       }
     };
 
