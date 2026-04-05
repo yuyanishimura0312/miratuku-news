@@ -818,7 +818,8 @@
 
     // === UTILS ===
     function esc(s){if(!s)return'';const d=document.createElement('div');d.textContent=String(s);return d.innerHTML}
-    async function fetchJSON(f){if(dataCache[f])return dataCache[f];try{const r=await fetch(DATA_BASE+'/'+f+cb());if(!r.ok){console.warn('fetchJSON: HTTP '+r.status+' for '+f);return null}const d=await r.json();dataCache[f]=d;return d}catch(e){console.warn('fetchJSON error for '+f+':',e);return null}}
+    let dataMeta={};// stores {ok,lastMod,size} per filename
+    async function fetchJSON(f){if(dataCache[f])return dataCache[f];try{const r=await fetch(DATA_BASE+'/'+f+cb());const lastMod=r.headers.get('last-modified');if(!r.ok){console.warn('fetchJSON: HTTP '+r.status+' for '+f);dataMeta[f]={ok:false,lastMod:null,size:0};return null}const text=await r.text();dataMeta[f]={ok:true,lastMod:lastMod,size:text.length};const d=JSON.parse(text);dataCache[f]=d;return d}catch(e){console.warn('fetchJSON error for '+f+':',e);dataMeta[f]={ok:false,lastMod:null,size:0};return null}}
     function relTime(ds){if(!ds)return'-';const d=new Date(ds);if(isNaN(d))return ds;const diff=Date.now()-d.getTime(),h=Math.floor(diff/3600000);if(h<1)return Math.floor(diff/60000)+'分前';if(h<24)return h+'時間前';return Math.floor(h/24)+'日前'}
     function fmtBytes(b){if(!b)return'-';if(b<1024)return b+' B';if(b<1048576)return(b/1024).toFixed(1)+' KB';return(b/1048576).toFixed(1)+' MB'}
     function fmtTimestamp(ts){if(!ts)return'-';if(ts.seconds)return new Date(ts.seconds*1000).toLocaleString('ja-JP');return new Date(ts).toLocaleString('ja-JP')}
@@ -929,8 +930,12 @@
     // duplicate network requests when both dashboard and pipeline tabs call this.
     async function fetchHeadResults(){
       if(headResultsCache)return headResultsCache;
-      // Use GET instead of HEAD — GitHub Pages CORS can reject HEAD requests
-      const results=await Promise.all(DATA_FILES.map(async f=>{try{const r=await fetch(DATA_BASE+'/'+f.name+cb());const lastMod=r.headers.get('last-modified');const ct=r.headers.get('content-length');return{...f,ok:r.ok,lastMod:lastMod,size:parseInt(ct||'0')}}catch{return{...f,ok:false}}}));
+      // Fetch all data files via fetchJSON (which caches both data and metadata)
+      await Promise.all(DATA_FILES.map(f=>fetchJSON(f.name)));
+      const results=DATA_FILES.map(f=>{
+        const m=dataMeta[f.name]||{ok:false,lastMod:null,size:0};
+        return{...f,ok:m.ok,lastMod:m.lastMod,size:m.size};
+      });
       headResultsCache=results;
       setTimeout(()=>{headResultsCache=null},60000);
       return results;
