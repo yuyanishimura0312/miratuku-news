@@ -929,9 +929,9 @@
     // duplicate network requests when both dashboard and pipeline tabs call this.
     async function fetchHeadResults(){
       if(headResultsCache)return headResultsCache;
-      const results=await Promise.all(DATA_FILES.map(async f=>{try{const r=await fetch(DATA_BASE+'/'+f.name+cb(),{method:'HEAD'});return{...f,ok:r.ok,lastMod:r.headers.get('last-modified'),size:parseInt(r.headers.get('content-length')||'0')}}catch{return{...f,ok:false}}}));
+      // Use GET instead of HEAD — GitHub Pages CORS can reject HEAD requests
+      const results=await Promise.all(DATA_FILES.map(async f=>{try{const r=await fetch(DATA_BASE+'/'+f.name+cb());const lastMod=r.headers.get('last-modified');const ct=r.headers.get('content-length');return{...f,ok:r.ok,lastMod:lastMod,size:parseInt(ct||'0')}}catch{return{...f,ok:false}}}));
       headResultsCache=results;
-      // Expire cache after 60 seconds so manual refreshes still work
       setTimeout(()=>{headResultsCache=null},60000);
       return results;
     }
@@ -1408,7 +1408,7 @@
       const fileResults=await Promise.all(PIPELINE_STEPS.map(async step=>{
         if(!step.file)return{...step,ok:null};
         try{
-          const r=await fetch(DATA_BASE+'/'+step.file+cb(),{method:'HEAD'});
+          const r=await fetch(DATA_BASE+'/'+step.file+cb());
           return{...step,ok:r.ok,lastMod:r.headers.get('last-modified'),size:parseInt(r.headers.get('content-length')||'0')};
         }catch{return{...step,ok:false}}
       }));
