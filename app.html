@@ -880,29 +880,35 @@
       flex-shrink: 0;
       margin-top: 2px;
     }
-    .pestle-article-bookmark {
-      flex-shrink: 0;
-    }
-    .pestle-article-report-btn {
-      display: inline-block;
-      background: transparent;
-      border: 1px solid var(--accent-soft);
+    .pestle-article-action-btn {
+      display: block;
+      background: var(--surface);
+      border: 1px solid var(--border);
       cursor: pointer;
-      font-size: 0.58rem;
-      font-weight: 600;
+      font-size: 0.6rem;
+      font-weight: 500;
       font-family: var(--font);
-      color: var(--accent-soft);
-      padding: 2px 6px;
-      border-radius: 3px;
+      color: var(--text-secondary);
+      padding: 3px 8px;
+      border-radius: 4px;
       transition: all 0.15s;
       white-space: nowrap;
-      letter-spacing: 0.02em;
       text-align: center;
     }
-    .pestle-article-report-btn:hover {
-      color: #fff;
+    .pestle-article-action-btn:hover {
+      background: var(--surface2);
+      border-color: var(--accent-soft);
+      color: var(--text);
+    }
+    .pestle-article-action-btn.bookmarked {
+      background: var(--accent-light);
+      border-color: var(--accent-soft);
+      color: var(--accent);
+    }
+    .pestle-article-action-report:hover {
       background: var(--accent);
       border-color: var(--accent);
+      color: #fff;
     }
 
     /* ================================================================
@@ -2721,8 +2727,8 @@
               (ja ? '<div class="pestle-article-trans">' + escapeHtml(ja) + '</div>' : '') +
               '</div>' +
               '<div class="pestle-article-actions">' +
-                '<button class="bookmark-btn pestle-article-bookmark ' + (isBm ? 'bookmarked' : '') + '" onclick="event.stopPropagation();toggleBookmark(\'' + bmId + '\',\'' + escapeAttr(a.title || '') + '\',\'' + escapeAttr(safeUrl(a.url)) + '\',this)" title="ブックマーク">&#9734;</button>' +
-                '<button class="pestle-article-report-btn" onclick="event.stopPropagation();confirmAndGenerateReport(\'' + escapeAttr(catKey) + '\',' + origIdx + ')">レポート</button>' +
+                '<button class="pestle-article-action-btn ' + (isBm ? 'bookmarked' : '') + '" onclick="event.stopPropagation();toggleBookmark(\'' + bmId + '\',\'' + escapeAttr(a.title || '') + '\',\'' + escapeAttr(safeUrl(a.url)) + '\',this)">ブックマーク</button>' +
+                '<button class="pestle-article-action-btn pestle-article-action-report" onclick="event.stopPropagation();confirmAndGenerateReport(\'' + escapeAttr(catKey) + '\',' + origIdx + ')">レポート生成</button>' +
               '</div>' +
             '</div></div>';
           });
@@ -2769,8 +2775,8 @@
           (ja ? '<div class="pestle-article-trans">' + escapeHtml(ja) + '</div>' : '') +
           '</div>' +
           '<div class="pestle-article-actions">' +
-            '<button class="bookmark-btn pestle-article-bookmark ' + (isBm ? 'bookmarked' : '') + '" onclick="event.stopPropagation();toggleBookmark(\'' + bmId + '\',\'' + escapeAttr(a.title || '') + '\',\'' + escapeAttr(safeUrl(a.url)) + '\',this)" title="ブックマーク">&#9734;</button>' +
-            '<button class="pestle-article-report-btn" onclick="event.stopPropagation();confirmAndGenerateReport(\'' + escapeAttr(catKey) + '\',' + origIdx + ')">レポート</button>' +
+            '<button class="pestle-article-action-btn ' + (isBm ? 'bookmarked' : '') + '" onclick="event.stopPropagation();toggleBookmark(\'' + bmId + '\',\'' + escapeAttr(a.title || '') + '\',\'' + escapeAttr(safeUrl(a.url)) + '\',this)">ブックマーク</button>' +
+            '<button class="pestle-article-action-btn pestle-article-action-report" onclick="event.stopPropagation();confirmAndGenerateReport(\'' + escapeAttr(catKey) + '\',' + origIdx + ')">レポート生成</button>' +
           '</div>' +
         '</div></div>';
       }).join('');
