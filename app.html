@@ -462,6 +462,36 @@
     .fulltext-body { margin-top: 8px; }
 
     /* ================================================================
+       HOME NEWS LAYOUT — PESTLE grid + sidebar
+       ================================================================ */
+    .home-news-layout {
+      display: grid;
+      grid-template-columns: 1fr 260px;
+      gap: 20px;
+      align-items: start;
+    }
+    .home-news-main { min-width: 0; }
+    .home-news-sidebar { position: sticky; top: 80px; }
+    .home-sidebar-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+    }
+    .home-sidebar-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--accent);
+    }
+    @media (max-width: 900px) {
+      .home-news-layout { grid-template-columns: 1fr; }
+      .home-news-sidebar { position: static; }
+    }
+
+    /* ================================================================
        PESTLE GRID — 3x2 responsive
        ================================================================ */
     .pestle-grid {
@@ -2336,8 +2366,18 @@
       if (glReport) html += renderDailyReportCard('海外メディアの視点', glReport);
       html += '</div>';
 
-      // 2. PESTLE grid
-      html += '<div><h2 class="section-title">Insight News</h2><div id="homePestleGrid"></div></div>';
+      // 2. PESTLE grid + User reports sidebar
+      html += '<div><h2 class="section-title">Insight News</h2>' +
+        '<div class="home-news-layout">' +
+          '<div class="home-news-main" id="homePestleGrid"></div>' +
+          '<div class="home-news-sidebar">' +
+            '<div class="home-sidebar-card">' +
+              '<h3 class="home-sidebar-title">読者レポート</h3>' +
+              '<div id="homeUserReports"><p style="font-size:0.78rem;color:var(--text-muted);line-height:1.6">ニュース記事の「レポート生成」ボタンからレポートを作成できます</p></div>' +
+              '<a class="more-link" href="#section-user-reports" onclick="event.preventDefault();showSection(\'section-user-reports\');history.pushState(null,\'\',\'app.html#section-user-reports\')" style="font-size:0.78rem;margin-top:8px;display:inline-block">全て見る &rarr;</a>' +
+            '</div>' +
+          '</div>' +
+        '</div></div>';
 
       // 3. Signals
       if (signals.length > 0) {
@@ -2377,11 +2417,6 @@
         '</form>' +
         '<div id="homeForesightResult" class="insight-result"></div>' +
       '</div>';
-
-      // 6. User-generated reports sidebar
-      html += '<div><h2 class="section-title">読者レポート</h2>' +
-        '<div id="homeUserReports"><p class="text-muted" style="font-size:0.82rem">ニュース記事の &#9998; ボタンからレポートを生成できます</p></div>' +
-        '<a class="more-link" href="#section-user-reports" onclick="event.preventDefault();showSection(\'section-user-reports\');history.pushState(null,\'\',\'app.html#section-user-reports\')">全ての読者レポートを見る &rarr;</a></div>';
 
       html += '</div>';
       container.innerHTML = html;
