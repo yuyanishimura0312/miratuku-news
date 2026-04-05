@@ -1871,8 +1871,10 @@
           <li><a href="#section-signals" class="nav-link" data-nav="section-signals">シグナル</a></li>
           <li><a href="#section-papers" class="nav-link" data-nav="section-papers">学術研究</a></li>
           <li><a href="#section-foresight" class="nav-link" data-nav="section-foresight">未来洞察</a></li>
+          <li><a href="#section-foresight-history" class="nav-link" data-nav="section-foresight-history">洞察履歴</a></li>
           <li><a href="#section-media" class="nav-link" data-nav="section-media">メディア</a></li>
           <li><a href="#section-reports" class="nav-link" data-nav="section-reports">レポート一覧</a></li>
+          <li><a href="#section-user-reports" class="nav-link" data-nav="section-user-reports">読者レポート</a></li>
           <li><a href="#section-bookmarks" class="nav-link" data-nav="section-bookmarks" id="navBookmarks">ブックマーク <span class="nav-badge" id="bookmarkCount">0</span></a></li>
         </ul>
       </div>
@@ -1988,6 +1990,18 @@
         </form>
         <div id="foresightAnswer"></div>
       </div>
+      <a class="more-link" href="#section-foresight-history" onclick="event.preventDefault();showSection('section-foresight-history');history.pushState(null,'','app.html#section-foresight-history')">過去の洞察履歴を見る &rarr;</a>
+    </section>
+
+    <!-- FORESIGHT HISTORY -->
+    <section class="app-section section-hidden" id="section-foresight-history">
+      <div class="section-header">
+        <h2 class="section-title">洞察履歴</h2>
+        <span class="section-subtitle">過去の未来洞察の問いかけと応答</span>
+      </div>
+      <div id="foresightHistoryContent">
+        <div class="loading-indicator"><div class="loading-spinner"></div><div>読み込み中...</div></div>
+      </div>
     </section>
 
     <!-- MEDIA -->
@@ -2009,6 +2023,17 @@
       </div>
       <div id="reportsArchiveContent">
         <div class="loading-indicator"><div class="loading-spinner"></div><div>レポートを読み込み中...</div></div>
+      </div>
+    </section>
+
+    <!-- USER REPORTS -->
+    <section class="app-section section-hidden" id="section-user-reports">
+      <div class="section-header">
+        <h2 class="section-title">読者レポート</h2>
+        <span class="section-subtitle">読者が生成したレポート一覧</span>
+      </div>
+      <div id="userReportsContent">
+        <div class="loading-indicator"><div class="loading-spinner"></div><div>読み込み中...</div></div>
       </div>
     </section>
 
@@ -2587,6 +2612,12 @@
           '</div>';
         }
       }
+
+      // Generate user report button
+      modalHtml += '<div style="margin:16px 0;padding:14px;background:var(--surface);border-radius:var(--radius-xs);border:1px solid var(--border-light)">' +
+        '<button class="btn-primary" style="width:100%" onclick="generateUserReport(' + reportIndex + ')">\u3053\u306e\u8a18\u4e8b\u304b\u3089\u30ec\u30dd\u30fc\u30c8\u3092\u751f\u6210</button>' +
+        '<div id="userReportResult-' + reportIndex + '" style="margin-top:12px"></div>' +
+      '</div>';
 
       // Full report text (deep-dive content at the bottom)
       modalHtml += '<h4 style="font-size:0.9rem;font-weight:600;margin:24px 0 12px;padding-top:16px;border-top:1px solid var(--border)">全文レポート</h4>';
@@ -3456,7 +3487,7 @@
     // ==============================================================
     // SECTION ROUTING
     // ==============================================================
-    const VALID_SECTIONS = ['section-home', 'section-cla', 'section-signals', 'section-papers', 'section-foresight', 'section-media', 'section-reports', 'section-bookmarks'];
+    const VALID_SECTIONS = ['section-home', 'section-cla', 'section-signals', 'section-papers', 'section-foresight', 'section-foresight-history', 'section-media', 'section-reports', 'section-user-reports', 'section-bookmarks'];
     const DEFAULT_SECTION = 'section-home';
 
     window.showSection = function(sectionId) {
@@ -3466,6 +3497,9 @@
       if (target) target.classList.remove('section-hidden');
       document.querySelectorAll('.nav-link[data-nav]').forEach(a => a.classList.toggle('active', a.dataset.nav === sectionId));
       window.scrollTo(0, 0);
+      // Load foresight history when navigating to the history section
+      if (sectionId === 'section-foresight-history') loadForesightHistory();
+      if (sectionId === 'section-user-reports') loadUserReports();
     };
 
     function initSectionFromHash() {
@@ -3485,6 +3519,226 @@
 
     window.addEventListener('popstate', initSectionFromHash);
     initSectionFromHash();
+
+    // ==============================================================
+    // USER REPORT GENERATION
+    // ==============================================================
+    window.generateUserReport = async function(index) {
+      var r = _insightReportsData?.reports?.[index];
+      if (!r) { showToast('\u30ec\u30dd\u30fc\u30c8\u30c7\u30fc\u30bf\u304c\u898b\u3064\u304b\u308a\u307e\u305b\u3093\u3002', 'error'); return; }
+      var user = auth.currentUser;
+      if (!user) { showToast('\u30ec\u30dd\u30fc\u30c8\u3092\u751f\u6210\u3059\u308b\u306b\u306f\u30ed\u30b0\u30a4\u30f3\u304c\u5fc5\u8981\u3067\u3059\u3002', 'error'); return; }
+
+      var resultEl = document.getElementById('userReportResult-' + index);
+      if (!resultEl) return;
+      resultEl.innerHTML = '<div class="loading-indicator" style="padding:12px 0"><div class="loading-spinner loading-spinner-sm"></div><div>\u30ec\u30dd\u30fc\u30c8\u3092\u751f\u6210\u4e2d\u3067\u3059\u3002\u3057\u3070\u3089\u304f\u304a\u5f85\u3061\u304f\u3060\u3055\u3044...</div></div>';
+
+      var question = '\u4ee5\u4e0b\u306e\u30a4\u30f3\u30b5\u30a4\u30c8\u30ec\u30dd\u30fc\u30c8\u306b\u3064\u3044\u3066\u3001\u7d4c\u55b6\u8005\u30fb\u30b3\u30f3\u30b5\u30eb\u30bf\u30f3\u30c8\u306e\u8996\u70b9\u304b\u3089\u72ec\u81ea\u306e\u30ec\u30dd\u30fc\u30c8\u3092\u751f\u6210\u3057\u3066\u304f\u3060\u3055\u3044: ' +
+        (r.report_title || '') + '\n\n' + (r.summary || '') +
+        (r.historical_context ? '\n\n\u6b74\u53f2\u7684\u7d4c\u7def: ' + r.historical_context : '') +
+        (r.future_signals ? '\n\n\u672a\u6765\u3078\u306e\u30b7\u30b0\u30ca\u30eb: ' + r.future_signals : '') +
+        (r.watch_points ? '\n\n\u30a6\u30a9\u30c3\u30c1\u30dd\u30a4\u30f3\u30c8: ' + r.watch_points : '');
+
+      var WORKER_BASE = 'https://future-insight-workspace.nishimura-69a.workers.dev';
+      try {
+        var resp = await fetch(WORKER_BASE + '/api/foresight', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-User-Id': user.uid },
+          body: JSON.stringify({
+            question: question,
+            claContext: window.__claContext || '',
+            signalsContext: window.__signalsContext || '',
+            newsContext: window.__newsContext || ''
+          })
+        });
+        if (!resp.ok) { var err = await resp.json().catch(function() { return {}; }); throw new Error(err.error || 'HTTP ' + resp.status); }
+        var data = await resp.json();
+        var generatedText = data.answer || '';
+
+        resultEl.innerHTML = '<div class="md-body" style="padding:12px 0;border-top:1px solid var(--border-light);margin-top:8px">' +
+          '<h4 style="font-size:0.88rem;font-weight:600;margin-bottom:8px;color:var(--accent)">\u751f\u6210\u3055\u308c\u305f\u30ec\u30dd\u30fc\u30c8</h4>' +
+          renderMarkdown(generatedText) + '</div>';
+
+        // Save to Firestore
+        try {
+          await db.collection('user_reports').add({
+            userId: user.uid,
+            userName: user.displayName || user.email || '',
+            sourceReportTitle: r.report_title || '',
+            sourceReportId: index.toString(),
+            generatedText: generatedText,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+          showToast('\u30ec\u30dd\u30fc\u30c8\u3092\u4fdd\u5b58\u3057\u307e\u3057\u305f\u3002', 'success');
+        } catch (saveErr) {
+          console.warn('User report save failed:', saveErr);
+          showToast('\u30ec\u30dd\u30fc\u30c8\u306e\u4fdd\u5b58\u306b\u5931\u6557\u3057\u307e\u3057\u305f\u3002', 'error');
+        }
+      } catch (err) {
+        console.error('User report generation error:', err);
+        resultEl.innerHTML = '<div style="color:var(--highlight);padding:8px 0;font-size:0.85rem">\u30ec\u30dd\u30fc\u30c8\u306e\u751f\u6210\u306b\u5931\u6557\u3057\u307e\u3057\u305f: ' + escapeHtml(err.message) + '</div>';
+      }
+    };
+
+    // ==============================================================
+    // USER REPORTS LIST
+    // ==============================================================
+    window.loadUserReports = async function() {
+      var container = document.getElementById('userReportsContent');
+      if (!container) return;
+
+      var user = auth.currentUser;
+      if (!user) {
+        container.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--text-secondary)">' +
+          '<p style="font-size:1rem;margin-bottom:12px">\u8aad\u8005\u30ec\u30dd\u30fc\u30c8\u3092\u8868\u793a\u3059\u308b\u306b\u306f\u30ed\u30b0\u30a4\u30f3\u304c\u5fc5\u8981\u3067\u3059\u3002</p>' +
+          '<p style="font-size:0.85rem;color:var(--text-muted)">\u53f3\u4e0a\u306e\u30ed\u30b0\u30a4\u30f3\u30dc\u30bf\u30f3\u304b\u3089Google\u30a2\u30ab\u30a6\u30f3\u30c8\u3067\u30ed\u30b0\u30a4\u30f3\u3057\u3066\u304f\u3060\u3055\u3044\u3002</p></div>';
+        return;
+      }
+
+      container.innerHTML = '<div class="loading-indicator"><div class="loading-spinner"></div><div>\u8aad\u307f\u8fbc\u307f\u4e2d...</div></div>';
+
+      try {
+        var snap = await db.collection('user_reports')
+          .where('userId', '==', user.uid)
+          .orderBy('createdAt', 'desc')
+          .limit(50)
+          .get();
+
+        if (snap.empty) {
+          container.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--text-secondary)">' +
+            '<p style="font-size:1rem;margin-bottom:8px">\u307e\u3060\u30ec\u30dd\u30fc\u30c8\u304c\u3042\u308a\u307e\u305b\u3093</p>' +
+            '<p style="font-size:0.85rem;color:var(--text-muted)">\u30ec\u30dd\u30fc\u30c8\u4e00\u89a7\u304b\u3089\u30a4\u30f3\u30b5\u30a4\u30c8\u30ec\u30dd\u30fc\u30c8\u3092\u958b\u304d\u3001\u300c\u3053\u306e\u8a18\u4e8b\u304b\u3089\u30ec\u30dd\u30fc\u30c8\u3092\u751f\u6210\u300d\u30dc\u30bf\u30f3\u3092\u4f7f\u3063\u3066\u30ec\u30dd\u30fc\u30c8\u3092\u4f5c\u6210\u3067\u304d\u307e\u3059\u3002</p></div>';
+          return;
+        }
+
+        var html = '<div style="display:grid;gap:16px">';
+        snap.forEach(function(doc) {
+          var d = doc.data();
+          var docId = doc.id;
+          var preview = (d.generatedText || '').substring(0, 200).replace(/\n/g, ' ');
+          if ((d.generatedText || '').length > 200) preview += '...';
+          var dateStr = d.createdAt ? new Date(d.createdAt.seconds * 1000).toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
+
+          html += '<div class="card" style="padding:20px;cursor:default" id="ur-card-' + docId + '">' +
+            '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">' +
+              '<div>' +
+                '<div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:4px">' + escapeHtml(dateStr) + '</div>' +
+                '<div style="font-size:0.92rem;font-weight:600;color:var(--text)">' + escapeHtml(d.sourceReportTitle || '(\u7121\u984c)') + '</div>' +
+              '</div>' +
+              '<button class="btn-secondary" style="font-size:0.75rem;padding:4px 10px;flex-shrink:0;margin-left:12px" onclick="deleteUserReport(\'' + docId + '\')">\u524a\u9664</button>' +
+            '</div>' +
+            '<div class="ur-preview" id="ur-preview-' + docId + '" style="font-size:0.85rem;color:var(--text-secondary);line-height:1.7;cursor:pointer" onclick="toggleUserReportExpand(\'' + docId + '\')">' +
+              escapeHtml(preview) +
+            '</div>' +
+            '<div class="ur-full md-body" id="ur-full-' + docId + '" style="display:none;margin-top:12px;padding-top:12px;border-top:1px solid var(--border-light)" data-text="' + escapeAttr(d.generatedText || '') + '"></div>' +
+            '<div style="margin-top:8px"><button class="btn-secondary" style="font-size:0.78rem;padding:4px 12px" onclick="toggleUserReportExpand(\'' + docId + '\')" id="ur-toggle-' + docId + '">\u5168\u6587\u3092\u8868\u793a</button></div>' +
+          '</div>';
+        });
+        html += '</div>';
+        container.innerHTML = html;
+      } catch (err) {
+        console.error('Load user reports error:', err);
+        container.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--highlight)">\u8aad\u8005\u30ec\u30dd\u30fc\u30c8\u306e\u8aad\u307f\u8fbc\u307f\u306b\u5931\u6557\u3057\u307e\u3057\u305f: ' + escapeHtml(err.message) + '</div>';
+      }
+    };
+
+    window.toggleUserReportExpand = function(docId) {
+      var previewEl = document.getElementById('ur-preview-' + docId);
+      var fullEl = document.getElementById('ur-full-' + docId);
+      var toggleBtn = document.getElementById('ur-toggle-' + docId);
+      if (!previewEl || !fullEl) return;
+
+      if (fullEl.style.display === 'none') {
+        if (!fullEl.innerHTML.trim()) {
+          fullEl.innerHTML = renderMarkdown(fullEl.getAttribute('data-text') || '');
+        }
+        fullEl.style.display = 'block';
+        previewEl.style.display = 'none';
+        if (toggleBtn) toggleBtn.textContent = '\u6298\u308a\u305f\u305f\u3080';
+      } else {
+        fullEl.style.display = 'none';
+        previewEl.style.display = 'block';
+        if (toggleBtn) toggleBtn.textContent = '\u5168\u6587\u3092\u8868\u793a';
+      }
+    };
+
+    window.deleteUserReport = async function(docId) {
+      if (!confirm('\u3053\u306e\u30ec\u30dd\u30fc\u30c8\u3092\u524a\u9664\u3057\u307e\u3059\u304b\uff1f')) return;
+      try {
+        await db.collection('user_reports').doc(docId).delete();
+        var card = document.getElementById('ur-card-' + docId);
+        if (card) card.remove();
+        showToast('\u30ec\u30dd\u30fc\u30c8\u3092\u524a\u9664\u3057\u307e\u3057\u305f\u3002', 'success');
+        var container = document.getElementById('userReportsContent');
+        if (container && !container.querySelector('.card')) {
+          container.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--text-secondary)">' +
+            '<p style="font-size:1rem;margin-bottom:8px">\u307e\u3060\u30ec\u30dd\u30fc\u30c8\u304c\u3042\u308a\u307e\u305b\u3093</p>' +
+            '<p style="font-size:0.85rem;color:var(--text-muted)">\u30ec\u30dd\u30fc\u30c8\u4e00\u89a7\u304b\u3089\u30a4\u30f3\u30b5\u30a4\u30c8\u30ec\u30dd\u30fc\u30c8\u3092\u958b\u304d\u3001\u300c\u3053\u306e\u8a18\u4e8b\u304b\u3089\u30ec\u30dd\u30fc\u30c8\u3092\u751f\u6210\u300d\u30dc\u30bf\u30f3\u3092\u4f7f\u3063\u3066\u30ec\u30dd\u30fc\u30c8\u3092\u4f5c\u6210\u3067\u304d\u307e\u3059\u3002</p></div>';
+        }
+      } catch (err) {
+        console.error('Delete user report error:', err);
+        showToast('\u524a\u9664\u306b\u5931\u6557\u3057\u307e\u3057\u305f\u3002', 'error');
+      }
+    };
+
+    // ==============================================================
+    // FORESIGHT HISTORY
+    // ==============================================================
+    async function loadForesightHistory() {
+      const container = document.getElementById('foresightHistoryContent');
+      const user = auth.currentUser;
+      if (!user) {
+        container.innerHTML = '<p class="text-muted">洞察履歴を見るにはログインが必要です。</p>';
+        return;
+      }
+      container.innerHTML = '<div class="loading-indicator"><div class="loading-spinner"></div><div>読み込み中...</div></div>';
+      try {
+        const snap = await db.collection('foresight_queries')
+          .where('userId', '==', user.uid)
+          .orderBy('createdAt', 'desc')
+          .limit(50)
+          .get();
+        if (snap.empty) {
+          container.innerHTML = '<p class="text-muted">まだ洞察の履歴がありません。「未来洞察」から問いかけてください。</p>';
+          return;
+        }
+        let html = '';
+        snap.forEach(doc => {
+          const d = doc.data();
+          const ts = d.createdAt ? d.createdAt.toDate() : null;
+          const dateStr = ts ? ts.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' }) + ' ' + ts.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' }) : '';
+          html += '<div class="card" id="fh-' + doc.id + '">' +
+            '<div class="card-title">' + escapeHtml(d.question || '') + '</div>' +
+            '<div class="card-sub">' + escapeHtml(dateStr) + '</div>' +
+            '<div class="md-body">' + renderMarkdown(d.answer || '') + '</div>' +
+            '<div style="margin-top:0.75rem;text-align:right;">' +
+            '<button class="btn-secondary" style="font-size:0.8rem;padding:0.3rem 0.8rem;" onclick="deleteForesightEntry(\'' + doc.id + '\')">削除</button>' +
+            '</div></div>';
+        });
+        container.innerHTML = html;
+      } catch (err) {
+        console.error('Foresight history error:', err);
+        container.innerHTML = '<p class="text-muted">履歴の読み込みに失敗しました: ' + escapeHtml(err.message) + '</p>';
+      }
+    }
+
+    window.deleteForesightEntry = async function(docId) {
+      if (!confirm('この洞察履歴を削除しますか？')) return;
+      try {
+        await db.collection('foresight_queries').doc(docId).delete();
+        const el = document.getElementById('fh-' + docId);
+        if (el) el.remove();
+        showToast('削除しました。', 'success');
+        // Show empty message if no cards remain
+        const container = document.getElementById('foresightHistoryContent');
+        if (!container.querySelector('.card')) {
+          container.innerHTML = '<p class="text-muted">まだ洞察の履歴がありません。「未来洞察」から問いかけてください。</p>';
+        }
+      } catch (err) {
+        console.error('Delete error:', err);
+        showToast('削除に失敗しました。', 'error');
+      }
+    };
 
     // ==============================================================
     // INSIGHT FORM (full page section)
