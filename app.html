@@ -3732,15 +3732,23 @@
       try {
         var snap = await db.collection('user_reports')
           .where('userId', '==', user.uid)
-          .orderBy('createdAt', 'desc')
-          .limit(5)
           .get();
-        if (snap.empty) {
+        // Sort client-side to avoid requiring a composite Firestore index
+        var docs = [];
+        snap.forEach(function(doc) { docs.push(doc); });
+        docs.sort(function(a, b) {
+          var aTs = (a.data().createdAt && a.data().createdAt.seconds) || 0;
+          var bTs = (b.data().createdAt && b.data().createdAt.seconds) || 0;
+          return bTs - aTs;
+        });
+        docs = docs.slice(0, 5);
+        // Re-wrap as iterable compatible with snap.forEach usage below
+        if (docs.length === 0) {
           el.innerHTML = '<p class="text-muted" style="font-size:0.82rem">ニュース記事の &#9998; ボタンからレポートを生成できます</p>';
           return;
         }
         var html = '';
-        snap.forEach(function(doc) {
+        docs.forEach(function(doc) {
           var d = doc.data();
           var ts = d.createdAt ? d.createdAt.toDate() : null;
           var dateStr = ts ? ts.toLocaleDateString('ja-JP', { month: 'short', day: 'numeric' }) : '';
@@ -3805,11 +3813,17 @@
       try {
         var snap = await db.collection('user_reports')
           .where('userId', '==', user.uid)
-          .orderBy('createdAt', 'desc')
-          .limit(50)
           .get();
+        // Sort client-side to avoid requiring a composite Firestore index
+        var docs = [];
+        snap.forEach(function(doc) { docs.push(doc); });
+        docs.sort(function(a, b) {
+          var aTs = (a.data().createdAt && a.data().createdAt.seconds) || 0;
+          var bTs = (b.data().createdAt && b.data().createdAt.seconds) || 0;
+          return bTs - aTs;
+        });
 
-        if (snap.empty) {
+        if (docs.length === 0) {
           container.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--text-secondary)">' +
             '<p style="font-size:1rem;margin-bottom:8px">\u307e\u3060\u30ec\u30dd\u30fc\u30c8\u304c\u3042\u308a\u307e\u305b\u3093</p>' +
             '<p style="font-size:0.85rem;color:var(--text-muted)">\u30ec\u30dd\u30fc\u30c8\u4e00\u89a7\u304b\u3089\u30a4\u30f3\u30b5\u30a4\u30c8\u30ec\u30dd\u30fc\u30c8\u3092\u958b\u304d\u3001\u300c\u3053\u306e\u8a18\u4e8b\u304b\u3089\u30ec\u30dd\u30fc\u30c8\u3092\u751f\u6210\u300d\u30dc\u30bf\u30f3\u3092\u4f7f\u3063\u3066\u30ec\u30dd\u30fc\u30c8\u3092\u4f5c\u6210\u3067\u304d\u307e\u3059\u3002</p></div>';
@@ -3817,7 +3831,7 @@
         }
 
         var html = '<div style="display:grid;gap:16px">';
-        snap.forEach(function(doc) {
+        docs.forEach(function(doc) {
           var d = doc.data();
           var docId = doc.id;
           var preview = (d.generatedText || '').substring(0, 200).replace(/\n/g, ' ');
@@ -3900,15 +3914,21 @@
       try {
         const snap = await db.collection('foresight_queries')
           .where('userId', '==', user.uid)
-          .orderBy('createdAt', 'desc')
-          .limit(50)
           .get();
-        if (snap.empty) {
+        // Sort client-side to avoid requiring a composite Firestore index
+        const docs = [];
+        snap.forEach(doc => docs.push(doc));
+        docs.sort((a, b) => {
+          const aTs = (a.data().createdAt && a.data().createdAt.seconds) || 0;
+          const bTs = (b.data().createdAt && b.data().createdAt.seconds) || 0;
+          return bTs - aTs;
+        });
+        if (docs.length === 0) {
           container.innerHTML = '<p class="text-muted">まだ洞察の履歴がありません。「未来洞察」から問いかけてください。</p>';
           return;
         }
         let html = '';
-        snap.forEach(doc => {
+        docs.forEach(doc => {
           const d = doc.data();
           const ts = d.createdAt ? d.createdAt.toDate() : null;
           const dateStr = ts ? ts.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' }) + ' ' + ts.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' }) : '';
