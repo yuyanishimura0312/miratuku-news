@@ -1526,7 +1526,7 @@
       const irArr=Array.isArray(irJson)?irJson:(irJson?.reports||[]);
 
       const irByCat={};
-      irArr.forEach(r=>{const cat=r.category||'不明';irByCat[cat]=(irByCat[cat]||0)+1});
+      irArr.forEach(r=>{const cat=r.category||(r.article||{}).pestle_category||'不明';irByCat[cat]=(irByCat[cat]||0)+1});
       const sortedCats=Object.entries(irByCat).sort((a,b)=>b[1]-a[1]);
       const maxCat=sortedCats.length>0?Math.max(...sortedCats.map(e=>e[1])):1;
 
@@ -1560,7 +1560,7 @@
         '</div>';
 
       // Average report length
-      const lengths=irArr.map(r=>(r.full_report||r.body||r.content||'').length).filter(l=>l>0);
+      const lengths=irArr.map(r=>(r.full_report||r.report_text||r.body||r.content||'').length).filter(l=>l>0);
       const avgLen=lengths.length>0?Math.round(lengths.reduce((a,b)=>a+b,0)/lengths.length):0;
       const maxLen=lengths.length>0?Math.max(...lengths):0;
       const minLen=lengths.length>0?Math.min(...lengths):0;
@@ -1695,7 +1695,7 @@
         editSnap.forEach(doc=>{irEdits[doc.id]=doc.data()});
 
         const cats=new Set();
-        irData.forEach(r=>{if(r.category)cats.add(r.category)});
+        irData.forEach(r=>{const c=r.category||(r.article||{}).pestle_category;if(c)cats.add(c)});
         const catSel=document.getElementById('irFilterCat');
         const curVal=catSel.value;
         catSel.innerHTML='<option value="">全カテゴリ</option>';
@@ -1716,8 +1716,21 @@
       const key=date+'-'+id;
       const edit=irEdits[key]||{};
       const status=irStatuses[key]||{};
+      // Normalize field names: actual data uses report_text, article.pestle_category, etc.
+      const art=report.article||{};
       return {
         ...report,
+        // Normalize body: report_text → full_report
+        full_report: report.full_report || report.report_text || report.body || report.content || '',
+        // Normalize category: article.pestle_category → category
+        category: report.category || art.pestle_category || '',
+        // Normalize title
+        title: report.title || report.report_title || art.title_ja || art.title || '',
+        // Normalize signals/watchpoints
+        signals: report.signals || report.future_signals || '',
+        signals_title: report.signals_title || report.future_signals_title || '',
+        watchpoints: report.watchpoints || report.watch_points || '',
+        watchpoints_title: report.watchpoints_title || report.watch_points_title || '',
         ...edit,
         _key:key,
         _idx:idx,
