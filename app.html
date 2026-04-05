@@ -2524,10 +2524,7 @@
         '</div>';
       }
 
-      // Full report text
-      modalHtml += '<div class="md-body">' + renderMarkdown(r.report_text || '') + '</div>';
-
-      // Timeline visualization for historical context (falls back to collapsible)
+      // Historical context (timeline visualization, falls back to markdown)
       if (r.timeline && r.timeline.length > 0) {
         modalHtml += '<div class="ir-modal-section open">' +
           '<div class="ir-modal-section-header" onclick="this.parentElement.classList.toggle(\'open\')">歴史的経緯<span class="ir-modal-section-chevron">&#9654;</span></div>' +
@@ -2542,26 +2539,56 @@
         });
         modalHtml += '</div></div></div>';
       } else if (r.historical_context) {
-        modalHtml += '<div class="ir-modal-section" onclick="this.classList.toggle(\'open\')">' +
-          '<div class="ir-modal-section-header">歴史的経緯<span class="ir-modal-section-chevron">&#9654;</span></div>' +
+        modalHtml += '<div class="ir-modal-section open">' +
+          '<div class="ir-modal-section-header" onclick="this.parentElement.classList.toggle(\'open\')">歴史的経緯<span class="ir-modal-section-chevron">&#9654;</span></div>' +
           '<div class="ir-modal-section-body md-body">' + renderMarkdown(r.historical_context) + '</div>' +
         '</div>';
       }
 
-      // Remaining collapsible sections
-      var sections = [
-        { key: 'future_signals', label: '未来へのシグナル' },
-        { key: 'watch_points', label: 'ウォッチポイント' },
-        { key: 'related_research', label: '関連学術成果' }
-      ];
-      sections.forEach(function(sec) {
-        if (r[sec.key]) {
-          modalHtml += '<div class="ir-modal-section" onclick="this.classList.toggle(\'open\')">' +
-            '<div class="ir-modal-section-header">' + sec.label + '<span class="ir-modal-section-chevron">&#9654;</span></div>' +
-            '<div class="ir-modal-section-body md-body">' + renderMarkdown(r[sec.key]) + '</div>' +
+      // Future signals — use custom title if available
+      if (r.future_signals) {
+        var fsLabel = r.future_signals_title ? escapeHtml(r.future_signals_title) : '未来へのシグナル';
+        modalHtml += '<div class="ir-modal-section open">' +
+          '<div class="ir-modal-section-header" onclick="this.parentElement.classList.toggle(\'open\')">' + fsLabel + '<span class="ir-modal-section-chevron">&#9654;</span></div>' +
+          '<div class="ir-modal-section-body md-body">' + renderMarkdown(r.future_signals) + '</div>' +
+        '</div>';
+      }
+
+      // Watch points — use custom title if available
+      if (r.watch_points) {
+        var wpLabel = r.watch_points_title ? escapeHtml(r.watch_points_title) : 'ウォッチポイント';
+        modalHtml += '<div class="ir-modal-section open">' +
+          '<div class="ir-modal-section-header" onclick="this.parentElement.classList.toggle(\'open\')">' + wpLabel + '<span class="ir-modal-section-chevron">&#9654;</span></div>' +
+          '<div class="ir-modal-section-body md-body">' + renderMarkdown(r.watch_points) + '</div>' +
+        '</div>';
+      }
+
+      // Related research — card grid for array format, collapsible for string format
+      if (r.related_research) {
+        if (Array.isArray(r.related_research)) {
+          modalHtml += '<div class="ir-modal-section open">' +
+            '<div class="ir-modal-section-header" onclick="this.parentElement.classList.toggle(\'open\')">関連学術成果<span class="ir-modal-section-chevron">&#9654;</span></div>' +
+            '<div class="ir-modal-section-body">' +
+            '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;margin:16px 0">';
+          r.related_research.forEach(function(item) {
+            modalHtml += '<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);padding:14px">' +
+              '<div style="font-weight:600;font-size:0.85rem;margin-bottom:4px">' + escapeHtml(item.title || '') + '</div>' +
+              '<div style="font-size:0.72rem;color:var(--text-muted);margin-bottom:6px">' + escapeHtml(item.author || item.authors || '') + '</div>' +
+              '<div style="font-size:0.8rem;line-height:1.6;color:var(--text-secondary)">' + escapeHtml(item.summary || '') + '</div>' +
+            '</div>';
+          });
+          modalHtml += '</div></div></div>';
+        } else {
+          modalHtml += '<div class="ir-modal-section open">' +
+            '<div class="ir-modal-section-header" onclick="this.parentElement.classList.toggle(\'open\')">関連学術成果<span class="ir-modal-section-chevron">&#9654;</span></div>' +
+            '<div class="ir-modal-section-body md-body">' + renderMarkdown(r.related_research) + '</div>' +
           '</div>';
         }
-      });
+      }
+
+      // Full report text (deep-dive content at the bottom)
+      modalHtml += '<h4 style="font-size:0.9rem;font-weight:600;margin:24px 0 12px;padding-top:16px;border-top:1px solid var(--border)">全文レポート</h4>';
+      modalHtml += '<div class="md-body">' + renderMarkdown(r.report_text || '') + '</div>';
 
       content.innerHTML = modalHtml;
       window._modalReturnFocus = document.activeElement;

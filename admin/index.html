@@ -411,6 +411,73 @@
           <button class="btn btn-p btn-sm" onclick="saveIRConfig()">パラメーターを保存</button>
         </div>
 
+        <!-- Section 1.5: Article Formation Rules -->
+        <div class="card" style="margin-top:12px">
+          <h3 class="card-title">記事形成ルール</h3>
+          <div class="card-sub" style="margin-bottom:10px">各セクションの生成ルールを個別に設定できます</div>
+
+          <div class="form-row">
+            <div class="form-group" style="flex:1">
+              <label class="form-label">要約ルール</label>
+              <textarea class="inp inp-sm" id="arSummaryRule" rows="3" style="resize:vertical;font-size:.72rem"></textarea>
+              <div class="card-sub">冒頭要約セクションの生成指示</div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group" style="flex:1">
+              <label class="form-label">タイムラインルール</label>
+              <textarea class="inp inp-sm" id="arTimelineRule" rows="3" style="resize:vertical;font-size:.72rem"></textarea>
+              <div class="card-sub">歴史的経緯の時系列データ構造化ルール</div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group" style="flex:1">
+              <label class="form-label">未来シグナルルール</label>
+              <textarea class="inp inp-sm" id="arSignalsRule" rows="3" style="resize:vertical;font-size:.72rem"></textarea>
+              <div class="card-sub">未来の方向性・変化の兆候分析ルール</div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group" style="flex:1">
+              <label class="form-label">ウォッチポイントルール</label>
+              <textarea class="inp inp-sm" id="arWatchpointsRule" rows="3" style="resize:vertical;font-size:.72rem"></textarea>
+              <div class="card-sub">今後注目すべきポイントの記述ルール</div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group" style="flex:1">
+              <label class="form-label">学術成果ルール</label>
+              <textarea class="inp inp-sm" id="arResearchRule" rows="3" style="resize:vertical;font-size:.72rem"></textarea>
+              <div class="card-sub">関連学術成果の選定・記述ルール</div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group" style="flex:1">
+              <label class="form-label">全文レポートルール</label>
+              <textarea class="inp inp-sm" id="arReportRule" rows="3" style="resize:vertical;font-size:.72rem"></textarea>
+              <div class="card-sub">本文の散文形式・文字数・対象読者ルール</div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group" style="min-width:140px;flex:0 0 auto">
+              <label class="form-label">記事本数</label>
+              <input type="number" class="inp inp-sm" id="arArticleCount" value="10" min="1" max="50">
+              <div class="card-sub">1回の生成で作成する記事数</div>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button class="btn btn-p btn-sm" onclick="saveArticleRules()">保存</button>
+            <button class="btn btn-s btn-sm" onclick="resetArticleRules()">デフォルトに戻す</button>
+          </div>
+        </div>
+
         <!-- Section 2: Reports List -->
         <div class="section-gap">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px">
@@ -1027,6 +1094,73 @@
       }catch(e){toast('保存失敗: '+e.message,'err')}
     };
 
+    // Article formation rules defaults
+    const ARTICLE_RULES_DEFAULTS = {
+      summary_rule: '冒頭要約として、この記事が示す最も重要な洞察を500字程度で記述。全文を読まなくても一定の理解が得られる内容にする',
+      timeline_rule: '歴史的経緯を5-8項目の時系列データとして構造化。各項目にyear, event, significanceを含める',
+      signals_rule: 'この記事が示す未来の方向性を分析。具体的なタイトルをつけ、変化の兆候を読み取る',
+      watchpoints_rule: '今後注目すべき具体的なポイントを記述。具体的なタイトルをつける',
+      research_rule: '関連する学術成果を3つ取り上げる。有名な論文だけでなく、あまり知られていない独自の論考や最新の研究も積極的に含める。各項目にtitle, author, summaryを含める',
+      report_rule: '約5,000字の散文形式で記述。箇条書きは補助的にのみ使用。読者は経営者・コンサルタントを想定し、知的かつ実用的な洞察を提供',
+      article_count: 10
+    };
+
+    // Map field keys to element IDs
+    const AR_FIELDS = {
+      summary_rule: 'arSummaryRule',
+      timeline_rule: 'arTimelineRule',
+      signals_rule: 'arSignalsRule',
+      watchpoints_rule: 'arWatchpointsRule',
+      research_rule: 'arResearchRule',
+      report_rule: 'arReportRule',
+      article_count: 'arArticleCount'
+    };
+
+    // Populate article rules fields from a data object
+    function populateArticleRules(data) {
+      for (const [key, elId] of Object.entries(AR_FIELDS)) {
+        const el = document.getElementById(elId);
+        if (el) el.value = data[key] !== undefined ? data[key] : (ARTICLE_RULES_DEFAULTS[key] || '');
+      }
+    }
+
+    // Load article rules from Firestore
+    async function loadArticleRules() {
+      try {
+        const doc = await db.collection('insight_report_config').doc('article_rules').get();
+        if (doc.exists) {
+          populateArticleRules(doc.data());
+        } else {
+          // No saved rules yet — use defaults
+          populateArticleRules(ARTICLE_RULES_DEFAULTS);
+        }
+      } catch(e) {
+        console.error('Article rules load error:', e);
+        populateArticleRules(ARTICLE_RULES_DEFAULTS);
+      }
+    }
+
+    // Save article rules to Firestore
+    window.saveArticleRules = async function() {
+      try {
+        const data = { updated_at: firebase.firestore.FieldValue.serverTimestamp() };
+        for (const [key, elId] of Object.entries(AR_FIELDS)) {
+          const el = document.getElementById(elId);
+          data[key] = key === 'article_count' ? (parseInt(el.value) || 10) : el.value;
+        }
+        await db.collection('insight_report_config').doc('article_rules').set(data);
+        toast('記事形成ルールを保存しました', 'ok');
+      } catch(e) {
+        toast('保存失敗: ' + e.message, 'err');
+      }
+    };
+
+    // Reset article rules to defaults
+    window.resetArticleRules = function() {
+      populateArticleRules(ARTICLE_RULES_DEFAULTS);
+      toast('デフォルト値に戻しました（保存はまだされていません）', 'warn');
+    };
+
     // Load insight reports data + Firestore overlays
     async function loadIRData(){
       try{
@@ -1344,7 +1478,7 @@
     // Initialize IR tab on tab switch
     let irLoaded=false;
     document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',function(){
-      if(this.dataset.tab==='insight'&&!irLoaded){irLoaded=true;loadIRConfig();loadIRData()}
+      if(this.dataset.tab==='insight'&&!irLoaded){irLoaded=true;loadIRConfig();loadArticleRules();loadIRData()}
     }));
 
   })();
