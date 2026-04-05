@@ -877,6 +877,22 @@
       flex-shrink: 0;
       margin-top: 2px;
     }
+    .pestle-article-report-btn {
+      flex-shrink: 0;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      padding: 2px 4px;
+      border-radius: 4px;
+      transition: all 0.15s;
+      margin-top: 2px;
+    }
+    .pestle-article-report-btn:hover {
+      color: var(--accent);
+      background: var(--accent-light);
+    }
 
     /* ================================================================
        ACADEMIC PAPERS
@@ -2345,12 +2361,20 @@
         '<div id="homeForesightResult" class="insight-result"></div>' +
       '</div>';
 
+      // 6. User-generated reports sidebar
+      html += '<div><h2 class="section-title">読者レポート</h2>' +
+        '<div id="homeUserReports"><p class="text-muted" style="font-size:0.82rem">ニュース記事の &#9998; ボタンからレポートを生成できます</p></div>' +
+        '<a class="more-link" href="#section-user-reports" onclick="event.preventDefault();showSection(\'section-user-reports\');history.pushState(null,\'\',\'app.html#section-user-reports\')">全ての読者レポートを見る &rarr;</a></div>';
+
       html += '</div>';
       container.innerHTML = html;
 
       // Render PESTLE grid
       const homeGrid = document.getElementById('homePestleGrid');
       if (homeGrid && latest) renderPESTLEInto(homeGrid, latest, aiData);
+
+      // Load user reports sidebar
+      loadUserReportsSidebar();
     }
 
     function renderDailyReportCard(label, report) {
@@ -2686,6 +2710,7 @@
               (ja ? '<div class="pestle-article-trans">' + escapeHtml(ja) + '</div>' : '') +
               '</div>' +
               '<button class="bookmark-btn pestle-article-bookmark ' + (isBm ? 'bookmarked' : '') + '" onclick="event.stopPropagation();toggleBookmark(\'' + bmId + '\',\'' + escapeAttr(a.title || '') + '\',\'' + escapeAttr(safeUrl(a.url)) + '\',this)" title="ブックマーク">&#9734;</button>' +
+              '<button class="pestle-article-report-btn" onclick="event.stopPropagation();generateNewsReport(\'' + escapeAttr(catKey) + '\',' + origIdx + ')" title="レポート生成">&#9998;</button>' +
             '</div></div>';
           });
         }
@@ -2731,6 +2756,7 @@
           (ja ? '<div class="pestle-article-trans">' + escapeHtml(ja) + '</div>' : '') +
           '</div>' +
           '<button class="bookmark-btn pestle-article-bookmark ' + (isBm ? 'bookmarked' : '') + '" onclick="event.stopPropagation();toggleBookmark(\'' + bmId + '\',\'' + escapeAttr(a.title || '') + '\',\'' + escapeAttr(safeUrl(a.url)) + '\',this)" title="ブックマーク">&#9734;</button>' +
+          '<button class="pestle-article-report-btn" onclick="event.stopPropagation();generateNewsReport(\'' + escapeAttr(catKey) + '\',' + origIdx + ')" title="レポート生成">&#9998;</button>' +
         '</div></div>';
       }).join('');
       const more = cards[idx].querySelector('.pestle-show-more');
@@ -3528,21 +3554,31 @@
       var user = auth.currentUser;
       if (!user) { showToast('レポートを生成するにはログインが必要です。', 'error'); return; }
 
-      var resultEl = document.getElementById('newsReportResult-' + catKey + '-' + index);
-      if (!resultEl) return;
-      resultEl.innerHTML = '<div class="loading-indicator" style="padding:12px 0"><div class="loading-spinner loading-spinner-sm"></div><div>レポートを生成中です。しばらくお待ちください...</div></div>';
+      showToast('レポートを生成中...しばらくお待ちください', 'info');
 
       var trans = aiData?.translations?.[catKey]?.find(function(t) { return t.index === index; });
       var titleJa = trans?.title_translated || '';
       var summaryJa = trans?.summary_translated || '';
+      var catCla = aiData?.cla?.[catKey] || {};
 
-      var question = '以下のニュース記事について、経営者・コンサルタントの視点から独自のレポートを生成してください。歴史的経緯、未来へのシグナル、注目すべきポイントを含めてください。\n\n' +
-        'タイトル: ' + (article.title || '') +
+      var question = '以下のニュース記事について、CLA（因果階層分析）の神話層との関連を踏まえた深層分析レポートを日本語で生成してください。\n\n' +
+        '## 記事情報\nタイトル: ' + (article.title || '') +
         (titleJa ? '\n日本語タイトル: ' + titleJa : '') +
         '\n出典: ' + (article.source || '') + ' (' + (article.published_date || '') + ')' +
         '\n要約: ' + (article.summary || '') +
         (summaryJa ? '\n日本語要約: ' + summaryJa : '') +
-        '\nカテゴリ: ' + catKey;
+        '\nPESTLEカテゴリ: ' + catKey +
+        '\n\n## CLA分析コンテキスト（' + catKey + '分野）' +
+        (catCla.myth_metaphor ? '\n神話・メタファー: ' + catCla.myth_metaphor : '') +
+        (catCla.emerging_narrative ? '\n浮上するナラティブ: ' + catCla.emerging_narrative : '') +
+        '\n\n## レポート要件\n' +
+        '1. 500字程度の要約\n' +
+        '2. この記事が示す社会構造の変化と神話層への影響\n' +
+        '3. 歴史的経緯（時系列で簡潔に）\n' +
+        '4. 未来へのシグナル分析\n' +
+        '5. 今後ウォッチすべきポイント\n' +
+        '6. 関連する学術的知見（2つ）\n' +
+        '読者は経営者・コンサルタント。知的かつ実用的な洞察を散文形式で提供してください。';
 
       var WORKER_BASE = 'https://future-insight-workspace.nishimura-69a.workers.dev';
       try {
@@ -3559,22 +3595,37 @@
         if (!resp.ok) { var err = await resp.json().catch(function() { return {}; }); throw new Error(err.error || 'HTTP ' + resp.status); }
         var respData = await resp.json();
         var generatedText = respData.answer || '';
+        var reportTitle = titleJa || article.title || '';
 
-        resultEl.innerHTML = '<div class="md-body" style="padding:12px 0;border-top:1px solid var(--border-light);margin-top:8px">' +
-          '<h4 style="font-size:0.88rem;font-weight:600;margin-bottom:8px;color:var(--accent)">生成されたレポート</h4>' +
-          renderMarkdown(generatedText) + '</div>';
+        // Show in modal
+        var content = document.getElementById('articleModalContent');
+        var catInfo = PESTLE_CATS[catKey] || { labelJa: catKey, color: 'var(--accent)' };
+        content.innerHTML = '<div style="border-top:4px solid ' + catInfo.color + ';padding-top:16px">' +
+          '<span class="ir-hero-cat-badge" style="background:' + catInfo.color + '">' + escapeHtml(catInfo.labelJa) + '</span> ' +
+          '<span style="font-size:0.68rem;font-weight:600;padding:2px 10px;border-radius:12px;background:var(--accent-light);color:var(--accent)">読者レポート</span>' +
+          '<h2 style="margin:12px 0 8px;font-size:1.3rem;line-height:1.4">' + escapeHtml(reportTitle) + '</h2>' +
+          '<div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:16px">' +
+            escapeHtml(article.source || '') + ' / ' + escapeHtml(article.published_date || '') +
+            (article.url ? ' &mdash; <a href="' + escapeAttr(safeUrl(article.url)) + '" target="_blank" style="color:var(--accent)">元記事</a>' : '') +
+          '</div>' +
+          '<div class="md-body" style="font-size:0.9rem;line-height:1.85">' + renderMarkdown(generatedText) + '</div></div>';
+        document.getElementById('articleModal').classList.add('visible');
+        document.body.style.overflow = 'hidden';
 
+        // Save to Firestore
         try {
           await db.collection('user_reports').add({
             userId: user.uid,
             userName: user.displayName || user.email || '',
-            sourceReportTitle: titleJa || article.title || '',
+            sourceReportTitle: reportTitle,
             sourceCategory: catKey,
             sourceUrl: article.url || '',
             generatedText: generatedText,
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
           });
           showToast('レポートを保存しました。', 'success');
+          // Update sidebar
+          loadUserReportsSidebar();
         } catch (saveErr) {
           console.warn('User report save failed:', saveErr);
           showToast('レポートの保存に失敗しました。', 'error');
@@ -3582,6 +3633,70 @@
       } catch (err) {
         console.error('News report generation error:', err);
         resultEl.innerHTML = '<div style="color:var(--highlight);padding:8px 0;font-size:0.85rem">レポートの生成に失敗しました: ' + escapeHtml(err.message) + '</div>';
+      }
+    };
+
+    // ==============================================================
+    // USER REPORTS SIDEBAR (home page)
+    // ==============================================================
+    window.loadUserReportsSidebar = async function() {
+      var el = document.getElementById('homeUserReports');
+      if (!el) return;
+      var user = auth.currentUser;
+      if (!user) { el.innerHTML = '<p class="text-muted" style="font-size:0.82rem">ログインするとレポートが表示されます</p>'; return; }
+      try {
+        var snap = await db.collection('user_reports')
+          .where('userId', '==', user.uid)
+          .orderBy('createdAt', 'desc')
+          .limit(5)
+          .get();
+        if (snap.empty) {
+          el.innerHTML = '<p class="text-muted" style="font-size:0.82rem">ニュース記事の &#9998; ボタンからレポートを生成できます</p>';
+          return;
+        }
+        var html = '';
+        snap.forEach(function(doc) {
+          var d = doc.data();
+          var ts = d.createdAt ? d.createdAt.toDate() : null;
+          var dateStr = ts ? ts.toLocaleDateString('ja-JP', { month: 'short', day: 'numeric' }) : '';
+          var catInfo = PESTLE_CATS[d.sourceCategory] || { labelJa: '', color: 'var(--accent)' };
+          var preview = (d.generatedText || '').replace(/[#*`\n]/g, ' ').substring(0, 80);
+          html += '<div class="card" style="padding:12px 14px;margin-bottom:8px;cursor:pointer" onclick="openUserReportModal(\'' + doc.id + '\')">' +
+            '<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">' +
+              '<span style="width:6px;height:6px;border-radius:50%;background:' + catInfo.color + ';flex-shrink:0"></span>' +
+              '<span style="font-size:0.78rem;font-weight:600;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + escapeHtml(d.sourceReportTitle || '') + '</span>' +
+              '<span style="font-size:0.65rem;color:var(--text-muted);flex-shrink:0">' + dateStr + '</span>' +
+            '</div>' +
+            '<div style="font-size:0.76rem;color:var(--text-secondary);line-height:1.5">' + escapeHtml(preview) + '...</div>' +
+          '</div>';
+        });
+        el.innerHTML = html;
+      } catch (err) {
+        console.warn('Sidebar user reports error:', err);
+      }
+    };
+
+    window.openUserReportModal = async function(docId) {
+      try {
+        var doc = await db.collection('user_reports').doc(docId).get();
+        if (!doc.exists) { showToast('レポートが見つかりません。', 'error'); return; }
+        var d = doc.data();
+        var catInfo = PESTLE_CATS[d.sourceCategory] || { labelJa: '', color: 'var(--accent)' };
+        var content = document.getElementById('articleModalContent');
+        content.innerHTML = '<div style="border-top:4px solid ' + catInfo.color + ';padding-top:16px">' +
+          '<span class="ir-hero-cat-badge" style="background:' + catInfo.color + '">' + escapeHtml(catInfo.labelJa || '') + '</span> ' +
+          '<span style="font-size:0.68rem;font-weight:600;padding:2px 10px;border-radius:12px;background:var(--accent-light);color:var(--accent)">読者レポート</span>' +
+          '<h2 style="margin:12px 0 8px;font-size:1.3rem;line-height:1.4">' + escapeHtml(d.sourceReportTitle || '') + '</h2>' +
+          '<div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:16px">' +
+            escapeHtml(d.userName || '') + ' / ' +
+            (d.createdAt ? d.createdAt.toDate().toLocaleDateString('ja-JP') : '') +
+            (d.sourceUrl ? ' &mdash; <a href="' + escapeAttr(safeUrl(d.sourceUrl)) + '" target="_blank" style="color:var(--accent)">元記事</a>' : '') +
+          '</div>' +
+          '<div class="md-body" style="font-size:0.9rem;line-height:1.85">' + renderMarkdown(d.generatedText || '') + '</div></div>';
+        document.getElementById('articleModal').classList.add('visible');
+        document.body.style.overflow = 'hidden';
+      } catch (err) {
+        showToast('レポートの読み込みに失敗しました。', 'error');
       }
     };
 
