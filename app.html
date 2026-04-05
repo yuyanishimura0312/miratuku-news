@@ -865,7 +865,7 @@
     .pestle-article-row {
       display: flex;
       align-items: flex-start;
-      gap: 8px;
+      gap: 6px;
     }
     .pestle-article-content {
       flex: 1;
@@ -873,24 +873,31 @@
       cursor: pointer;
     }
     .pestle-article-content:hover { padding-left: 8px; }
-    .pestle-article-bookmark {
+    .pestle-article-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
       flex-shrink: 0;
       margin-top: 2px;
     }
-    .pestle-article-report-btn {
+    .pestle-article-bookmark {
       flex-shrink: 0;
-      background: var(--surface);
-      border: 1px solid var(--border);
+    }
+    .pestle-article-report-btn {
+      display: inline-block;
+      background: transparent;
+      border: 1px solid var(--accent-soft);
       cursor: pointer;
-      font-size: 0.62rem;
+      font-size: 0.58rem;
       font-weight: 600;
       font-family: var(--font);
-      color: var(--text-muted);
-      padding: 3px 8px;
-      border-radius: 4px;
+      color: var(--accent-soft);
+      padding: 2px 6px;
+      border-radius: 3px;
       transition: all 0.15s;
-      margin-top: 2px;
       white-space: nowrap;
+      letter-spacing: 0.02em;
+      text-align: center;
     }
     .pestle-article-report-btn:hover {
       color: #fff;
@@ -2713,8 +2720,10 @@
               '<div class="pestle-article-title">' + escapeHtml(a.title) + '</div>' +
               (ja ? '<div class="pestle-article-trans">' + escapeHtml(ja) + '</div>' : '') +
               '</div>' +
-              '<button class="bookmark-btn pestle-article-bookmark ' + (isBm ? 'bookmarked' : '') + '" onclick="event.stopPropagation();toggleBookmark(\'' + bmId + '\',\'' + escapeAttr(a.title || '') + '\',\'' + escapeAttr(safeUrl(a.url)) + '\',this)" title="ブックマーク">&#9734;</button>' +
-              '<button class="pestle-article-report-btn" onclick="event.stopPropagation();confirmAndGenerateReport(\'' + escapeAttr(catKey) + '\',' + origIdx + ')" title="この記事の分析レポートを生成">分析</button>' +
+              '<div class="pestle-article-actions">' +
+                '<button class="bookmark-btn pestle-article-bookmark ' + (isBm ? 'bookmarked' : '') + '" onclick="event.stopPropagation();toggleBookmark(\'' + bmId + '\',\'' + escapeAttr(a.title || '') + '\',\'' + escapeAttr(safeUrl(a.url)) + '\',this)" title="ブックマーク">&#9734;</button>' +
+                '<button class="pestle-article-report-btn" onclick="event.stopPropagation();confirmAndGenerateReport(\'' + escapeAttr(catKey) + '\',' + origIdx + ')">レポート</button>' +
+              '</div>' +
             '</div></div>';
           });
         }
@@ -2759,8 +2768,10 @@
           '<div class="pestle-article-title">' + escapeHtml(a.title) + '</div>' +
           (ja ? '<div class="pestle-article-trans">' + escapeHtml(ja) + '</div>' : '') +
           '</div>' +
-          '<button class="bookmark-btn pestle-article-bookmark ' + (isBm ? 'bookmarked' : '') + '" onclick="event.stopPropagation();toggleBookmark(\'' + bmId + '\',\'' + escapeAttr(a.title || '') + '\',\'' + escapeAttr(safeUrl(a.url)) + '\',this)" title="ブックマーク">&#9734;</button>' +
-          '<button class="pestle-article-report-btn" onclick="event.stopPropagation();confirmAndGenerateReport(\'' + escapeAttr(catKey) + '\',' + origIdx + ')" title="この記事の分析レポートを生成">分析</button>' +
+          '<div class="pestle-article-actions">' +
+            '<button class="bookmark-btn pestle-article-bookmark ' + (isBm ? 'bookmarked' : '') + '" onclick="event.stopPropagation();toggleBookmark(\'' + bmId + '\',\'' + escapeAttr(a.title || '') + '\',\'' + escapeAttr(safeUrl(a.url)) + '\',this)" title="ブックマーク">&#9734;</button>' +
+            '<button class="pestle-article-report-btn" onclick="event.stopPropagation();confirmAndGenerateReport(\'' + escapeAttr(catKey) + '\',' + origIdx + ')">レポート</button>' +
+          '</div>' +
         '</div></div>';
       }).join('');
       const more = cards[idx].querySelector('.pestle-show-more');
@@ -3563,7 +3574,7 @@
       var modal = document.getElementById('articleModal');
       var content = document.getElementById('articleModalContent');
       content.innerHTML = '<div style="padding:20px 0">' +
-        '<h3 style="font-size:1.1rem;font-weight:700;margin-bottom:16px">分析レポートを生成しますか？</h3>' +
+        '<h3 style="font-size:1.1rem;font-weight:700;margin-bottom:16px">この記事のレポートを生成しますか？</h3>' +
         '<div class="card" style="margin-bottom:16px">' +
           '<div style="font-size:0.72rem;color:var(--text-muted);margin-bottom:4px">' + escapeHtml(catLabel) + ' / ' + escapeHtml(article.source || '') + ' / ' + escapeHtml(article.published_date || '') + '</div>' +
           '<div style="font-size:0.9rem;font-weight:600;line-height:1.5">' + escapeHtml(displayTitle) + '</div>' +
