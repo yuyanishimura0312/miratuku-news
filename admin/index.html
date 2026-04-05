@@ -1521,12 +1521,23 @@
         }).join('')+'</div>';
       }
 
-      // Content analysis: IR by category
-      const irJson=await fetchJSON('insight_reports.json');
-      const irArr=Array.isArray(irJson)?irJson:(irJson?.reports||[]);
+      // Content analysis: use irData (already loaded in loadIRData) via getMergedIR()
+      // so that field normalization (report_text→full_report, article.pestle_category→category)
+      // and edit overrides are consistently applied.
+      // If irData is empty (insight tab not yet visited), fall back to fetching directly.
+      let irMergedArr;
+      if(irData.length>0){
+        irMergedArr=irData.map((r,i)=>getMergedIR(r,i)).filter(r=>!r._deleted);
+      }else{
+        const irJson=await fetchJSON('insight_reports.json');
+        const topDate=irJson?.date||irJson?.generated_at||'';
+        const rawArr=(Array.isArray(irJson)?irJson:(irJson?.reports||[])).map(r=>({...r,date:r.date||r.generated_date||topDate}));
+        irMergedArr=rawArr.map((r,i)=>getMergedIR(r,i));
+      }
 
       const irByCat={};
-      irArr.forEach(r=>{const cat=r.category||(r.article||{}).pestle_category||'不明';irByCat[cat]=(irByCat[cat]||0)+1});
+      // category is normalized by getMergedIR() from article.pestle_category
+      irMergedArr.forEach(r=>{const cat=r.category||'不明';irByCat[cat]=(irByCat[cat]||0)+1});
       const sortedCats=Object.entries(irByCat).sort((a,b)=>b[1]-a[1]);
       const maxCat=sortedCats.length>0?Math.max(...sortedCats.map(e=>e[1])):1;
 
@@ -1544,9 +1555,9 @@
         }).join('')+'</div>';
       }
 
-      // Myth relation distribution
+      // Myth relation distribution — myth_relation field is preserved by getMergedIR()
       let strengthens=0,changes=0,other=0;
-      irArr.forEach(r=>{
+      irMergedArr.forEach(r=>{
         if(r.myth_relation==='strengthens')strengthens++;
         else if(r.myth_relation==='changes')changes++;
         else other++;
@@ -1559,8 +1570,8 @@
           '<div class="stat-card" style="flex:1;min-width:120px"><div class="stat-val" style="color:var(--text-m)">'+other+'</div><div class="stat-lbl">その他/未設定</div><div class="card-sub">'+(totalMyth>0?Math.round(other/totalMyth*100):0)+'%</div></div>'+
         '</div>';
 
-      // Average report length
-      const lengths=irArr.map(r=>(r.full_report||r.report_text||r.body||r.content||'').length).filter(l=>l>0);
+      // Average report length — full_report is normalized by getMergedIR()
+      const lengths=irMergedArr.map(r=>(r.full_report||'').length).filter(l=>l>0);
       const avgLen=lengths.length>0?Math.round(lengths.reduce((a,b)=>a+b,0)/lengths.length):0;
       const maxLen=lengths.length>0?Math.max(...lengths):0;
       const minLen=lengths.length>0?Math.min(...lengths):0;
@@ -1696,7 +1707,8 @@
         editSnap.forEach(doc=>{irEdits[doc.id]=doc.data()});
 
         const cats=new Set();
-        irData.forEach(r=>{const c=r.category||(r.article||{}).pestle_category;if(c)cats.add(c)});
+        // Use getMergedIR() so that normalized category (from article.pestle_category) is used
+        irData.forEach((r,i)=>{const c=getMergedIR(r,i).category;if(c)cats.add(c)});
         const catSel=document.getElementById('irFilterCat');
         const curVal=catSel.value;
         catSel.innerHTML='<option value="">全カテゴリ</option>';
@@ -1717,22 +1729,25 @@
       const key=date+'-'+id;
       const edit=irEdits[key]||{};
       const status=irStatuses[key]||{};
-      // Normalize field names: actual data uses report_text, article.pestle_category, etc.
-      const art=report.article||{};
+      // Merge edit overrides first, then normalize field names on top of the merged result.
+      // This ensures edit data (stored as future_signals/watch_points/full_report) is
+      // correctly reflected in the normalized fields (signals/watchpoints/full_report).
+      const merged={...report,...edit};
+      const art=merged.article||report.article||{};
       return {
-        ...report,
-        // Normalize body: report_text → full_report
-        full_report: report.full_report || report.report_text || report.body || report.content || '',
+        ...merged,
+        // Normalize body: edit stores as full_report; raw data uses report_text
+        full_report: merged.full_report || merged.report_text || merged.body || merged.content || '',
         // Normalize category: article.pestle_category → category
-        category: report.category || art.pestle_category || '',
-        // Normalize title
-        title: report.title || report.report_title || art.title_ja || art.title || '',
-        // Normalize signals/watchpoints
-        signals: report.signals || report.future_signals || '',
-        signals_title: report.signals_title || report.future_signals_title || '',
-        watchpoints: report.watchpoints || report.watch_points || '',
-        watchpoints_title: report.watchpoints_title || report.watch_points_title || '',
-        ...edit,
+        category: merged.category || art.pestle_category || '',
+        // Normalize title: edit stores as title; raw data may use report_title
+        title: merged.title || merged.report_title || art.title_ja || art.title || '',
+        // Normalize signals: edit stores as future_signals; raw data uses future_signals
+        signals: merged.signals || merged.future_signals || '',
+        signals_title: merged.signals_title || merged.future_signals_title || '',
+        // Normalize watchpoints: edit stores as watch_points; raw data uses watch_points
+        watchpoints: merged.watchpoints || merged.watch_points || '',
+        watchpoints_title: merged.watchpoints_title || merged.watch_points_title || '',
         _key:key,
         _idx:idx,
         _published:status.published!==undefined?status.published:true,
@@ -1746,7 +1761,8 @@
       const total=merged.length;
       const published=merged.filter(r=>r._published).length;
       const totalChars=merged.reduce((s,r)=>{
-        const body=r.full_report||r.body||r.content||'';
+        // getMergedIR() always sets full_report; fallbacks are kept for safety
+        const body=r.full_report||'';
         return s+body.length;
       },0);
       const avgChars=total>0?Math.round(totalChars/total):0;
@@ -1780,8 +1796,9 @@
       if(sort==='category')rows.sort((a,b)=>(a.category||'').localeCompare(b.category||''));
       else if(sort==='chars'){
         rows.sort((a,b)=>{
-          const ac=(a.full_report||a.body||a.content||'').length;
-          const bc=(b.full_report||b.body||b.content||'').length;
+          // getMergedIR() guarantees full_report is set
+          const ac=(a.full_report||'').length;
+          const bc=(b.full_report||'').length;
           return bc-ac;
         });
       }else{
@@ -1799,7 +1816,8 @@
         const mythRel=r.myth_relation||'-';
         const mythBadge=mythRel==='strengthens'?'badge-ok':mythRel==='changes'?'badge-warn':'badge-info';
         const mythLabel=mythRel==='strengthens'?'強化':mythRel==='changes'?'変化':mythRel;
-        const body=r.full_report||r.body||r.content||'';
+        // getMergedIR() guarantees full_report is set from report_text/body/content
+        const body=r.full_report||'';
         const chars=body.length;
         const checked=r._published?'checked':'';
         const regenBadge=r._regenerate?'<span class="badge badge-warn" style="margin-left:4px">再生成待ち</span>':'';
@@ -1867,12 +1885,30 @@
       document.getElementById('irEdTitle').value=report.title||'';
       document.getElementById('irEdSummary').value=report.summary||report.excerpt||'';
       document.getElementById('irEdSumCount').textContent='('+(report.summary||report.excerpt||'').length+'/150)';
-      document.getElementById('irEdBody').value=report.full_report||report.body||report.content||'';
-      document.getElementById('irEdBodyCount').textContent='('+(report.full_report||report.body||report.content||'').length+'文字)';
+      // getMergedIR() normalizes: full_report (from report_text), signals (from future_signals),
+      // watchpoints (from watch_points). Use these normalized fields directly.
+      const bodyVal=report.full_report||'';
+      document.getElementById('irEdBody').value=bodyVal;
+      document.getElementById('irEdBodyCount').textContent='('+bodyVal.length+'文字)';
       document.getElementById('irEdHistorical').value=report.historical_context||'';
-      document.getElementById('irEdSignals').value=Array.isArray(report.future_signals)?report.future_signals.join('\n'):(report.future_signals||'');
-      document.getElementById('irEdWatch').value=Array.isArray(report.watch_points)?report.watch_points.join('\n'):(report.watch_points||'');
-      document.getElementById('irEdResearch').value=Array.isArray(report.related_research)?report.related_research.join('\n'):(report.related_research||'');
+      // Use normalized signals/watchpoints fields (already merged edit+raw by getMergedIR)
+      const signalsVal=report.signals||'';
+      document.getElementById('irEdSignals').value=Array.isArray(signalsVal)?signalsVal.join('\n'):(signalsVal||'');
+      const watchVal=report.watchpoints||'';
+      document.getElementById('irEdWatch').value=Array.isArray(watchVal)?watchVal.join('\n'):(watchVal||'');
+      // related_research may be an array of strings or objects {title,author,summary}
+      const researchArr=Array.isArray(report.related_research)?report.related_research:(report.related_research?[report.related_research]:[]);
+      document.getElementById('irEdResearch').value=researchArr.map(item=>{
+        if(typeof item==='string')return item;
+        if(item&&typeof item==='object'){
+          const parts=[];
+          if(item.title)parts.push(item.title);
+          if(item.author)parts.push('著者: '+item.author);
+          if(item.summary)parts.push(item.summary);
+          return parts.join(' / ');
+        }
+        return String(item);
+      }).join('\n');
       document.getElementById('irEdMyth').value=report.related_myth||report.myth||'';
       document.getElementById('irEdMythRel').value=report.myth_relation||'strengthens';
 
