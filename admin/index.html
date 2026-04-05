@@ -936,8 +936,9 @@
       return results;
     }
 
-    async function loadDashboard(){
-      const results=await fetchHeadResults();
+    async function loadDashboard(){try{
+      let results;
+      try{results=await fetchHeadResults()}catch(e){console.error('HEAD fetch error:',e);results=DATA_FILES.map(f=>({...f,ok:false}))}
 
       document.getElementById('filesBody').innerHTML=results.map(f=>{
         const s=f.ok?'ok':'err',sl=f.ok?'正常':'エラー';
@@ -988,7 +989,11 @@
         });
         h+='</div>';sum.innerHTML=h;
       }
-    }
+    }catch(e){
+      console.error('loadDashboard error:',e);
+      const fb=document.getElementById('filesBody');
+      if(fb)fb.innerHTML='<tr><td colspan="5" style="color:var(--red)">読み込みエラー: '+esc(e.message)+'</td></tr>';
+    }}
 
     // === LOAD ALL FIRESTORE DATA (for User Content, Analytics, Dashboard) ===
     async function loadAllFirestoreData(){
