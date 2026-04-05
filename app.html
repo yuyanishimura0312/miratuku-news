@@ -879,19 +879,23 @@
     }
     .pestle-article-report-btn {
       flex-shrink: 0;
-      background: none;
-      border: none;
+      background: var(--surface);
+      border: 1px solid var(--border);
       cursor: pointer;
-      font-size: 0.82rem;
+      font-size: 0.62rem;
+      font-weight: 600;
+      font-family: var(--font);
       color: var(--text-muted);
-      padding: 2px 4px;
+      padding: 3px 8px;
       border-radius: 4px;
       transition: all 0.15s;
       margin-top: 2px;
+      white-space: nowrap;
     }
     .pestle-article-report-btn:hover {
-      color: var(--accent);
-      background: var(--accent-light);
+      color: #fff;
+      background: var(--accent);
+      border-color: var(--accent);
     }
 
     /* ================================================================
@@ -2710,7 +2714,7 @@
               (ja ? '<div class="pestle-article-trans">' + escapeHtml(ja) + '</div>' : '') +
               '</div>' +
               '<button class="bookmark-btn pestle-article-bookmark ' + (isBm ? 'bookmarked' : '') + '" onclick="event.stopPropagation();toggleBookmark(\'' + bmId + '\',\'' + escapeAttr(a.title || '') + '\',\'' + escapeAttr(safeUrl(a.url)) + '\',this)" title="ブックマーク">&#9734;</button>' +
-              '<button class="pestle-article-report-btn" onclick="event.stopPropagation();generateNewsReport(\'' + escapeAttr(catKey) + '\',' + origIdx + ')" title="レポート生成">&#9998;</button>' +
+              '<button class="pestle-article-report-btn" onclick="event.stopPropagation();confirmAndGenerateReport(\'' + escapeAttr(catKey) + '\',' + origIdx + ')" title="この記事の分析レポートを生成">分析</button>' +
             '</div></div>';
           });
         }
@@ -2756,7 +2760,7 @@
           (ja ? '<div class="pestle-article-trans">' + escapeHtml(ja) + '</div>' : '') +
           '</div>' +
           '<button class="bookmark-btn pestle-article-bookmark ' + (isBm ? 'bookmarked' : '') + '" onclick="event.stopPropagation();toggleBookmark(\'' + bmId + '\',\'' + escapeAttr(a.title || '') + '\',\'' + escapeAttr(safeUrl(a.url)) + '\',this)" title="ブックマーク">&#9734;</button>' +
-          '<button class="pestle-article-report-btn" onclick="event.stopPropagation();generateNewsReport(\'' + escapeAttr(catKey) + '\',' + origIdx + ')" title="レポート生成">&#9998;</button>' +
+          '<button class="pestle-article-report-btn" onclick="event.stopPropagation();confirmAndGenerateReport(\'' + escapeAttr(catKey) + '\',' + origIdx + ')" title="この記事の分析レポートを生成">分析</button>' +
         '</div></div>';
       }).join('');
       const more = cards[idx].querySelector('.pestle-show-more');
@@ -3545,6 +3549,35 @@
     // ==============================================================
     // USER REPORT GENERATION
     // ==============================================================
+    window.confirmAndGenerateReport = function(catKey, index) {
+      var data = dataCache['latest.json'];
+      var aiData = dataCache['ai_analysis.json'];
+      if (!data?.pestle?.[catKey]?.articles?.[index]) { showToast('記事が見つかりません。', 'error'); return; }
+      if (!auth.currentUser) { showToast('レポートを生成するにはログインが必要です。', 'error'); return; }
+      var article = data.pestle[catKey].articles[index];
+      var trans = aiData?.translations?.[catKey]?.find(function(t) { return t.index === index; });
+      var titleJa = trans?.title_translated || '';
+      var displayTitle = titleJa || article.title || '';
+      var catLabel = PESTLE_CATS[catKey]?.labelJa || catKey;
+
+      var modal = document.getElementById('articleModal');
+      var content = document.getElementById('articleModalContent');
+      content.innerHTML = '<div style="padding:20px 0">' +
+        '<h3 style="font-size:1.1rem;font-weight:700;margin-bottom:16px">分析レポートを生成しますか？</h3>' +
+        '<div class="card" style="margin-bottom:16px">' +
+          '<div style="font-size:0.72rem;color:var(--text-muted);margin-bottom:4px">' + escapeHtml(catLabel) + ' / ' + escapeHtml(article.source || '') + ' / ' + escapeHtml(article.published_date || '') + '</div>' +
+          '<div style="font-size:0.9rem;font-weight:600;line-height:1.5">' + escapeHtml(displayTitle) + '</div>' +
+          (article.summary ? '<div style="font-size:0.8rem;color:var(--text-secondary);margin-top:8px;line-height:1.6">' + escapeHtml(article.summary.substring(0, 200)) + '...</div>' : '') +
+        '</div>' +
+        '<p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:20px;line-height:1.6">この記事をもとにCLA（因果階層分析）の視点から深層分析レポートを生成します。生成には30秒〜1分程度かかります。</p>' +
+        '<div style="display:flex;gap:10px;justify-content:flex-end">' +
+          '<button class="btn-secondary" onclick="closeArticleModal()">キャンセル</button>' +
+          '<button class="btn-primary" onclick="closeArticleModal();generateNewsReport(\'' + escapeAttr(catKey) + '\',' + index + ')">レポートを生成する</button>' +
+        '</div></div>';
+      modal.classList.add('visible');
+      document.body.style.overflow = 'hidden';
+    };
+
     window.generateNewsReport = async function(catKey, index) {
       var data = dataCache['latest.json'];
       var aiData = dataCache['ai_analysis.json'];
