@@ -156,6 +156,23 @@
     @keyframes sp{to{transform:rotate(360deg)}}
     .loading{color:var(--text-m);font-size:.8rem;padding:1rem;text-align:center}
 
+    /* Toggle switch */
+    .toggle{position:relative;display:inline-block;width:36px;height:20px;flex-shrink:0}
+    .toggle input{opacity:0;width:0;height:0}
+    .toggle-slider{position:absolute;cursor:pointer;inset:0;background:var(--border);border-radius:10px;transition:.3s}
+    .toggle-slider::before{content:'';position:absolute;height:14px;width:14px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.3s}
+    .toggle input:checked+.toggle-slider{background:var(--green)}
+    .toggle input:checked+.toggle-slider::before{transform:translateX(16px)}
+    .toggle-label{display:inline-flex;align-items:center;gap:6px;font-size:.72rem;color:var(--text-s);cursor:pointer}
+
+    /* IR row expand */
+    .ir-preview-row{display:none}
+    .ir-preview-row.show{display:table-row}
+    .ir-preview-cell{padding:12px 16px;background:var(--surface);font-size:.75rem;line-height:1.7;color:var(--text-s)}
+
+    /* IR category dot */
+    .ir-cat-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px}
+
     /* Responsive */
     @media(max-width:768px){
       .container{padding:0 14px}
@@ -206,6 +223,7 @@
           <li><button class="tab" data-tab="collection">収集制御</button></li>
           <li><button class="tab" data-tab="firebase">Firebase</button></li>
           <li><button class="tab" data-tab="system">システム</button></li>
+          <li><button class="tab" data-tab="insight">インサイトレポート</button></li>
         </ul>
       </div></nav>
     </header>
@@ -354,6 +372,159 @@
         </div>
       </div>
 
+      <!-- ===== INSIGHT REPORTS ===== -->
+      <div class="panel" id="panel-insight">
+        <h2 class="panel-title">インサイトレポート</h2>
+        <p class="panel-desc">インサイトレポートの管理・編集・公開設定</p>
+
+        <div class="stat-grid" id="irStats"><div class="stat-card"><div class="stat-val"><span class="spin"></span></div><div class="stat-lbl">読み込み中</div></div></div>
+
+        <!-- Section 1: Generation Parameters -->
+        <div class="card">
+          <h3 class="card-title">生成パラメーター</h3>
+          <div class="card-sub" style="margin-bottom:10px">レポート生成時のAIモデル・パラメータ設定</div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">モデル</label>
+              <select class="inp inp-sm" id="irModel">
+                <option value="claude-haiku-4-5-20251001">claude-haiku-4-5-20251001</option>
+                <option value="claude-sonnet-4-20250514">claude-sonnet-4-20250514</option>
+              </select>
+            </div>
+            <div class="form-group"><label class="form-label">レポート数</label><input type="number" class="inp inp-sm" id="irCount" value="10" min="1" max="20"></div>
+            <div class="form-group"><label class="form-label">目標文字数</label><input type="number" class="inp inp-sm" id="irChars" value="5000" min="2000" max="10000" step="500"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Temperature: <span id="irTempVal">0.7</span></label>
+              <input type="range" class="inp inp-sm" id="irTemp" min="0" max="1" step="0.1" value="0.7" oninput="document.getElementById('irTempVal').textContent=this.value" style="padding:4px 0">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group" style="flex:1"><label class="form-label">記事選定プロンプト</label>
+              <textarea class="inp inp-sm" id="irSelPrompt" rows="4" style="resize:vertical;font-size:.72rem" placeholder="記事選定用のプロンプトテンプレートを入力..."></textarea>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group" style="flex:1"><label class="form-label">レポート生成プロンプト</label>
+              <textarea class="inp inp-sm" id="irGenPrompt" rows="4" style="resize:vertical;font-size:.72rem" placeholder="レポート生成用のプロンプトテンプレートを入力..."></textarea>
+            </div>
+          </div>
+          <button class="btn btn-p btn-sm" onclick="saveIRConfig()">パラメーターを保存</button>
+        </div>
+
+        <!-- Section 2: Reports List -->
+        <div class="section-gap">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+            <h3 class="card-title" style="margin:0">レポート一覧</h3>
+            <div id="irLastGen" style="font-size:.72rem;color:var(--text-m)"></div>
+          </div>
+
+          <div class="filters">
+            <select class="inp inp-sm" style="width:auto" id="irFilterCat" onchange="renderIR()">
+              <option value="">全カテゴリ</option>
+            </select>
+            <select class="inp inp-sm" style="width:auto" id="irFilterMyth" onchange="renderIR()">
+              <option value="">全神話関連</option>
+              <option value="strengthens">強化</option>
+              <option value="changes">変化</option>
+            </select>
+            <select class="inp inp-sm" style="width:auto" id="irFilterStatus" onchange="renderIR()">
+              <option value="">全ステータス</option>
+              <option value="published">公開</option>
+              <option value="unpublished">非公開</option>
+            </select>
+            <select class="inp inp-sm" style="width:auto" id="irSort" onchange="renderIR()">
+              <option value="date">日付順</option>
+              <option value="category">カテゴリ順</option>
+              <option value="chars">文字数順</option>
+            </select>
+          </div>
+
+          <div class="tw"><table class="dt"><thead><tr>
+            <th>#</th><th>タイトル</th><th>カテゴリ</th><th>神話関連</th><th>文字数</th><th>ステータス</th><th>操作</th>
+          </tr></thead>
+          <tbody id="irBody"><tr><td colspan="7" class="loading"><span class="spin"></span> 読み込み中...</td></tr></tbody></table></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- INSIGHT REPORT EDIT MODAL -->
+  <div class="modal-bg" id="irEditModal">
+    <div class="modal" style="max-width:900px;max-height:92vh">
+      <button class="modal-close" onclick="closeIREdit()">&times;</button>
+      <h3 class="modal-title" id="irEditTitle">レポート編集</h3>
+
+      <div class="form-row">
+        <div class="form-group" style="flex:1"><label class="form-label">タイトル</label>
+          <input type="text" class="inp inp-sm" id="irEdTitle">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group" style="flex:1"><label class="form-label">要約 <span id="irEdSumCount" style="color:var(--text-m)">(0/150)</span></label>
+          <textarea class="inp inp-sm" id="irEdSummary" rows="2" maxlength="150" style="resize:vertical" oninput="document.getElementById('irEdSumCount').textContent='('+this.value.length+'/150)'"></textarea>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group" style="flex:1"><label class="form-label">本文 <span id="irEdBodyCount" style="color:var(--text-m)">(0文字)</span></label>
+          <textarea class="inp inp-sm" id="irEdBody" rows="10" style="resize:vertical;font-size:.75rem" oninput="document.getElementById('irEdBodyCount').textContent='('+this.value.length+'文字)'"></textarea>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group" style="flex:1"><label class="form-label">歴史的背景</label>
+          <textarea class="inp inp-sm" id="irEdHistorical" rows="3" style="resize:vertical;font-size:.75rem"></textarea>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group" style="flex:1"><label class="form-label">未来シグナル</label>
+          <textarea class="inp inp-sm" id="irEdSignals" rows="3" style="resize:vertical;font-size:.75rem"></textarea>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group" style="flex:1"><label class="form-label">注目ポイント</label>
+          <textarea class="inp inp-sm" id="irEdWatch" rows="3" style="resize:vertical;font-size:.75rem"></textarea>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group" style="flex:1"><label class="form-label">関連リサーチ</label>
+          <textarea class="inp inp-sm" id="irEdResearch" rows="3" style="resize:vertical;font-size:.75rem"></textarea>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group" style="flex:1">
+          <label class="form-label">タイムライン</label>
+          <div id="irEdTimeline"></div>
+          <button class="btn btn-s btn-sm" style="margin-top:4px" onclick="addIRTimeline()">+ エントリ追加</button>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">関連する神話</label>
+          <input type="text" class="inp inp-sm" id="irEdMyth">
+        </div>
+        <div class="form-group"><label class="form-label">神話との関係</label>
+          <select class="inp inp-sm" id="irEdMythRel">
+            <option value="strengthens">強化 (strengthens)</option>
+            <option value="changes">変化 (changes)</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap">
+        <button class="btn btn-p" onclick="saveIREdit()">保存</button>
+        <button class="btn btn-s" onclick="previewIREdit()">プレビュー</button>
+        <button class="btn btn-s" onclick="closeIREdit()">キャンセル</button>
+      </div>
+
+      <!-- Preview area -->
+      <div id="irPreview" style="display:none;margin-top:16px;padding:16px;background:var(--surface);border-radius:var(--rx);font-size:.8rem;line-height:1.8"></div>
     </div>
   </div>
 
@@ -807,6 +978,374 @@
       if(!confirm('削除しますか？'))return;
       try{await db.collection(col).doc(id).delete();toast('削除完了','ok');const m={'news_comments':'comments','news_bookmarks':'bookmarks','foresight_queries':'foresight'};showFB(m[col]);loadFBStats()}catch(e){toast('削除失敗','err')}
     };
+
+    // === INSIGHT REPORTS ===
+    let irData = [];       // Original data from JSON
+    let irEdits = {};      // Firestore edits overlay
+    let irStatuses = {};   // Firestore status overlay
+    let irEditingId = null;
+    let irTimelineEntries = [];
+
+    // Category color map for insight reports
+    const IR_CAT_COLORS = {
+      'Political':'var(--P)','Economic':'var(--E)','Social':'var(--S)',
+      'Technological':'var(--T)','Legal':'var(--L)','Environmental':'var(--En)',
+      'political':'var(--P)','economic':'var(--E)','social':'var(--S)',
+      'technological':'var(--T)','legal':'var(--L)','environmental':'var(--En)'
+    };
+
+    // Load insight report config from Firestore
+    async function loadIRConfig(){
+      try{
+        const doc=await db.collection('insight_report_config').doc('default').get();
+        if(doc.exists){
+          const d=doc.data();
+          document.getElementById('irModel').value=d.model||'claude-haiku-4-5-20251001';
+          document.getElementById('irCount').value=d.report_count||10;
+          document.getElementById('irChars').value=d.target_chars||5000;
+          document.getElementById('irTemp').value=d.temperature||0.7;
+          document.getElementById('irTempVal').textContent=d.temperature||0.7;
+          document.getElementById('irSelPrompt').value=d.selection_prompt||'';
+          document.getElementById('irGenPrompt').value=d.generation_prompt||'';
+        }
+      }catch(e){console.error('IR config load error:',e)}
+    }
+
+    // Save insight report config to Firestore
+    window.saveIRConfig = async function(){
+      try{
+        await db.collection('insight_report_config').doc('default').set({
+          model:document.getElementById('irModel').value,
+          report_count:parseInt(document.getElementById('irCount').value)||10,
+          target_chars:parseInt(document.getElementById('irChars').value)||5000,
+          temperature:parseFloat(document.getElementById('irTemp').value)||0.7,
+          selection_prompt:document.getElementById('irSelPrompt').value,
+          generation_prompt:document.getElementById('irGenPrompt').value,
+          updated_at:firebase.firestore.FieldValue.serverTimestamp()
+        });
+        toast('パラメーターを保存しました','ok');
+      }catch(e){toast('保存失敗: '+e.message,'err')}
+    };
+
+    // Load insight reports data + Firestore overlays
+    async function loadIRData(){
+      try{
+        // Load JSON data
+        const data=await fetchJSON('insight_reports.json');
+        irData=Array.isArray(data)?data:(data?.reports||[]);
+
+        // Load Firestore status overlays
+        const statusSnap=await db.collection('insight_report_status').get();
+        irStatuses={};
+        statusSnap.forEach(doc=>{irStatuses[doc.id]=doc.data()});
+
+        // Load Firestore edit overlays
+        const editSnap=await db.collection('insight_report_edits').get();
+        irEdits={};
+        editSnap.forEach(doc=>{irEdits[doc.id]=doc.data()});
+
+        // Populate category filter
+        const cats=new Set();
+        irData.forEach(r=>{if(r.category)cats.add(r.category)});
+        const catSel=document.getElementById('irFilterCat');
+        const curVal=catSel.value;
+        catSel.innerHTML='<option value="">全カテゴリ</option>';
+        cats.forEach(c=>{catSel.innerHTML+='<option value="'+esc(c)+'">'+esc(c)+'</option>'});
+        catSel.value=curVal;
+
+        renderIRStats();
+        renderIR();
+      }catch(e){
+        console.error('IR data load error:',e);
+        document.getElementById('irBody').innerHTML='<tr><td colspan="7" style="color:var(--red);font-size:.82rem">データの読み込みに失敗しました</td></tr>';
+      }
+    }
+
+    // Get merged report (original + edits)
+    function getMergedIR(report,idx){
+      const date=report.date||report.generated_date||'';
+      const id=report.id||idx;
+      const key=date+'-'+id;
+      const edit=irEdits[key]||{};
+      const status=irStatuses[key]||{};
+      return {
+        ...report,
+        ...edit,
+        _key:key,
+        _idx:idx,
+        _published:status.published!==undefined?status.published:true,
+        _deleted:status.deleted||false,
+        _regenerate:status.regenerate||false
+      };
+    }
+
+    // Render stats
+    function renderIRStats(){
+      const merged=irData.map((r,i)=>getMergedIR(r,i)).filter(r=>!r._deleted);
+      const total=merged.length;
+      const published=merged.filter(r=>r._published).length;
+      const totalChars=merged.reduce((s,r)=>{
+        const body=r.full_report||r.body||r.content||'';
+        return s+body.length;
+      },0);
+      const avgChars=total>0?Math.round(totalChars/total):0;
+
+      // Find last generated date
+      let lastGen='-';
+      if(irData.length>0){
+        const dates=irData.map(r=>r.date||r.generated_date||r.generated_at||'').filter(d=>d).sort().reverse();
+        if(dates.length>0)lastGen=dates[0];
+      }
+      document.getElementById('irLastGen').textContent='最終生成日時: '+lastGen;
+
+      document.getElementById('irStats').innerHTML=
+        '<div class="stat-card"><div class="stat-val">'+total+'</div><div class="stat-lbl">レポート総数</div></div>'+
+        '<div class="stat-card"><div class="stat-val">'+published+'</div><div class="stat-lbl">公開中</div></div>'+
+        '<div class="stat-card"><div class="stat-val">'+avgChars+'</div><div class="stat-lbl">平均文字数</div></div>';
+    }
+
+    // Render reports table
+    window.renderIR = function(){
+      const cat=document.getElementById('irFilterCat').value;
+      const myth=document.getElementById('irFilterMyth').value;
+      const statusF=document.getElementById('irFilterStatus').value;
+      const sort=document.getElementById('irSort').value;
+
+      let rows=irData.map((r,i)=>getMergedIR(r,i)).filter(r=>!r._deleted);
+
+      // Filter
+      if(cat)rows=rows.filter(r=>(r.category||'')==cat);
+      if(myth)rows=rows.filter(r=>(r.myth_relation||'')==myth);
+      if(statusF==='published')rows=rows.filter(r=>r._published);
+      if(statusF==='unpublished')rows=rows.filter(r=>!r._published);
+
+      // Sort
+      if(sort==='category')rows.sort((a,b)=>(a.category||'').localeCompare(b.category||''));
+      else if(sort==='chars'){
+        rows.sort((a,b)=>{
+          const ac=(a.full_report||a.body||a.content||'').length;
+          const bc=(b.full_report||b.body||b.content||'').length;
+          return bc-ac;
+        });
+      }else{
+        rows.sort((a,b)=>(b.date||b.generated_date||'').localeCompare(a.date||a.generated_date||''));
+      }
+
+      if(rows.length===0){
+        document.getElementById('irBody').innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--text-m)">該当するレポートがありません</td></tr>';
+        return;
+      }
+
+      document.getElementById('irBody').innerHTML=rows.map((r,i)=>{
+        const title=r.title||'(無題)';
+        const catColor=IR_CAT_COLORS[r.category]||'var(--accent)';
+        const mythRel=r.myth_relation||'-';
+        const mythBadge=mythRel==='strengthens'?'badge-ok':mythRel==='changes'?'badge-warn':'badge-info';
+        const mythLabel=mythRel==='strengthens'?'強化':mythRel==='changes'?'変化':mythRel;
+        const body=r.full_report||r.body||r.content||'';
+        const chars=body.length;
+        const checked=r._published?'checked':'';
+        const regenBadge=r._regenerate?'<span class="badge badge-warn" style="margin-left:4px">再生成待ち</span>':'';
+        const preview=body.substring(0,200).replace(/\n/g,' ')+'...';
+
+        return '<tr style="cursor:pointer" onclick="toggleIRPreview('+r._idx+',event)">'+
+          '<td class="num">'+(i+1)+'</td>'+
+          '<td><strong>'+esc(title)+'</strong>'+regenBadge+'</td>'+
+          '<td><span class="ir-cat-dot" style="background:'+catColor+'"></span>'+esc(r.category||'-')+'</td>'+
+          '<td><span class="badge '+mythBadge+'">'+mythLabel+'</span></td>'+
+          '<td class="num">'+chars+'</td>'+
+          '<td onclick="event.stopPropagation()"><label class="toggle-label"><label class="toggle"><input type="checkbox" '+checked+' onchange="toggleIRStatus(\''+r._key+'\',this.checked)"><span class="toggle-slider"></span></label>'+(r._published?'公開':'非公開')+'</label></td>'+
+          '<td onclick="event.stopPropagation()">'+
+            '<button class="btn btn-s btn-sm" onclick="openIREdit('+r._idx+')">編集</button> '+
+            '<button class="btn btn-s btn-sm" onclick="regenerateIR(\''+r._key+'\')">再生成</button> '+
+            '<button class="btn btn-d btn-sm" onclick="deleteIR(\''+r._key+'\')">削除</button>'+
+          '</td>'+
+        '</tr>'+
+        '<tr class="ir-preview-row" id="ir-prev-'+r._idx+'"><td colspan="7" class="ir-preview-cell">'+esc(preview)+'</td></tr>';
+      }).join('');
+    };
+
+    // Toggle preview row
+    window.toggleIRPreview = function(idx,event){
+      if(event.target.closest('button,input,label,.toggle'))return;
+      const row=document.getElementById('ir-prev-'+idx);
+      if(row)row.classList.toggle('show');
+    };
+
+    // Toggle publish status
+    window.toggleIRStatus = async function(key,published){
+      try{
+        await db.collection('insight_report_status').doc(key).set({published:published},{merge:true});
+        irStatuses[key]={...irStatuses[key],published:published};
+        renderIRStats();
+        renderIR();
+        toast(published?'公開に設定':'非公開に設定','ok');
+      }catch(e){toast('ステータス更新失敗: '+e.message,'err')}
+    };
+
+    // Mark for regeneration
+    window.regenerateIR = async function(key){
+      if(!confirm('このレポートを再生成対象としてマークしますか?'))return;
+      try{
+        await db.collection('insight_report_status').doc(key).set({regenerate:true},{merge:true});
+        irStatuses[key]={...irStatuses[key],regenerate:true};
+        renderIR();
+        toast('再生成対象としてマークしました','ok');
+      }catch(e){toast('更新失敗: '+e.message,'err')}
+    };
+
+    // Soft delete
+    window.deleteIR = async function(key){
+      if(!confirm('このレポートを削除しますか?'))return;
+      try{
+        await db.collection('insight_report_status').doc(key).set({deleted:true},{merge:true});
+        irStatuses[key]={...irStatuses[key],deleted:true};
+        renderIRStats();
+        renderIR();
+        toast('レポートを削除しました','ok');
+      }catch(e){toast('削除失敗: '+e.message,'err')}
+    };
+
+    // Open edit modal
+    window.openIREdit = function(idx){
+      const report=getMergedIR(irData[idx],idx);
+      irEditingId=report._key;
+
+      document.getElementById('irEditTitle').textContent='レポート編集: '+esc(report.title||'(無題)');
+      document.getElementById('irEdTitle').value=report.title||'';
+      document.getElementById('irEdSummary').value=report.summary||report.excerpt||'';
+      document.getElementById('irEdSumCount').textContent='('+(report.summary||report.excerpt||'').length+'/150)';
+      document.getElementById('irEdBody').value=report.full_report||report.body||report.content||'';
+      document.getElementById('irEdBodyCount').textContent='('+(report.full_report||report.body||report.content||'').length+'文字)';
+      document.getElementById('irEdHistorical').value=report.historical_context||'';
+      document.getElementById('irEdSignals').value=Array.isArray(report.future_signals)?report.future_signals.join('\n'):(report.future_signals||'');
+      document.getElementById('irEdWatch').value=Array.isArray(report.watch_points)?report.watch_points.join('\n'):(report.watch_points||'');
+      document.getElementById('irEdResearch').value=Array.isArray(report.related_research)?report.related_research.join('\n'):(report.related_research||'');
+      document.getElementById('irEdMyth').value=report.related_myth||report.myth||'';
+      document.getElementById('irEdMythRel').value=report.myth_relation||'strengthens';
+
+      // Timeline
+      irTimelineEntries=Array.isArray(report.timeline)?[...report.timeline]:[];
+      renderIRTimeline();
+
+      document.getElementById('irPreview').style.display='none';
+      document.getElementById('irEditModal').classList.add('show');
+    };
+
+    window.closeIREdit = function(){
+      document.getElementById('irEditModal').classList.remove('show');
+      irEditingId=null;
+    };
+
+    // Timeline management
+    function renderIRTimeline(){
+      const c=document.getElementById('irEdTimeline');
+      if(irTimelineEntries.length===0){c.innerHTML='<div style="font-size:.72rem;color:var(--text-m);padding:4px">エントリなし</div>';return}
+      c.innerHTML=irTimelineEntries.map((e,i)=>{
+        const yr=e.year||e.date||'';
+        const txt=e.event||e.text||e.description||'';
+        return '<div style="display:flex;gap:6px;margin-bottom:4px;align-items:center">'+
+          '<input type="text" class="inp inp-sm" style="width:80px;flex-shrink:0" value="'+esc(yr)+'" onchange="updateIRTimeline('+i+',\'year\',this.value)" placeholder="年">'+
+          '<input type="text" class="inp inp-sm" style="flex:1" value="'+esc(txt)+'" onchange="updateIRTimeline('+i+',\'event\',this.value)" placeholder="イベント">'+
+          '<button class="btn btn-d btn-sm" onclick="removeIRTimeline('+i+')" style="flex-shrink:0">x</button>'+
+          (i>0?'<button class="btn btn-s btn-sm" onclick="moveIRTimeline('+i+',-1)" style="flex-shrink:0">&#9650;</button>':'')+
+          (i<irTimelineEntries.length-1?'<button class="btn btn-s btn-sm" onclick="moveIRTimeline('+i+',1)" style="flex-shrink:0">&#9660;</button>':'')+
+        '</div>';
+      }).join('');
+    }
+
+    window.addIRTimeline = function(){
+      irTimelineEntries.push({year:'',event:''});
+      renderIRTimeline();
+    };
+
+    window.removeIRTimeline = function(i){
+      irTimelineEntries.splice(i,1);
+      renderIRTimeline();
+    };
+
+    window.updateIRTimeline = function(i,field,val){
+      if(irTimelineEntries[i])irTimelineEntries[i][field]=val;
+    };
+
+    window.moveIRTimeline = function(i,dir){
+      const ni=i+dir;
+      if(ni<0||ni>=irTimelineEntries.length)return;
+      const tmp=irTimelineEntries[i];
+      irTimelineEntries[i]=irTimelineEntries[ni];
+      irTimelineEntries[ni]=tmp;
+      renderIRTimeline();
+    };
+
+    // Save edit to Firestore
+    window.saveIREdit = async function(){
+      if(!irEditingId){toast('編集対象が選択されていません','err');return}
+
+      const signalsRaw=document.getElementById('irEdSignals').value;
+      const watchRaw=document.getElementById('irEdWatch').value;
+      const researchRaw=document.getElementById('irEdResearch').value;
+
+      const editData={
+        title:document.getElementById('irEdTitle').value,
+        summary:document.getElementById('irEdSummary').value,
+        full_report:document.getElementById('irEdBody').value,
+        historical_context:document.getElementById('irEdHistorical').value,
+        future_signals:signalsRaw.split('\n').map(s=>s.trim()).filter(s=>s),
+        watch_points:watchRaw.split('\n').map(s=>s.trim()).filter(s=>s),
+        related_research:researchRaw.split('\n').map(s=>s.trim()).filter(s=>s),
+        timeline:irTimelineEntries.filter(e=>e.year||e.event),
+        related_myth:document.getElementById('irEdMyth').value,
+        myth_relation:document.getElementById('irEdMythRel').value,
+        edited_at:firebase.firestore.FieldValue.serverTimestamp()
+      };
+
+      try{
+        await db.collection('insight_report_edits').doc(irEditingId).set(editData);
+        irEdits[irEditingId]=editData;
+        toast('編集内容を保存しました','ok');
+        closeIREdit();
+        renderIRStats();
+        renderIR();
+      }catch(e){toast('保存失敗: '+e.message,'err')}
+    };
+
+    // Preview
+    window.previewIREdit = function(){
+      const prev=document.getElementById('irPreview');
+      if(prev.style.display==='block'){prev.style.display='none';return}
+
+      const title=document.getElementById('irEdTitle').value;
+      const summary=document.getElementById('irEdSummary').value;
+      const body=document.getElementById('irEdBody').value;
+      const historical=document.getElementById('irEdHistorical').value;
+      const signals=document.getElementById('irEdSignals').value;
+      const watch=document.getElementById('irEdWatch').value;
+      const myth=document.getElementById('irEdMyth').value;
+      const mythRel=document.getElementById('irEdMythRel').value;
+
+      let html='<h3 style="font-size:1.1rem;font-weight:700;margin-bottom:8px">'+esc(title)+'</h3>';
+      if(summary)html+='<p style="color:var(--text-s);font-style:italic;margin-bottom:12px">'+esc(summary)+'</p>';
+      if(body)html+='<div style="margin-bottom:12px;white-space:pre-line">'+esc(body)+'</div>';
+      if(historical)html+='<div style="margin-bottom:12px"><strong>歴史的背景:</strong><div style="white-space:pre-line;margin-top:4px">'+esc(historical)+'</div></div>';
+      if(signals)html+='<div style="margin-bottom:12px"><strong>未来シグナル:</strong><div style="white-space:pre-line;margin-top:4px">'+esc(signals)+'</div></div>';
+      if(watch)html+='<div style="margin-bottom:12px"><strong>注目ポイント:</strong><div style="white-space:pre-line;margin-top:4px">'+esc(watch)+'</div></div>';
+      if(myth)html+='<div style="margin-bottom:8px"><strong>関連する神話:</strong> '+esc(myth)+' <span class="badge '+(mythRel==='strengthens'?'badge-ok':'badge-warn')+'">'+(mythRel==='strengthens'?'強化':'変化')+'</span></div>';
+
+      if(irTimelineEntries.length>0){
+        html+='<div style="margin-bottom:8px"><strong>タイムライン:</strong><ul style="margin-top:4px;padding-left:16px">';
+        irTimelineEntries.forEach(e=>{if(e.year||e.event)html+='<li>'+esc(e.year||'')+': '+esc(e.event||e.text||e.description||'')+'</li>'});
+        html+='</ul></div>';
+      }
+
+      prev.innerHTML=html;
+      prev.style.display='block';
+    };
+
+    // Initialize IR tab on tab switch
+    let irLoaded=false;
+    document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',function(){
+      if(this.dataset.tab==='insight'&&!irLoaded){irLoaded=true;loadIRConfig();loadIRData()}
+    }));
 
   })();
   </script>

@@ -1731,6 +1731,68 @@
     }
     .ir-modal-section.open .ir-modal-section-body { display: block; }
 
+    /* Summary / lead text */
+    .ir-summary {
+      font-size: 0.95rem;
+      line-height: 1.8;
+      color: var(--text);
+      font-weight: 500;
+      padding: 16px 20px;
+      background: var(--surface);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 var(--radius-xs) var(--radius-xs) 0;
+      margin-bottom: 20px;
+    }
+
+    /* Vertical timeline */
+    .ir-timeline {
+      position: relative;
+      padding-left: 24px;
+    }
+    .ir-timeline::before {
+      content: '';
+      position: absolute;
+      left: 4px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: var(--accent-soft);
+    }
+    .ir-timeline-entry {
+      position: relative;
+      padding: 12px 0 12px 20px;
+    }
+    .ir-timeline-entry::before {
+      content: '';
+      position: absolute;
+      left: -20px;
+      top: 18px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+    .ir-timeline-entry:nth-child(even) {
+      background: var(--surface);
+      border-radius: var(--radius-xs);
+    }
+    .ir-timeline-year {
+      font-weight: 700;
+      color: var(--accent);
+      font-size: 0.82rem;
+    }
+    .ir-timeline-event {
+      font-size: 0.84rem;
+      line-height: 1.6;
+      margin-top: 4px;
+    }
+    .ir-timeline-sig {
+      font-size: 0.78rem;
+      font-style: italic;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
     @media (max-width: 768px) {
       .ir-hero-layout {
         grid-template-columns: 1fr;
@@ -2363,7 +2425,7 @@
           var catInfo = PESTLE_CATS[r.article?.pestle_category] || { labelJa: '', color: 'var(--accent)' };
           var mythLabel = r.myth_relation === 'strengthens' ? '強化' : '変革';
           var mythClass = r.myth_relation === 'strengthens' ? 'ir-myth-badge-strengthens' : 'ir-myth-badge-transforms';
-          var preview = stripMarkdown(r.report_text || '').substring(0, 120);
+          var preview = r.summary ? r.summary.substring(0, 120) : stripMarkdown(r.report_text || '').substring(0, 120);
           html += '<div class="ir-carousel-card" onclick="openInsightReport(' + realIdx + ')">' +
             '<div class="ir-carousel-accent" style="background:' + catInfo.color + '"></div>' +
             '<div class="ir-carousel-body">' +
@@ -2391,6 +2453,10 @@
       var mythClass = report.myth_relation === 'strengthens' ? 'ir-myth-badge-strengthens' : 'ir-myth-badge-transforms';
       var preview = stripMarkdown(report.report_text || '').substring(0, 300);
 
+      var summaryHtml = report.summary
+        ? '<div class="ir-summary">' + escapeHtml(report.summary) + '</div>'
+        : '<div class="ir-hero-preview">' + escapeHtml(preview) + '</div>';
+
       return '<div class="ir-hero-card" onclick="openInsightReport(' + index + ')">' +
         '<div class="ir-hero-accent" style="background:' + catInfo.color + '"></div>' +
         '<div class="ir-hero-body">' +
@@ -2398,7 +2464,7 @@
           '<div class="ir-hero-title">' + escapeHtml(report.report_title || '') + '</div>' +
           '<span class="ir-myth-badge ' + mythClass + '">' + mythLabel + '</span>' +
           (report.related_myth ? '<div class="ir-myth-text">' + escapeHtml(report.related_myth) + '</div>' : '') +
-          '<div class="ir-hero-preview">' + escapeHtml(preview) + '</div>' +
+          summaryHtml +
           '<span class="ir-hero-read-more" onclick="event.stopPropagation();openInsightReport(' + index + ')">続きを読む &rarr;</span>' +
           '<div class="ir-hero-source">' +
             escapeHtml(report.article?.source || '') + ' | ' + escapeHtml(report.article?.published_date || '') +
@@ -2444,6 +2510,11 @@
         modalHtml += '<div style="font-style:italic;color:var(--text-secondary);margin-bottom:14px;font-size:0.88rem">' + escapeHtml(r.related_myth) + '</div>';
       }
 
+      // Summary lead text
+      if (r.summary) {
+        modalHtml += '<div class="ir-summary">' + escapeHtml(r.summary) + '</div>';
+      }
+
       // Source article link
       if (r.article) {
         modalHtml += '<div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:16px;padding:10px 14px;background:var(--surface);border-radius:var(--radius-xs)">' +
@@ -2456,9 +2527,29 @@
       // Full report text
       modalHtml += '<div class="md-body">' + renderMarkdown(r.report_text || '') + '</div>';
 
-      // Collapsible sections
+      // Timeline visualization for historical context (falls back to collapsible)
+      if (r.timeline && r.timeline.length > 0) {
+        modalHtml += '<div class="ir-modal-section open">' +
+          '<div class="ir-modal-section-header" onclick="this.parentElement.classList.toggle(\'open\')">歴史的経緯<span class="ir-modal-section-chevron">&#9654;</span></div>' +
+          '<div class="ir-modal-section-body">';
+        modalHtml += '<div class="ir-timeline">';
+        r.timeline.forEach(function(t) {
+          modalHtml += '<div class="ir-timeline-entry">' +
+            '<div class="ir-timeline-year">' + escapeHtml(t.year || '') + '</div>' +
+            '<div class="ir-timeline-event">' + escapeHtml(t.event || '') + '</div>' +
+            (t.significance ? '<div class="ir-timeline-sig">' + escapeHtml(t.significance) + '</div>' : '') +
+          '</div>';
+        });
+        modalHtml += '</div></div></div>';
+      } else if (r.historical_context) {
+        modalHtml += '<div class="ir-modal-section" onclick="this.classList.toggle(\'open\')">' +
+          '<div class="ir-modal-section-header">歴史的経緯<span class="ir-modal-section-chevron">&#9654;</span></div>' +
+          '<div class="ir-modal-section-body md-body">' + renderMarkdown(r.historical_context) + '</div>' +
+        '</div>';
+      }
+
+      // Remaining collapsible sections
       var sections = [
-        { key: 'historical_context', label: '歴史的経緯' },
         { key: 'future_signals', label: '未来へのシグナル' },
         { key: 'watch_points', label: 'ウォッチポイント' },
         { key: 'related_research', label: '関連学術成果' }
@@ -3055,7 +3146,7 @@
               '<span class="ir-carousel-cat">' + escapeHtml(getPestleLabel(r.article?.pestle_category)) + '</span></div>' +
               '<div class="ir-carousel-title" style="-webkit-line-clamp:3">' + escapeHtml(r.report_title || '') + '</div>' +
               mythBadgeHtml(r.myth_relation, 'ir-carousel-myth') +
-              '<div class="ir-carousel-preview">' + escapeHtml(stripMarkdown(r.report_text || '').substring(0, 150)) + '...</div>' +
+              '<div class="ir-carousel-preview">' + escapeHtml(r.summary ? r.summary.substring(0, 150) : stripMarkdown(r.report_text || '').substring(0, 150)) + '...</div>' +
             '</div></div>';
         });
         html += '</div>';
