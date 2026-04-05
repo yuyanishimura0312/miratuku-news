@@ -125,8 +125,9 @@
     /* Code */
     .code{background:var(--surface);border:1px solid var(--border);border-radius:var(--rx);padding:10px 14px;font-family:'SF Mono','Menlo',monospace;font-size:.72rem;line-height:1.5;overflow-x:auto;white-space:pre-wrap;word-break:break-all;color:var(--text-s);margin-bottom:10px}
 
-    /* Log viewer */
-    .log{background:#1a1410;color:#c4b8a8;border-radius:var(--rx);padding:14px;font-family:'SF Mono','Menlo',monospace;font-size:.7rem;line-height:1.5;max-height:350px;overflow-y:auto;margin-bottom:10px}
+    /* Log viewer — intentionally dark in both themes (terminal style) */
+    .log{background:#1a1410;color:#c4b8a8;border:1px solid #3a2e24;border-radius:var(--rx);padding:14px;font-family:'SF Mono','Menlo',monospace;font-size:.7rem;line-height:1.5;max-height:350px;overflow-y:auto;margin-bottom:10px}
+    [data-theme="dark"] .log{border-color:#4a3c2c}
     .log-ok{color:#6BBF7A}.log-warn{color:#FFB74D}.log-err{color:#EF5350}
 
     /* Modal */
@@ -206,6 +207,15 @@
     }
     @media(max-width:375px){
       .stat-grid{grid-template-columns:1fr 1fr}
+      .container{padding:0 10px}
+      .hdr-brand span{display:none}
+      .btn{padding:6px 10px;font-size:.72rem}
+      .btn-sm{padding:4px 7px;font-size:.68rem}
+      .tab{padding:6px 10px;font-size:.72rem}
+      .dt th,.dt td{padding:7px 8px}
+      .modal{padding:12px}
+      .form-group{min-width:unset;width:100%}
+      .filters{gap:6px}
     }
   </style>
 </head>
@@ -578,6 +588,7 @@
         <div class="card">
           <h3 class="card-title">GitHub API トークン</h3>
           <div class="card-sub" style="margin-bottom:8px">フィード設定のGitHub自動保存に必要です（Personal Access Token: repo権限）</div>
+          <div style="font-size:.72rem;color:var(--yellow);background:var(--yellow-l);padding:6px 10px;border-radius:var(--rx);margin-bottom:8px">注意: トークンはこのブラウザのlocalStorageに保存されます。共有端末では使用後にログアウトしてください。</div>
           <div class="form-row">
             <input type="password" class="inp inp-sm" id="ghToken" placeholder="ghp_..." style="flex:2">
             <button class="btn btn-p btn-sm" onclick="saveGHToken()">保存</button>
@@ -599,6 +610,7 @@
         </div>
         <div class="card section-gap">
           <h3 class="card-title">管理パスワード変更</h3>
+          <div style="font-size:.72rem;color:var(--text-m);margin-bottom:8px">このブラウザのみに適用されます。他のブラウザや端末には反映されません。</div>
           <div class="form-row" style="margin-top:8px"><input type="password" class="inp inp-sm" id="newPw" placeholder="新しいパスワード" style="max-width:300px"><button class="btn btn-p btn-sm" onclick="changePw()">変更</button></div>
         </div>
       </div>
@@ -607,7 +619,7 @@
   </div>
 
   <!-- INSIGHT REPORT EDIT MODAL -->
-  <div class="modal-bg" id="irEditModal">
+  <div class="modal-bg" id="irEditModal" onclick="if(event.target===this)closeIREdit()">
     <div class="modal" style="max-width:900px;max-height:92vh">
       <button class="modal-close" onclick="closeIREdit()">&times;</button>
       <h3 class="modal-title" id="irEditTitle">レポート編集</h3>
@@ -686,7 +698,7 @@
   </div>
 
   <!-- USER CONTENT DETAIL MODAL -->
-  <div class="modal-bg" id="ucDetailModal">
+  <div class="modal-bg" id="ucDetailModal" onclick="if(event.target===this)closeUCDetail()">
     <div class="modal" style="max-width:800px;max-height:90vh">
       <button class="modal-close" onclick="closeUCDetail()">&times;</button>
       <h3 class="modal-title" id="ucDetailTitle">詳細</h3>
@@ -695,7 +707,7 @@
   </div>
 
   <!-- FEED MODAL -->
-  <div class="modal-bg" id="feedModal">
+  <div class="modal-bg" id="feedModal" onclick="if(event.target===this)closeFeedModal()">
     <div class="modal">
       <button class="modal-close" onclick="closeFeedModal()">&times;</button>
       <h3 class="modal-title" id="feedModalTitle">フィード追加</h3>
@@ -733,8 +745,16 @@
     const DATA_BASE = 'https://yuyanishimura0312.github.io/future-insight-app/data';
     const CONFIG_REPO = 'yuyanishimura0312/future-insight-app';
     const CONFIG_PATH = 'data/feed_config.json';
-    const DEFAULT_PW = 'insightnews2026';
+    // SHA-256 hash of 'insightnews2026' — plaintext is not stored in source
+    const DEFAULT_PW_HASH = '6d0ab7637cbad3308a10ab2a8814ad2ebfbac30a505e69f4f1dcb119d5bab3ba';
     const cb = () => '?v=' + Date.now();
+
+    // Hash a password with SHA-256 and return hex string
+    async function hashPw(pw) {
+      const enc = new TextEncoder().encode(pw);
+      const buf = await crypto.subtle.digest('SHA-256', enc);
+      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
 
     firebase.initializeApp({apiKey:"AIzaSyB5ubJobtiCOelI-hI6vQ9cyMnBBewyNwg",authDomain:"miratuku-afa2c.firebaseapp.com",projectId:"miratuku-afa2c",storageBucket:"miratuku-afa2c.firebasestorage.app",messagingSenderId:"344400461535",appId:"1:344400461535:web:544ebe32ad4add42f4b36a"});
     const db = firebase.firestore();
@@ -749,19 +769,45 @@
     let cachedForesightQueries = [];
     let cachedComments = [];
 
+    // Cache for HEAD request results (shared between dashboard and pipeline)
+    let headResultsCache = null;
+
     const PESTLE_COLORS = {Political:'var(--P)',Economic:'var(--E)',Social:'var(--S)',Technological:'var(--T)',Legal:'var(--L)',Environmental:'var(--En)'};
     const PESTLE_JA = {Political:'政治',Economic:'経済',Social:'社会',Technological:'技術',Legal:'法律',Environmental:'環境'};
 
     // === AUTH ===
-    function getPw(){ return localStorage.getItem('in_admin_pw') || DEFAULT_PW }
-    window.doLogin = function(){ const pw=document.getElementById('loginPw').value; if(pw===getPw()){sessionStorage.setItem('admin_auth','1');document.getElementById('loginScreen').classList.add('hidden');document.getElementById('adminApp').classList.remove('hidden');init()}else{document.getElementById('loginError').style.display='block';document.getElementById('loginPw').value=''}};
+    // Returns the stored hash, or the compiled-in default hash
+    function getStoredPwHash(){ return localStorage.getItem('in_admin_pw_hash') || DEFAULT_PW_HASH; }
+
+    window.doLogin = async function(){
+      const pw = document.getElementById('loginPw').value;
+      const h = await hashPw(pw);
+      if(h === getStoredPwHash()){
+        sessionStorage.setItem('admin_auth','1');
+        document.getElementById('loginScreen').classList.add('hidden');
+        document.getElementById('adminApp').classList.remove('hidden');
+        init();
+      } else {
+        document.getElementById('loginError').style.display='block';
+        document.getElementById('loginPw').value='';
+      }
+    };
     document.getElementById('loginPw').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()});
-    window.doLogout = function(){sessionStorage.removeItem('admin_auth');location.reload()};
-    window.changePw = function(){const pw=document.getElementById('newPw').value;if(!pw||pw.length<4){toast('4文字以上入力してください','err');return}localStorage.setItem('in_admin_pw',pw);document.getElementById('newPw').value='';toast('パスワード変更完了','ok')};
+    window.doLogout = function(){sessionStorage.removeItem('admin_auth');sessionStorage.removeItem('gh_token_session');location.reload()};
+    window.changePw = async function(){
+      const pw=document.getElementById('newPw').value;
+      if(!pw||pw.length<4){toast('4文字以上入力してください','err');return}
+      const h = await hashPw(pw);
+      localStorage.setItem('in_admin_pw_hash', h);
+      // Remove legacy plaintext key if present
+      localStorage.removeItem('in_admin_pw');
+      document.getElementById('newPw').value='';
+      toast('パスワード変更完了（このブラウザのみに適用されます）','ok');
+    };
     if(sessionStorage.getItem('admin_auth')==='1'){document.getElementById('loginScreen').classList.add('hidden');document.getElementById('adminApp').classList.remove('hidden');init()}
 
-    // === TABS ===
-    document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',function(){document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));this.classList.add('active');const p=document.getElementById('panel-'+this.dataset.tab);if(p)p.classList.add('active')}));
+    // === TABS (switching + lazy loading in one listener) ===
+    // The second registration below is removed; all tab logic is merged here.
 
     // === THEME ===
     if(localStorage.getItem('admin_theme')==='dark')document.documentElement.setAttribute('data-theme','dark');
@@ -772,7 +818,7 @@
 
     // === UTILS ===
     function esc(s){if(!s)return'';const d=document.createElement('div');d.textContent=String(s);return d.innerHTML}
-    async function fetchJSON(f){if(dataCache[f])return dataCache[f];try{const r=await fetch(DATA_BASE+'/'+f+cb());if(!r.ok)return null;const d=await r.json();dataCache[f]=d;return d}catch{return null}}
+    async function fetchJSON(f){if(dataCache[f])return dataCache[f];try{const r=await fetch(DATA_BASE+'/'+f+cb());if(!r.ok){console.warn('fetchJSON: HTTP '+r.status+' for '+f);return null}const d=await r.json();dataCache[f]=d;return d}catch(e){console.warn('fetchJSON error for '+f+':',e);return null}}
     function relTime(ds){if(!ds)return'-';const d=new Date(ds);if(isNaN(d))return ds;const diff=Date.now()-d.getTime(),h=Math.floor(diff/3600000);if(h<1)return Math.floor(diff/60000)+'分前';if(h<24)return h+'時間前';return Math.floor(h/24)+'日前'}
     function fmtBytes(b){if(!b)return'-';if(b<1024)return b+' B';if(b<1048576)return(b/1024).toFixed(1)+' KB';return(b/1048576).toFixed(1)+' MB'}
     function fmtTimestamp(ts){if(!ts)return'-';if(ts.seconds)return new Date(ts.seconds*1000).toLocaleString('ja-JP');return new Date(ts).toLocaleString('ja-JP')}
@@ -879,8 +925,19 @@
       {name:'feed_config.json',label:'フィード設定'},
     ];
 
-    async function loadDashboard(){
+    // Fetch HEAD results for all DATA_FILES, using a short-lived cache to avoid
+    // duplicate network requests when both dashboard and pipeline tabs call this.
+    async function fetchHeadResults(){
+      if(headResultsCache)return headResultsCache;
       const results=await Promise.all(DATA_FILES.map(async f=>{try{const r=await fetch(DATA_BASE+'/'+f.name+cb(),{method:'HEAD'});return{...f,ok:r.ok,lastMod:r.headers.get('last-modified'),size:parseInt(r.headers.get('content-length')||'0')}}catch{return{...f,ok:false}}}));
+      headResultsCache=results;
+      // Expire cache after 60 seconds so manual refreshes still work
+      setTimeout(()=>{headResultsCache=null},60000);
+      return results;
+    }
+
+    async function loadDashboard(){
+      const results=await fetchHeadResults();
 
       document.getElementById('filesBody').innerHTML=results.map(f=>{
         const s=f.ok?'ok':'err',sl=f.ok?'正常':'エラー';
@@ -1245,10 +1302,11 @@
       if(!url){res.textContent='URLを入力してください';res.style.color='var(--red)';return}
       res.innerHTML='<span class="spin" style="width:14px;height:14px"></span> テスト中...';res.style.color='var(--text-m)';
       try{
-        const r=await fetch(url,{mode:'no-cors'});
-        res.textContent='接続OK（CORSのためコンテンツ確認不可ですが、URLは到達可能です）';res.style.color='var(--green)';
+        await fetch(url,{mode:'no-cors'});
+        // no-cors always returns opaque response — we can only confirm the URL resolved
+        res.textContent='URLは到達可能です（no-corsのためHTTPステータスや内容は確認できません）';res.style.color='var(--yellow)';
       }catch(e){
-        res.textContent='接続エラー: '+e.message;res.style.color='var(--red)';
+        res.textContent='接続エラー（URLが到達不可またはネットワーク問題）: '+e.message;res.style.color='var(--red)';
       }
     };
 
@@ -1270,7 +1328,8 @@
       }
       const ok=Object.values(feedHealthResults).filter(v=>v==='ok').length;
       const err=Object.values(feedHealthResults).filter(v=>v==='error').length;
-      toast('ヘルスチェック完了: '+ok+'件OK / '+err+'件エラー',err>0?'err':'ok');
+      // no-cors mode: "ok" means URL resolved (not HTTP 200). Errors mean network failure.
+      toast('ヘルスチェック完了: '+ok+'件到達可能 / '+err+'件ネットワークエラー（no-corsのためHTTPステータスは未確認）',err>0?'err':'ok');
     };
 
     // === PESTLE SETTINGS (merged into Feeds tab) ===
@@ -1367,9 +1426,8 @@
         '</div>';
       }).join('');
 
-      // Data files table (all files)
-      const allFiles=[...DATA_FILES];
-      const allResults=await Promise.all(allFiles.map(async f=>{try{const r=await fetch(DATA_BASE+'/'+f.name+cb(),{method:'HEAD'});return{...f,ok:r.ok,lastMod:r.headers.get('last-modified'),size:parseInt(r.headers.get('content-length')||'0')}}catch{return{...f,ok:false}}}));
+      // Data files table — reuse cached HEAD results from dashboard if available
+      const allResults=await fetchHeadResults();
 
       document.getElementById('pipeFilesBody').innerHTML=allResults.map(f=>{
         const s=f.ok?'ok':'err',sl=f.ok?'正常':'エラー';
@@ -1907,13 +1965,20 @@
       prev.style.display='block';
     };
 
-    // === TAB LAZY LOADING ===
+    // === TAB LAZY LOADING (single unified listener for all tab behavior) ===
     let irLoaded=false;
     let ucLoaded=false;
     let pipeLoaded=false;
     let analyticsLoaded=false;
 
     document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',function(){
+      // Switch active tab and panel
+      document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+      this.classList.add('active');
+      const p=document.getElementById('panel-'+this.dataset.tab);
+      if(p)p.classList.add('active');
+      // Lazy-load tab content on first visit
       const tab=this.dataset.tab;
       if(tab==='insight'&&!irLoaded){irLoaded=true;loadIRConfig();loadArticleRules();loadIRData()}
       if(tab==='usercontent'&&!ucLoaded){ucLoaded=true;renderUCReports()}
