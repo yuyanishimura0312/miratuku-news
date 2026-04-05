@@ -148,7 +148,7 @@
     /* Toast */
     .toast-c{position:fixed;bottom:20px;right:20px;z-index:9999}
     .toast{background:var(--card);border:1px solid var(--border);border-radius:var(--rx);padding:10px 16px;font-size:.78rem;box-shadow:var(--shadow-md);margin-top:8px;animation:ti .3s ease-out}
-    .toast-ok{border-left:3px solid var(--green)}.toast-err{border-left:3px solid var(--red)}
+    .toast-ok{border-left:3px solid var(--green)}.toast-err{border-left:3px solid var(--red)}.toast-warn{border-left:3px solid var(--yellow)}
     @keyframes ti{from{opacity:0;transform:translateY(10px)}}
 
     /* Loading */
@@ -172,6 +172,27 @@
 
     /* IR category dot */
     .ir-cat-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px}
+
+    /* Pipeline step status */
+    .pipe-step{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border-l)}
+    .pipe-step:last-child{border-bottom:none}
+    .pipe-num{width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;flex-shrink:0}
+    .pipe-info{flex:1}
+    .pipe-name{font-weight:600;font-size:.82rem}
+    .pipe-desc{font-size:.7rem;color:var(--text-m)}
+    .pipe-meta{font-size:.68rem;color:var(--text-m);text-align:right;min-width:120px}
+
+    /* Expandable detail */
+    .expand-content{display:none;padding:12px 16px;background:var(--surface);font-size:.75rem;line-height:1.7;color:var(--text-s);border-bottom:1px solid var(--border-l)}
+    .expand-content.show{display:block}
+
+    /* Analytics bar */
+    .bar-chart{display:flex;flex-direction:column;gap:6px}
+    .bar-row{display:flex;align-items:center;gap:8px}
+    .bar-label{font-size:.7rem;color:var(--text-s);min-width:80px;text-align:right}
+    .bar-track{flex:1;height:20px;background:var(--surface);border-radius:3px;overflow:hidden}
+    .bar-fill{height:100%;border-radius:3px;transition:width .3s}
+    .bar-val{font-size:.7rem;font-weight:600;min-width:30px}
 
     /* Responsive */
     @media(max-width:768px){
@@ -218,12 +239,12 @@
       <nav class="tabs"><div class="container">
         <ul class="tab-list">
           <li><button class="tab active" data-tab="dashboard">ダッシュボード</button></li>
-          <li><button class="tab" data-tab="feeds">フィード管理</button></li>
-          <li><button class="tab" data-tab="pestle">PESTLE設定</button></li>
-          <li><button class="tab" data-tab="collection">収集制御</button></li>
-          <li><button class="tab" data-tab="firebase">Firebase</button></li>
-          <li><button class="tab" data-tab="system">システム</button></li>
           <li><button class="tab" data-tab="insight">インサイトレポート</button></li>
+          <li><button class="tab" data-tab="usercontent">ユーザーコンテンツ</button></li>
+          <li><button class="tab" data-tab="feeds">フィード管理</button></li>
+          <li><button class="tab" data-tab="pipeline">パイプライン</button></li>
+          <li><button class="tab" data-tab="analytics">分析</button></li>
+          <li><button class="tab" data-tab="system">設定</button></li>
         </ul>
       </div></nav>
     </header>
@@ -242,147 +263,17 @@
         <div id="catSummary" class="card"><div class="loading"><span class="spin"></span> 読み込み中...</div></div>
       </div>
 
-      <!-- ===== FEED MANAGEMENT ===== -->
-      <div class="panel" id="panel-feeds">
-        <h2 class="panel-title">フィード管理</h2>
-        <p class="panel-desc">RSSフィードの追加・編集・削除・ヘルスチェック。変更はGitHubに自動保存されます。</p>
-
-        <div style="display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap">
-          <button class="btn btn-p" onclick="openAddFeed()">+ フィード追加</button>
-          <button class="btn btn-g" onclick="healthCheckAll()">全フィードのヘルスチェック</button>
-          <button class="btn btn-s" onclick="saveConfig()">設定を保存</button>
-        </div>
-
-        <div class="filters">
-          <select class="inp inp-sm" style="width:auto" id="fTier" onchange="renderFeeds()">
-            <option value="">全Tier</option><option value="1">Tier 1</option><option value="2">Tier 2</option><option value="3">Tier 3</option>
-          </select>
-          <select class="inp inp-sm" style="width:auto" id="fLang" onchange="renderFeeds()">
-            <option value="">全言語</option><option value="ja">日本語</option><option value="en">英語</option>
-          </select>
-          <select class="inp inp-sm" style="width:auto" id="fFocus" onchange="renderFeeds()">
-            <option value="">全カテゴリ</option><option value="Political">Political</option><option value="Economic">Economic</option>
-            <option value="Social">Social</option><option value="Technological">Technological</option>
-            <option value="Legal">Legal</option><option value="Environmental">Environmental</option>
-          </select>
-          <select class="inp inp-sm" style="width:auto" id="fStatus" onchange="renderFeeds()">
-            <option value="">全状態</option><option value="enabled">有効のみ</option><option value="disabled">無効のみ</option>
-          </select>
-          <input type="text" class="inp inp-sm" style="width:200px" id="fSearch" placeholder="名前/URLで検索..." oninput="renderFeeds()">
-        </div>
-
-        <div class="stat-grid" id="feedStats"></div>
-        <div class="tw"><table class="dt"><thead><tr><th>状態</th><th>名前</th><th>言語</th><th>Tier</th><th>Focus</th><th>リージョン</th><th>ヘルス</th><th>操作</th></tr></thead>
-        <tbody id="feedsBody"><tr><td colspan="8" class="loading"><span class="spin"></span> 設定を読み込み中...</td></tr></tbody></table></div>
-      </div>
-
-      <!-- ===== PESTLE SETTINGS ===== -->
-      <div class="panel" id="panel-pestle">
-        <h2 class="panel-title">PESTLE設定</h2>
-        <p class="panel-desc">各カテゴリのキーワード、GDELTクエリ、スコアリングパラメータを管理</p>
-
-        <div class="card">
-          <h3 class="card-title">スコアリングパラメータ</h3>
-          <div class="form-row">
-            <div class="form-group"><label class="form-label">カテゴリ当たり目標件数</label><input type="number" class="inp inp-sm" id="pTarget" value="334"></div>
-            <div class="form-group"><label class="form-label">Tier 1 ブースト</label><input type="number" class="inp inp-sm" id="pBoost1" value="1.0" step="0.1"></div>
-            <div class="form-group"><label class="form-label">Tier 2 ブースト</label><input type="number" class="inp inp-sm" id="pBoost2" value="1.5" step="0.1"></div>
-            <div class="form-group"><label class="form-label">Tier 3 ブースト</label><input type="number" class="inp inp-sm" id="pBoost3" value="2.0" step="0.1"></div>
-            <div class="form-group"><label class="form-label">Focus ブースト</label><input type="number" class="inp inp-sm" id="pFocusBoost" value="0.3" step="0.1"></div>
-            <div class="form-group"><label class="form-label">GDELT件数/カテゴリ</label><input type="number" class="inp inp-sm" id="pGdelt" value="80"></div>
-          </div>
-          <button class="btn btn-p btn-sm" onclick="saveScoringParams()">パラメータを保存</button>
-        </div>
-
-        <div id="pestleCards" class="section-gap">
-          <div class="loading"><span class="spin"></span> 読み込み中...</div>
-        </div>
-      </div>
-
-      <!-- ===== COLLECTION CONTROL ===== -->
-      <div class="panel" id="panel-collection">
-        <h2 class="panel-title">収集制御</h2>
-        <p class="panel-desc">パイプラインの手動実行とスケジュール管理</p>
-
-        <div class="card">
-          <h3 class="card-title">パイプライン構成</h3>
-          <div class="card-sub" style="margin-bottom:10px">毎日 04:00 JST に自動実行</div>
-          <div class="tw"><table class="dt"><thead><tr><th>#</th><th>ステップ</th><th>スクリプト</th><th>説明</th><th>頻度</th></tr></thead><tbody>
-            <tr><td>1</td><td>ニュース収集</td><td><code>collect_news.py</code></td><td>RSSフィード + GDELT APIからPESTLEニュース収集</td><td>毎日</td></tr>
-            <tr><td>2</td><td>AI分析</td><td><code>ai_analyze.py</code></td><td>翻訳 + CLA分析 + 弱いシグナル検出</td><td>毎日</td></tr>
-            <tr><td>3</td><td>論文キュレーション</td><td><code>curate_daily_papers.py</code></td><td>5分野の論文を選定・翻訳・新規性スコア</td><td>毎日</td></tr>
-            <tr><td>4</td><td>アラート検出</td><td><code>detect_alerts.py</code></td><td>異常・新出現トピック検出</td><td>毎日</td></tr>
-            <tr><td>5</td><td>日次レポート</td><td><code>generate_daily_report.py</code></td><td>日本版・グローバル版レポート生成</td><td>毎日</td></tr>
-            <tr><td>6</td><td>シナリオ生成</td><td><code>generate_scenarios.py</code></td><td>4シナリオ生成</td><td>週次（月曜）</td></tr>
-            <tr><td>7</td><td>歴史データ</td><td><code>collect_historical_daily.py</code></td><td>1990-2025年の歴史的データ収集</td><td>毎日</td></tr>
-            <tr><td>8</td><td>デプロイ</td><td><code>git push</code></td><td>GitHub Pagesへデプロイ</td><td>毎日</td></tr>
-          </tbody></table></div>
-        </div>
-
-        <div class="card section-gap">
-          <h3 class="card-title">手動実行コマンド</h3>
-          <div style="margin-bottom:12px"><div class="form-label">全パイプライン実行</div><div class="code">cd ~/projects/apps/future-insight-app && bash scripts/daily_update.sh</div></div>
-          <div style="margin-bottom:12px"><div class="form-label">ニュース収集のみ</div><div class="code">cd ~/projects/apps/future-insight-app && ~/.venv/bin/python scripts/collect_news.py</div></div>
-          <div style="margin-bottom:12px"><div class="form-label">AI分析のみ</div><div class="code">cd ~/projects/apps/future-insight-app && ~/.venv/bin/python scripts/ai_analyze.py</div></div>
-          <div><div class="form-label">デプロイのみ</div><div class="code">cd ~/projects/apps/future-insight-app && git add data/ && git commit -m "chore: manual update $(date +%Y-%m-%d)" && git push</div></div>
-        </div>
-      </div>
-
-      <!-- ===== FIREBASE ===== -->
-      <div class="panel" id="panel-firebase">
-        <h2 class="panel-title">Firebase データ管理</h2>
-        <p class="panel-desc">コメント・ブックマーク・洞察クエリの管理</p>
-        <div class="stat-grid" id="fbStats"><div class="stat-card"><div class="stat-val"><span class="spin"></span></div><div class="stat-lbl">読み込み中</div></div></div>
-        <div style="display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap">
-          <button class="btn btn-s" onclick="showFB('comments')">コメント一覧</button>
-          <button class="btn btn-s" onclick="showFB('bookmarks')">ブックマーク一覧</button>
-          <button class="btn btn-s" onclick="showFB('foresight')">洞察クエリ一覧</button>
-        </div>
-        <div id="fbContent"></div>
-      </div>
-
-      <!-- ===== SYSTEM ===== -->
-      <div class="panel" id="panel-system">
-        <h2 class="panel-title">システム設定</h2>
-        <div class="card">
-          <h3 class="card-title">GitHub API トークン</h3>
-          <div class="card-sub" style="margin-bottom:8px">フィード設定のGitHub自動保存に必要です（Personal Access Token: repo権限）</div>
-          <div class="form-row">
-            <input type="password" class="inp inp-sm" id="ghToken" placeholder="ghp_..." style="flex:2">
-            <button class="btn btn-p btn-sm" onclick="saveGHToken()">保存</button>
-            <button class="btn btn-s btn-sm" onclick="testGHToken()">テスト</button>
-          </div>
-          <div id="ghTokenStatus" style="font-size:.72rem;color:var(--text-m);margin-top:4px"></div>
-        </div>
-        <div class="card section-gap">
-          <h3 class="card-title">システム情報</h3>
-          <div class="tw" style="margin-top:8px"><table class="dt"><tbody>
-            <tr><td>データ配信元</td><td><code>https://yuyanishimura0312.github.io/future-insight-app/data/</code></td></tr>
-            <tr><td>設定ファイル</td><td><code>future-insight-app/data/feed_config.json</code></td></tr>
-            <tr><td>Cloudflare Worker</td><td><code>future-insight-proxy.yuyanishimura0312.workers.dev</code></td></tr>
-            <tr><td>Firebase Project</td><td><code>miratuku-afa2c</code></td></tr>
-            <tr><td>AI分析モデル</td><td><code>claude-haiku-4-5-20251001</code></td></tr>
-            <tr><td>未来洞察モデル</td><td><code>claude-sonnet-4-20250514</code></td></tr>
-            <tr><td>パイプライン</td><td><code>~/projects/apps/future-insight-app/scripts/</code></td></tr>
-          </tbody></table></div>
-        </div>
-        <div class="card section-gap">
-          <h3 class="card-title">管理パスワード変更</h3>
-          <div class="form-row" style="margin-top:8px"><input type="password" class="inp inp-sm" id="newPw" placeholder="新しいパスワード" style="max-width:300px"><button class="btn btn-p btn-sm" onclick="changePw()">変更</button></div>
-        </div>
-      </div>
-
       <!-- ===== INSIGHT REPORTS ===== -->
       <div class="panel" id="panel-insight">
         <h2 class="panel-title">インサイトレポート</h2>
-        <p class="panel-desc">インサイトレポートの管理・編集・公開設定</p>
+        <p class="panel-desc">月次レポートの管理・編集・公開設定</p>
 
         <div class="stat-grid" id="irStats"><div class="stat-card"><div class="stat-val"><span class="spin"></span></div><div class="stat-lbl">読み込み中</div></div></div>
 
         <!-- Section 1: Generation Parameters -->
         <div class="card">
           <h3 class="card-title">生成パラメーター</h3>
-          <div class="card-sub" style="margin-bottom:10px">レポート生成時のAIモデル・パラメータ設定</div>
+          <div class="card-sub" style="margin-bottom:10px">月次レポート生成時のAIモデル・パラメータ設定</div>
           <div class="form-row">
             <div class="form-group"><label class="form-label">モデル</label>
               <select class="inp inp-sm" id="irModel">
@@ -513,6 +404,205 @@
         </div>
       </div>
 
+      <!-- ===== USER CONTENT ===== -->
+      <div class="panel" id="panel-usercontent">
+        <h2 class="panel-title">ユーザーコンテンツ管理</h2>
+        <p class="panel-desc">読者レポート・洞察履歴・コメントの一括管理</p>
+
+        <div class="stat-grid" id="ucStats"><div class="stat-card"><div class="stat-val"><span class="spin"></span></div><div class="stat-lbl">読み込み中</div></div></div>
+
+        <!-- Sub-nav -->
+        <div style="display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap">
+          <button class="btn btn-p btn-sm" onclick="showUCSection('reports')">読者レポート</button>
+          <button class="btn btn-s btn-sm" onclick="showUCSection('foresight')">洞察履歴</button>
+          <button class="btn btn-s btn-sm" onclick="showUCSection('comments')">コメント</button>
+        </div>
+
+        <!-- Section A: User Reports -->
+        <div id="ucReportsSection">
+          <h3 class="card-title" style="margin-bottom:8px">読者レポート管理</h3>
+          <div class="filters">
+            <select class="inp inp-sm" style="width:auto" id="ucReportUserFilter" onchange="renderUCReports()">
+              <option value="">全ユーザー</option>
+            </select>
+            <select class="inp inp-sm" style="width:auto" id="ucReportSort" onchange="renderUCReports()">
+              <option value="date">日付順（新しい順）</option>
+              <option value="user">ユーザー順</option>
+            </select>
+          </div>
+          <div class="tw"><table class="dt"><thead><tr>
+            <th>ユーザー</th><th>ソースタイトル</th><th>生成日</th><th>プレビュー</th><th>操作</th>
+          </tr></thead>
+          <tbody id="ucReportsBody"><tr><td colspan="5" class="loading"><span class="spin"></span> 読み込み中...</td></tr></tbody></table></div>
+        </div>
+
+        <!-- Section B: Foresight Queries -->
+        <div id="ucForesightSection" style="display:none">
+          <h3 class="card-title" style="margin-bottom:8px">洞察履歴管理</h3>
+          <div class="filters">
+            <select class="inp inp-sm" style="width:auto" id="ucForesightUserFilter" onchange="renderUCForesight()">
+              <option value="">全ユーザー</option>
+            </select>
+          </div>
+          <div id="ucForesightContent"></div>
+        </div>
+
+        <!-- Section C: Comments -->
+        <div id="ucCommentsSection" style="display:none">
+          <h3 class="card-title" style="margin-bottom:8px">コメント管理</h3>
+          <div id="ucCommentsContent"></div>
+        </div>
+      </div>
+
+      <!-- ===== FEED MANAGEMENT ===== -->
+      <div class="panel" id="panel-feeds">
+        <h2 class="panel-title">フィード管理</h2>
+        <p class="panel-desc">RSSフィードの追加・編集・削除・ヘルスチェック。変更はGitHubに自動保存されます。</p>
+
+        <div style="display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap">
+          <button class="btn btn-p" onclick="openAddFeed()">+ フィード追加</button>
+          <button class="btn btn-g" onclick="healthCheckAll()">全フィードのヘルスチェック</button>
+          <button class="btn btn-s" onclick="saveConfig()">設定を保存</button>
+        </div>
+
+        <div class="filters">
+          <select class="inp inp-sm" style="width:auto" id="fTier" onchange="renderFeeds()">
+            <option value="">全Tier</option><option value="1">Tier 1</option><option value="2">Tier 2</option><option value="3">Tier 3</option>
+          </select>
+          <select class="inp inp-sm" style="width:auto" id="fLang" onchange="renderFeeds()">
+            <option value="">全言語</option><option value="ja">日本語</option><option value="en">英語</option>
+          </select>
+          <select class="inp inp-sm" style="width:auto" id="fFocus" onchange="renderFeeds()">
+            <option value="">全カテゴリ</option><option value="Political">Political</option><option value="Economic">Economic</option>
+            <option value="Social">Social</option><option value="Technological">Technological</option>
+            <option value="Legal">Legal</option><option value="Environmental">Environmental</option>
+          </select>
+          <select class="inp inp-sm" style="width:auto" id="fStatus" onchange="renderFeeds()">
+            <option value="">全状態</option><option value="enabled">有効のみ</option><option value="disabled">無効のみ</option>
+          </select>
+          <input type="text" class="inp inp-sm" style="width:200px" id="fSearch" placeholder="名前/URLで検索..." oninput="renderFeeds()">
+        </div>
+
+        <div class="stat-grid" id="feedStats"></div>
+        <div class="tw"><table class="dt"><thead><tr><th>状態</th><th>名前</th><th>言語</th><th>Tier</th><th>Focus</th><th>リージョン</th><th>ヘルス</th><th>操作</th></tr></thead>
+        <tbody id="feedsBody"><tr><td colspan="8" class="loading"><span class="spin"></span> 設定を読み込み中...</td></tr></tbody></table></div>
+
+        <!-- PESTLE Settings (merged into Feeds) -->
+        <div class="section-gap">
+          <h3 class="card-title" style="margin-bottom:8px">スコアリングパラメータ</h3>
+          <div class="card">
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">カテゴリ当たり目標件数</label><input type="number" class="inp inp-sm" id="pTarget" value="334"></div>
+              <div class="form-group"><label class="form-label">Tier 1 ブースト</label><input type="number" class="inp inp-sm" id="pBoost1" value="1.0" step="0.1"></div>
+              <div class="form-group"><label class="form-label">Tier 2 ブースト</label><input type="number" class="inp inp-sm" id="pBoost2" value="1.5" step="0.1"></div>
+              <div class="form-group"><label class="form-label">Tier 3 ブースト</label><input type="number" class="inp inp-sm" id="pBoost3" value="2.0" step="0.1"></div>
+              <div class="form-group"><label class="form-label">Focus ブースト</label><input type="number" class="inp inp-sm" id="pFocusBoost" value="0.3" step="0.1"></div>
+              <div class="form-group"><label class="form-label">GDELT件数/カテゴリ</label><input type="number" class="inp inp-sm" id="pGdelt" value="80"></div>
+            </div>
+            <button class="btn btn-p btn-sm" onclick="saveScoringParams()">パラメータを保存</button>
+          </div>
+        </div>
+
+        <div id="pestleCards" class="section-gap">
+          <h3 class="card-title" style="margin-bottom:8px">PESTLEカテゴリ設定</h3>
+          <div class="loading"><span class="spin"></span> 読み込み中...</div>
+        </div>
+      </div>
+
+      <!-- ===== PIPELINE ===== -->
+      <div class="panel" id="panel-pipeline">
+        <h2 class="panel-title">パイプライン制御</h2>
+        <p class="panel-desc">パイプラインの状態確認と手動実行コマンド</p>
+
+        <!-- Section A: Pipeline Status -->
+        <div class="card">
+          <h3 class="card-title">パイプライン状態</h3>
+          <div class="card-sub" style="margin-bottom:10px">各ステップの最終実行状況とデータファイルの状態</div>
+          <div id="pipelineSteps"></div>
+        </div>
+
+        <!-- Section B: Data File Status -->
+        <div class="card section-gap">
+          <h3 class="card-title">データファイル状態</h3>
+          <div class="card-sub" style="margin-bottom:10px">GitHub Pages上のデータファイルのサイズと更新日時</div>
+          <div class="tw"><table class="dt"><thead><tr><th>ファイル名</th><th>ステータス</th><th>最終更新</th><th>サイズ</th><th></th></tr></thead>
+          <tbody id="pipeFilesBody"><tr><td colspan="5" class="loading"><span class="spin"></span> 確認中...</td></tr></tbody></table></div>
+        </div>
+
+        <!-- Section C: Manual Execution Commands -->
+        <div class="card section-gap">
+          <h3 class="card-title">手動実行コマンド</h3>
+          <div class="card-sub" style="margin-bottom:10px">シェルアクセスが必要です。以下のコマンドをターミナルで実行してください。</div>
+          <div id="pipeCommands"></div>
+        </div>
+      </div>
+
+      <!-- ===== ANALYTICS ===== -->
+      <div class="panel" id="panel-analytics">
+        <h2 class="panel-title">分析</h2>
+        <p class="panel-desc">ユーザー活動とコンテンツの分析</p>
+
+        <!-- Section A: User Activity -->
+        <div class="card">
+          <h3 class="card-title">ユーザー活動</h3>
+          <div class="stat-grid" id="analyticsUserStats"><div class="stat-card"><div class="stat-val"><span class="spin"></span></div><div class="stat-lbl">読み込み中</div></div></div>
+
+          <h4 style="font-size:.82rem;font-weight:600;margin-bottom:8px">アクティブユーザー</h4>
+          <div id="analyticsActiveUsers" class="loading"><span class="spin"></span> 読み込み中...</div>
+
+          <h4 style="font-size:.82rem;font-weight:600;margin-top:16px;margin-bottom:8px">日別レポート生成数</h4>
+          <div id="analyticsReportsByDate" class="loading"><span class="spin"></span> 読み込み中...</div>
+
+          <h4 style="font-size:.82rem;font-weight:600;margin-top:16px;margin-bottom:8px">日別洞察クエリ数</h4>
+          <div id="analyticsForesightByDate" class="loading"><span class="spin"></span> 読み込み中...</div>
+        </div>
+
+        <!-- Section B: Content Analysis -->
+        <div class="card section-gap">
+          <h3 class="card-title">コンテンツ分析</h3>
+
+          <h4 style="font-size:.82rem;font-weight:600;margin-bottom:8px">カテゴリ別インサイトレポート数</h4>
+          <div id="analyticsIRByCategory" class="loading"><span class="spin"></span> 読み込み中...</div>
+
+          <h4 style="font-size:.82rem;font-weight:600;margin-top:16px;margin-bottom:8px">神話関連分布</h4>
+          <div id="analyticsMythDist"></div>
+
+          <h4 style="font-size:.82rem;font-weight:600;margin-top:16px;margin-bottom:8px">レポート文字数統計</h4>
+          <div id="analyticsCharStats"></div>
+        </div>
+      </div>
+
+      <!-- ===== SETTINGS ===== -->
+      <div class="panel" id="panel-system">
+        <h2 class="panel-title">設定</h2>
+        <div class="card">
+          <h3 class="card-title">GitHub API トークン</h3>
+          <div class="card-sub" style="margin-bottom:8px">フィード設定のGitHub自動保存に必要です（Personal Access Token: repo権限）</div>
+          <div class="form-row">
+            <input type="password" class="inp inp-sm" id="ghToken" placeholder="ghp_..." style="flex:2">
+            <button class="btn btn-p btn-sm" onclick="saveGHToken()">保存</button>
+            <button class="btn btn-s btn-sm" onclick="testGHToken()">テスト</button>
+          </div>
+          <div id="ghTokenStatus" style="font-size:.72rem;color:var(--text-m);margin-top:4px"></div>
+        </div>
+        <div class="card section-gap">
+          <h3 class="card-title">システム情報</h3>
+          <div class="tw" style="margin-top:8px"><table class="dt"><tbody>
+            <tr><td>データ配信元</td><td><code>https://yuyanishimura0312.github.io/future-insight-app/data/</code></td></tr>
+            <tr><td>設定ファイル</td><td><code>future-insight-app/data/feed_config.json</code></td></tr>
+            <tr><td>Cloudflare Worker</td><td><code>future-insight-proxy.yuyanishimura0312.workers.dev</code></td></tr>
+            <tr><td>Firebase Project</td><td><code>miratuku-afa2c</code></td></tr>
+            <tr><td>AI分析モデル</td><td><code>claude-haiku-4-5-20251001</code></td></tr>
+            <tr><td>未来洞察モデル</td><td><code>claude-sonnet-4-20250514</code></td></tr>
+            <tr><td>パイプライン</td><td><code>~/projects/apps/future-insight-app/scripts/</code></td></tr>
+          </tbody></table></div>
+        </div>
+        <div class="card section-gap">
+          <h3 class="card-title">管理パスワード変更</h3>
+          <div class="form-row" style="margin-top:8px"><input type="password" class="inp inp-sm" id="newPw" placeholder="新しいパスワード" style="max-width:300px"><button class="btn btn-p btn-sm" onclick="changePw()">変更</button></div>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -595,6 +685,15 @@
     </div>
   </div>
 
+  <!-- USER CONTENT DETAIL MODAL -->
+  <div class="modal-bg" id="ucDetailModal">
+    <div class="modal" style="max-width:800px;max-height:90vh">
+      <button class="modal-close" onclick="closeUCDetail()">&times;</button>
+      <h3 class="modal-title" id="ucDetailTitle">詳細</h3>
+      <div id="ucDetailContent" style="font-size:.82rem;line-height:1.8;white-space:pre-line"></div>
+    </div>
+  </div>
+
   <!-- FEED MODAL -->
   <div class="modal-bg" id="feedModal">
     <div class="modal">
@@ -645,6 +744,11 @@
     let feedHealthResults = {};
     let dataCache = {};
 
+    // Cached Firestore data for analytics and user content
+    let cachedUserReports = [];
+    let cachedForesightQueries = [];
+    let cachedComments = [];
+
     const PESTLE_COLORS = {Political:'var(--P)',Economic:'var(--E)',Social:'var(--S)',Technological:'var(--T)',Legal:'var(--L)',Environmental:'var(--En)'};
     const PESTLE_JA = {Political:'政治',Economic:'経済',Social:'社会',Technological:'技術',Legal:'法律',Environmental:'環境'};
 
@@ -671,9 +775,11 @@
     async function fetchJSON(f){if(dataCache[f])return dataCache[f];try{const r=await fetch(DATA_BASE+'/'+f+cb());if(!r.ok)return null;const d=await r.json();dataCache[f]=d;return d}catch{return null}}
     function relTime(ds){if(!ds)return'-';const d=new Date(ds);if(isNaN(d))return ds;const diff=Date.now()-d.getTime(),h=Math.floor(diff/3600000);if(h<1)return Math.floor(diff/60000)+'分前';if(h<24)return h+'時間前';return Math.floor(h/24)+'日前'}
     function fmtBytes(b){if(!b)return'-';if(b<1024)return b+' B';if(b<1048576)return(b/1024).toFixed(1)+' KB';return(b/1048576).toFixed(1)+' MB'}
+    function fmtTimestamp(ts){if(!ts)return'-';if(ts.seconds)return new Date(ts.seconds*1000).toLocaleString('ja-JP');return new Date(ts).toLocaleString('ja-JP')}
+    function fmtDate(ts){if(!ts)return'-';if(ts.seconds)return new Date(ts.seconds*1000).toLocaleDateString('ja-JP');return new Date(ts).toLocaleDateString('ja-JP')}
 
     // === INIT ===
-    function init(){loadConfig();loadDashboard();loadFBStats()}
+    function init(){loadConfig();loadDashboard();loadAllFirestoreData()}
 
     // === CONFIG (feed_config.json) ===
     async function loadConfig(){
@@ -681,7 +787,6 @@
       try{
         feedConfig = await fetchJSON('feed_config.json');
         if(!feedConfig){
-          // Create default config from media_sources if no feed_config exists
           feedConfig = {target_per_category:334,tier_boost:{"1":1.0,"2":1.5,"3":2.0},focus_boost:0.3,gdelt_max_per_category:80,feeds:[],pestle_categories:{},updated_at:new Date().toISOString()};
           cs.textContent='設定ファイル未検出';cs.className='badge badge-warn';cs.style.display='';
         } else {
@@ -716,13 +821,12 @@
     window.saveConfig = async function(){
       if(!feedConfig){toast('設定が読み込まれていません','err');return}
       const token=localStorage.getItem('gh_token');
-      if(!token){toast('GitHub APIトークンを設定してください（システムタブ）','err');return}
+      if(!token){toast('GitHub APIトークンを設定してください（設定タブ）','err');return}
 
       feedConfig.updated_at=new Date().toISOString();
       const content=btoa(unescape(encodeURIComponent(JSON.stringify(feedConfig,null,2))));
 
       try{
-        // Get current file SHA
         let sha='';
         try{
           const r=await fetch('https://api.github.com/repos/'+CONFIG_REPO+'/contents/'+CONFIG_PATH,{headers:{'Authorization':'token '+token}});
@@ -766,7 +870,7 @@
     // === DASHBOARD ===
     const DATA_FILES=[
       {name:'latest.json',label:'PESTLEニュース',critical:true},
-      {name:'daily_report.json',label:'日次レポート',critical:true},
+      {name:'insight_reports.json',label:'インサイトレポート',critical:true},
       {name:'ai_analysis.json',label:'AI分析',critical:true},
       {name:'daily_papers.json',label:'学術論文',critical:true},
       {name:'alerts.json',label:'アラート'},
@@ -781,22 +885,34 @@
       document.getElementById('filesBody').innerHTML=results.map(f=>{
         const s=f.ok?'ok':'err',sl=f.ok?'正常':'エラー';
         const mod=f.lastMod?new Date(f.lastMod).toLocaleString('ja-JP'):'-';
-        return '<tr><td><strong>'+esc(f.label)+'</strong><br><code style="font-size:.65rem;color:var(--text-m)">'+esc(f.name)+'</code></td><td><span class="badge badge-'+s+'"><span class="dot dot-'+s+'"></span>'+sl+'</span></td><td>'+mod+'<br><span style="font-size:.65rem;color:var(--text-m)">'+relTime(f.lastMod)+'</span></td><td>'+fmtBytes(f.size)+'</td><td><button class="btn btn-s btn-sm" onclick="window.open(\''+DATA_BASE+'/'+f.name+cb()+'\')">開く</button></td></tr>'
+        return '<tr><td><strong>'+esc(f.label)+'</strong><br><code style="font-size:.65rem;color:var(--text-m)">'+esc(f.name)+'</code></td><td><span class="badge badge-'+s+'"><span class="dot dot-'+s+'"></span>'+sl+'</span></td><td>'+mod+'<br><span style="font-size:.65rem;color:var(--text-m)">'+relTime(f.lastMod)+'</span></td><td>'+fmtBytes(f.size)+'</td><td><button class="btn btn-s btn-sm" onclick="window.open(\''+DATA_BASE+'/'+f.name+cb()+'\')">開く</button></td></tr>';
       }).join('');
 
-      const[latest,report,ai,papers]=await Promise.all([fetchJSON('latest.json'),fetchJSON('daily_report.json'),fetchJSON('ai_analysis.json'),fetchJSON('daily_papers.json')]);
+      const[latest,ai,papers,irJson]=await Promise.all([fetchJSON('latest.json'),fetchJSON('ai_analysis.json'),fetchJSON('daily_papers.json'),fetchJSON('insight_reports.json')]);
       let totalA=0;if(latest?.pestle)Object.values(latest.pestle).forEach(c=>{totalA+=(c.articles||[]).length});
       const sig=ai?.weak_signals?.length||0;
       let pCnt=0;const flds=papers?.fields||papers?.by_field||{};Object.values(flds).forEach(f=>{pCnt+=(Array.isArray(f)?f:f?.papers||[]).length});
-      const rd=report?.generated_at?report.generated_at.split('T')[0]:'-';
       const feedCnt=feedConfig?.feeds?.length||'-';
 
+      // Insight report count
+      const irArr=Array.isArray(irJson)?irJson:(irJson?.reports||[]);
+      const irCount=irArr.length;
+
+      // Latest data date from latest.json
+      let latestDate='-';
+      if(latest?.generated_at)latestDate=latest.generated_at.split('T')[0];
+      else if(latest?.date)latestDate=latest.date;
+
+      // User reports and foresight counts will be populated after Firestore loads
       document.getElementById('dashStats').innerHTML=
         '<div class="stat-card"><div class="stat-val">'+totalA+'</div><div class="stat-lbl">ニュース記事</div></div>'+
         '<div class="stat-card"><div class="stat-val">'+feedCnt+'</div><div class="stat-lbl">登録フィード</div></div>'+
         '<div class="stat-card"><div class="stat-val">'+sig+'</div><div class="stat-lbl">弱いシグナル</div></div>'+
         '<div class="stat-card"><div class="stat-val">'+pCnt+'</div><div class="stat-lbl">学術論文</div></div>'+
-        '<div class="stat-card"><div class="stat-val" style="font-size:1rem">'+rd+'</div><div class="stat-lbl">最終更新日</div></div>';
+        '<div class="stat-card"><div class="stat-val">'+irCount+'</div><div class="stat-lbl">インサイトレポート</div></div>'+
+        '<div class="stat-card" id="dashUserReportsCard"><div class="stat-val"><span class="spin"></span></div><div class="stat-lbl">読者レポート</div></div>'+
+        '<div class="stat-card" id="dashForesightCard"><div class="stat-val"><span class="spin"></span></div><div class="stat-lbl">洞察クエリ</div></div>'+
+        '<div class="stat-card"><div class="stat-val" style="font-size:1rem">'+latestDate+'</div><div class="stat-lbl">最新データ日</div></div>';
 
       // Category summary
       const sum=document.getElementById('catSummary');
@@ -816,6 +932,198 @@
         h+='</div>';sum.innerHTML=h;
       }
     }
+
+    // === LOAD ALL FIRESTORE DATA (for User Content, Analytics, Dashboard) ===
+    async function loadAllFirestoreData(){
+      try{
+        const [reportSnap, foresightSnap, commentSnap] = await Promise.all([
+          db.collection('user_reports').orderBy('createdAt','desc').limit(200).get(),
+          db.collection('foresight_queries').orderBy('createdAt','desc').limit(200).get(),
+          db.collection('news_comments').orderBy('createdAt','desc').limit(100).get()
+        ]);
+
+        cachedUserReports = reportSnap.docs.map(d=>({id:d.id,...d.data()}));
+        cachedForesightQueries = foresightSnap.docs.map(d=>({id:d.id,...d.data()}));
+        cachedComments = commentSnap.docs.map(d=>({id:d.id,...d.data()}));
+
+        // Update dashboard stats
+        const urCard=document.getElementById('dashUserReportsCard');
+        if(urCard)urCard.innerHTML='<div class="stat-val">'+cachedUserReports.length+'</div><div class="stat-lbl">読者レポート</div>';
+        const fqCard=document.getElementById('dashForesightCard');
+        if(fqCard)fqCard.innerHTML='<div class="stat-val">'+cachedForesightQueries.length+'</div><div class="stat-lbl">洞察クエリ</div>';
+
+        // Update UC stats
+        updateUCStats();
+      }catch(e){
+        console.error('Firestore load error:',e);
+      }
+    }
+
+    function updateUCStats(){
+      document.getElementById('ucStats').innerHTML=
+        '<div class="stat-card"><div class="stat-val">'+cachedUserReports.length+'</div><div class="stat-lbl">読者レポート</div></div>'+
+        '<div class="stat-card"><div class="stat-val">'+cachedForesightQueries.length+'</div><div class="stat-lbl">洞察クエリ</div></div>'+
+        '<div class="stat-card"><div class="stat-val">'+cachedComments.length+'</div><div class="stat-lbl">コメント</div></div>';
+    }
+
+    // === USER CONTENT MANAGEMENT ===
+    window.showUCSection = function(section){
+      document.getElementById('ucReportsSection').style.display=section==='reports'?'':'none';
+      document.getElementById('ucForesightSection').style.display=section==='foresight'?'':'none';
+      document.getElementById('ucCommentsSection').style.display=section==='comments'?'':'none';
+
+      if(section==='reports')renderUCReports();
+      else if(section==='foresight')renderUCForesight();
+      else if(section==='comments')renderUCComments();
+    };
+
+    // -- User Reports --
+    window.renderUCReports = function(){
+      const userFilter=document.getElementById('ucReportUserFilter').value;
+      const sort=document.getElementById('ucReportSort').value;
+
+      // Populate user filter
+      const users=new Set();
+      cachedUserReports.forEach(r=>{if(r.userName||r.userId)users.add(r.userName||r.userId)});
+      const sel=document.getElementById('ucReportUserFilter');
+      const curVal=sel.value;
+      sel.innerHTML='<option value="">全ユーザー</option>';
+      users.forEach(u=>{sel.innerHTML+='<option value="'+esc(u)+'">'+esc(u)+'</option>'});
+      sel.value=curVal;
+
+      let filtered=[...cachedUserReports];
+      if(userFilter)filtered=filtered.filter(r=>(r.userName||r.userId||'')==userFilter);
+      if(sort==='user')filtered.sort((a,b)=>(a.userName||a.userId||'').localeCompare(b.userName||b.userId||''));
+
+      if(filtered.length===0){
+        document.getElementById('ucReportsBody').innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--text-m)">データなし</td></tr>';
+        return;
+      }
+
+      document.getElementById('ucReportsBody').innerHTML=filtered.map(r=>{
+        const user=r.userName||r.userId||'-';
+        const title=r.sourceTitle||r.title||r.articleTitle||'-';
+        const date=fmtTimestamp(r.createdAt);
+        const content=r.reportContent||r.content||r.text||'';
+        const preview=content.substring(0,100)+(content.length>100?'...':'');
+        return '<tr>'+
+          '<td>'+esc(user)+'</td>'+
+          '<td style="max-width:200px">'+esc(title)+'</td>'+
+          '<td style="font-size:.68rem">'+date+'</td>'+
+          '<td style="max-width:250px;font-size:.72rem;color:var(--text-s)">'+esc(preview)+'</td>'+
+          '<td>'+
+            '<button class="btn btn-s btn-sm" onclick="viewUCDetail(\'report\',\''+r.id+'\')">全文</button> '+
+            '<button class="btn btn-d btn-sm" onclick="deleteUC(\'user_reports\',\''+r.id+'\')">削除</button>'+
+          '</td></tr>';
+      }).join('');
+    };
+
+    // -- Foresight Queries --
+    window.renderUCForesight = function(){
+      const userFilter=document.getElementById('ucForesightUserFilter').value;
+
+      // Populate user filter
+      const users=new Set();
+      cachedForesightQueries.forEach(r=>{if(r.userName||r.userId)users.add(r.userName||r.userId)});
+      const sel=document.getElementById('ucForesightUserFilter');
+      const curVal=sel.value;
+      sel.innerHTML='<option value="">全ユーザー</option>';
+      users.forEach(u=>{sel.innerHTML+='<option value="'+esc(u)+'">'+esc(u)+'</option>'});
+      sel.value=curVal;
+
+      let filtered=[...cachedForesightQueries];
+      if(userFilter)filtered=filtered.filter(r=>(r.userName||r.userId||'')==userFilter);
+
+      if(filtered.length===0){
+        document.getElementById('ucForesightContent').innerHTML='<p style="color:var(--text-m);font-size:.82rem">データなし</p>';
+        return;
+      }
+
+      document.getElementById('ucForesightContent').innerHTML='<div class="tw"><table class="dt"><thead><tr><th>ユーザー</th><th>質問</th><th>日時</th><th>回答プレビュー</th><th>操作</th></tr></thead><tbody>'+
+        filtered.map(r=>{
+          const user=r.userName||r.userId||'-';
+          const date=fmtTimestamp(r.createdAt);
+          const answer=r.answer||'';
+          const preview=answer.substring(0,80)+(answer.length>80?'...':'');
+          return '<tr>'+
+            '<td>'+esc(user)+'</td>'+
+            '<td style="max-width:250px;font-weight:600;font-size:.78rem">'+esc(r.question||'')+'</td>'+
+            '<td style="font-size:.68rem">'+date+'</td>'+
+            '<td style="max-width:200px;font-size:.72rem;color:var(--text-s)">'+esc(preview)+'</td>'+
+            '<td>'+
+              '<button class="btn btn-s btn-sm" onclick="viewUCDetail(\'foresight\',\''+r.id+'\')">全文</button> '+
+              '<button class="btn btn-d btn-sm" onclick="deleteUC(\'foresight_queries\',\''+r.id+'\')">削除</button>'+
+            '</td></tr>';
+        }).join('')+'</tbody></table></div>';
+    };
+
+    // -- Comments --
+    window.renderUCComments = function(){
+      if(cachedComments.length===0){
+        document.getElementById('ucCommentsContent').innerHTML='<p style="color:var(--text-m);font-size:.82rem">データなし</p>';
+        return;
+      }
+
+      document.getElementById('ucCommentsContent').innerHTML='<div class="tw"><table class="dt"><thead><tr><th>ユーザー</th><th>記事</th><th>コメント</th><th>日時</th><th>操作</th></tr></thead><tbody>'+
+        cachedComments.map(r=>{
+          const user=r.userName||r.userId||'-';
+          const date=fmtTimestamp(r.createdAt);
+          const articleRef=r.articleTitle||r.articleId||'-';
+          return '<tr>'+
+            '<td>'+esc(user)+'</td>'+
+            '<td style="font-size:.68rem;max-width:150px;overflow:hidden;text-overflow:ellipsis">'+esc(articleRef)+'</td>'+
+            '<td style="max-width:250px">'+esc(r.text||r.content||'')+'</td>'+
+            '<td style="font-size:.68rem">'+date+'</td>'+
+            '<td><button class="btn btn-d btn-sm" onclick="deleteUC(\'news_comments\',\''+r.id+'\')">削除</button></td>'+
+          '</tr>';
+        }).join('')+'</tbody></table></div>';
+    };
+
+    // View detail modal
+    window.viewUCDetail = function(type,id){
+      let item;
+      if(type==='report')item=cachedUserReports.find(r=>r.id===id);
+      else item=cachedForesightQueries.find(r=>r.id===id);
+      if(!item)return;
+
+      let title,content;
+      if(type==='report'){
+        title='読者レポート: '+(item.sourceTitle||item.title||'(無題)');
+        content='ユーザー: '+(item.userName||item.userId||'-')+'\n'+
+                '生成日: '+fmtTimestamp(item.createdAt)+'\n'+
+                'ソース: '+(item.sourceTitle||item.title||'-')+'\n\n'+
+                '--- レポート内容 ---\n\n'+
+                (item.reportContent||item.content||item.text||'(内容なし)');
+      }else{
+        title='洞察クエリ: '+(item.question||'(無題)');
+        content='ユーザー: '+(item.userName||item.userId||'-')+'\n'+
+                '日時: '+fmtTimestamp(item.createdAt)+'\n\n'+
+                '--- 質問 ---\n'+
+                (item.question||'')+'\n\n'+
+                '--- 回答 ---\n\n'+
+                (item.answer||'(回答なし)');
+      }
+
+      document.getElementById('ucDetailTitle').textContent=title;
+      document.getElementById('ucDetailContent').textContent=content;
+      document.getElementById('ucDetailModal').classList.add('show');
+    };
+
+    window.closeUCDetail = function(){document.getElementById('ucDetailModal').classList.remove('show')};
+
+    // Delete from Firestore
+    window.deleteUC = async function(col,id){
+      if(!confirm('削除しますか？'))return;
+      try{
+        await db.collection(col).doc(id).delete();
+        toast('削除完了','ok');
+        // Refresh data
+        if(col==='user_reports'){cachedUserReports=cachedUserReports.filter(r=>r.id!==id);renderUCReports();}
+        else if(col==='foresight_queries'){cachedForesightQueries=cachedForesightQueries.filter(r=>r.id!==id);renderUCForesight();}
+        else if(col==='news_comments'){cachedComments=cachedComments.filter(r=>r.id!==id);renderUCComments();}
+        updateUCStats();
+      }catch(e){toast('削除失敗','err')}
+    };
 
     // === FEED MANAGEMENT ===
     window.renderFeeds = function(){
@@ -937,7 +1245,6 @@
       if(!url){res.textContent='URLを入力してください';res.style.color='var(--red)';return}
       res.innerHTML='<span class="spin" style="width:14px;height:14px"></span> テスト中...';res.style.color='var(--text-m)';
       try{
-        // Use a CORS proxy or direct fetch (RSS feeds usually allow CORS)
         const r=await fetch(url,{mode:'no-cors'});
         res.textContent='接続OK（CORSのためコンテンツ確認不可ですが、URLは到達可能です）';res.style.color='var(--green)';
       }catch(e){
@@ -953,7 +1260,6 @@
       feedConfig.feeds.forEach((_,i)=>{feedHealthResults[i]='checking'});
       renderFeeds();
 
-      // Check feeds in batches of 5
       for(let i=0;i<feedConfig.feeds.length;i+=5){
         const batch=feedConfig.feeds.slice(i,i+5).map((f,bi)=>{
           const idx=i+bi;
@@ -967,11 +1273,11 @@
       toast('ヘルスチェック完了: '+ok+'件OK / '+err+'件エラー',err>0?'err':'ok');
     };
 
-    // === PESTLE SETTINGS ===
+    // === PESTLE SETTINGS (merged into Feeds tab) ===
     function renderPESTLE(){
-      if(!feedConfig?.pestle_categories){document.getElementById('pestleCards').innerHTML='<p style="color:var(--text-m);font-size:.82rem">PESTLE設定が読み込まれていません。</p>';return}
+      if(!feedConfig?.pestle_categories){document.getElementById('pestleCards').innerHTML='<h3 class="card-title" style="margin-bottom:8px">PESTLEカテゴリ設定</h3><p style="color:var(--text-m);font-size:.82rem">PESTLE設定が読み込まれていません。</p>';return}
       const cats=feedConfig.pestle_categories;
-      let html='';
+      let html='<h3 class="card-title" style="margin-bottom:8px">PESTLEカテゴリ設定</h3>';
       Object.entries(cats).forEach(([key,cat])=>{
         const clr=PESTLE_COLORS[key]||'var(--accent)';
         const kwCount=(cat.keywords||[]).length;
@@ -1013,47 +1319,199 @@
       toast(newKws.length+'件のキーワードを追加','ok');
     };
 
-    // === FIREBASE ===
-    async function loadFBStats(){
-      try{
-        const[c,b,f]=await Promise.all([db.collection('news_comments').get().then(s=>s.size).catch(()=>0),db.collection('news_bookmarks').get().then(s=>s.size).catch(()=>0),db.collection('foresight_queries').get().then(s=>s.size).catch(()=>0)]);
-        document.getElementById('fbStats').innerHTML='<div class="stat-card"><div class="stat-val">'+c+'</div><div class="stat-lbl">コメント</div></div><div class="stat-card"><div class="stat-val">'+b+'</div><div class="stat-lbl">ブックマーク</div></div><div class="stat-card"><div class="stat-val">'+f+'</div><div class="stat-lbl">洞察クエリ</div></div>';
-      }catch(e){console.error(e)}
+    // === PIPELINE TAB ===
+    const PIPELINE_STEPS = [
+      {name:'ニュース収集',desc:'RSSフィード + GDELT APIからPESTLEニュース収集',script:'collect_news.py',file:'latest.json',freq:'毎日'},
+      {name:'AI分析',desc:'翻訳 + CLA分析 + 弱いシグナル検出',script:'ai_analyze.py',file:'ai_analysis.json',freq:'毎日'},
+      {name:'論文キュレーション',desc:'5分野の論文を選定・翻訳・新規性スコア',script:'curate_daily_papers.py',file:'daily_papers.json',freq:'毎日'},
+      {name:'インサイトレポート生成',desc:'月次インサイトレポートの自動生成',script:'generate_insight_reports.py',file:'insight_reports.json',freq:'月次'},
+      {name:'アラート検出',desc:'異常・新出現トピック検出',script:'detect_alerts.py',file:'alerts.json',freq:'毎日'},
+      {name:'歴史データ収集',desc:'1990-2025年の歴史的データ収集',script:'collect_historical_daily.py',file:'scenarios.json',freq:'毎日'},
+      {name:'履歴更新',desc:'データ履歴のインクリメンタル更新',script:'update_history.py',file:null,freq:'毎日'},
+    ];
+
+    const PIPE_COMMANDS = [
+      {label:'全パイプライン実行',cmd:'cd ~/projects/apps/future-insight-app && bash scripts/daily_update.sh'},
+      {label:'ニュース収集のみ',cmd:'cd ~/projects/apps/future-insight-app && ~/.venv/bin/python scripts/collect_news.py'},
+      {label:'AI分析のみ',cmd:'cd ~/projects/apps/future-insight-app && ~/.venv/bin/python scripts/ai_analyze.py'},
+      {label:'論文キュレーションのみ',cmd:'cd ~/projects/apps/future-insight-app && ~/.venv/bin/python scripts/curate_daily_papers.py'},
+      {label:'インサイトレポート生成のみ',cmd:'cd ~/projects/apps/future-insight-app && ~/.venv/bin/python scripts/generate_insight_reports.py'},
+      {label:'デプロイのみ',cmd:'cd ~/projects/apps/future-insight-app && git add data/ && git commit -m "chore: manual update $(date +%Y-%m-%d)" && git push'},
+    ];
+
+    async function loadPipeline(){
+      // Render pipeline steps with data file status
+      const fileResults=await Promise.all(PIPELINE_STEPS.map(async step=>{
+        if(!step.file)return{...step,ok:null};
+        try{
+          const r=await fetch(DATA_BASE+'/'+step.file+cb(),{method:'HEAD'});
+          return{...step,ok:r.ok,lastMod:r.headers.get('last-modified'),size:parseInt(r.headers.get('content-length')||'0')};
+        }catch{return{...step,ok:false}}
+      }));
+
+      // Pipeline steps
+      document.getElementById('pipelineSteps').innerHTML=fileResults.map((s,i)=>{
+        const statusBadge=s.ok===null?'<span class="badge badge-info">対象外</span>':(s.ok?'<span class="badge badge-ok"><span class="dot dot-ok"></span>正常</span>':'<span class="badge badge-err"><span class="dot dot-err"></span>エラー</span>');
+        const lastMod=s.lastMod?relTime(s.lastMod):'-';
+        return '<div class="pipe-step">'+
+          '<div class="pipe-num">'+(i+1)+'</div>'+
+          '<div class="pipe-info">'+
+            '<div class="pipe-name">'+esc(s.name)+'</div>'+
+            '<div class="pipe-desc">'+esc(s.desc)+'</div>'+
+            '<div style="font-size:.65rem;color:var(--text-m);margin-top:2px"><code>'+esc(s.script)+'</code> | 頻度: '+esc(s.freq)+'</div>'+
+          '</div>'+
+          '<div class="pipe-meta">'+
+            statusBadge+'<br>'+
+            '<span style="font-size:.65rem">'+lastMod+'</span>'+
+          '</div>'+
+        '</div>';
+      }).join('');
+
+      // Data files table (all files)
+      const allFiles=[...DATA_FILES];
+      const allResults=await Promise.all(allFiles.map(async f=>{try{const r=await fetch(DATA_BASE+'/'+f.name+cb(),{method:'HEAD'});return{...f,ok:r.ok,lastMod:r.headers.get('last-modified'),size:parseInt(r.headers.get('content-length')||'0')}}catch{return{...f,ok:false}}}));
+
+      document.getElementById('pipeFilesBody').innerHTML=allResults.map(f=>{
+        const s=f.ok?'ok':'err',sl=f.ok?'正常':'エラー';
+        const mod=f.lastMod?new Date(f.lastMod).toLocaleString('ja-JP'):'-';
+        return '<tr><td><strong>'+esc(f.label)+'</strong><br><code style="font-size:.65rem;color:var(--text-m)">'+esc(f.name)+'</code></td><td><span class="badge badge-'+s+'"><span class="dot dot-'+s+'"></span>'+sl+'</span></td><td>'+mod+'<br><span style="font-size:.65rem;color:var(--text-m)">'+relTime(f.lastMod)+'</span></td><td>'+fmtBytes(f.size)+'</td><td><button class="btn btn-s btn-sm" onclick="window.open(\''+DATA_BASE+'/'+f.name+cb()+'\')">開く</button></td></tr>';
+      }).join('');
+
+      // Commands
+      document.getElementById('pipeCommands').innerHTML=PIPE_COMMANDS.map(c=>{
+        return '<div style="margin-bottom:12px"><div class="form-label">'+esc(c.label)+'</div><div class="code">'+esc(c.cmd)+'</div></div>';
+      }).join('');
     }
 
-    window.showFB = async function(section){
-      const c=document.getElementById('fbContent');
-      c.innerHTML='<div class="loading"><span class="spin"></span> 読み込み中...</div>';
-      try{
-        if(section==='comments'){
-          const snap=await db.collection('news_comments').orderBy('createdAt','desc').limit(50).get();
-          if(snap.empty){c.innerHTML='<p style="color:var(--text-m);font-size:.82rem">データなし</p>';return}
-          c.innerHTML='<div class="tw"><table class="dt"><thead><tr><th>ユーザー</th><th>記事ID</th><th>コメント</th><th>日時</th><th></th></tr></thead><tbody>'+snap.docs.map(d=>{const v=d.data();const t=v.createdAt?new Date(v.createdAt.seconds*1000).toLocaleString('ja-JP'):'-';return'<tr><td>'+esc(v.userName||v.userId||'-')+'</td><td style="font-size:.68rem;max-width:100px;overflow:hidden;text-overflow:ellipsis">'+esc(v.articleId||'')+'</td><td style="max-width:250px">'+esc(v.text||v.content||'')+'</td><td style="font-size:.68rem">'+t+'</td><td><button class="btn btn-d btn-sm" onclick="delFB(\'news_comments\',\''+d.id+'\')">削除</button></td></tr>'}).join('')+'</tbody></table></div>';
-        }else if(section==='bookmarks'){
-          const snap=await db.collection('news_bookmarks').orderBy('createdAt','desc').limit(50).get();
-          if(snap.empty){c.innerHTML='<p style="color:var(--text-m);font-size:.82rem">データなし</p>';return}
-          c.innerHTML='<div class="tw"><table class="dt"><thead><tr><th>ユーザー</th><th>タイトル</th><th>カテゴリ</th><th>日時</th><th></th></tr></thead><tbody>'+snap.docs.map(d=>{const v=d.data();const t=v.createdAt?new Date(v.createdAt.seconds*1000).toLocaleString('ja-JP'):'-';return'<tr><td style="font-size:.68rem">'+esc(v.userId||'-')+'</td><td>'+esc(v.title||'-')+'</td><td>'+esc(v.category||v.articleType||'-')+'</td><td style="font-size:.68rem">'+t+'</td><td><button class="btn btn-d btn-sm" onclick="delFB(\'news_bookmarks\',\''+d.id+'\')">削除</button></td></tr>'}).join('')+'</tbody></table></div>';
-        }else{
-          const snap=await db.collection('foresight_queries').orderBy('createdAt','desc').limit(30).get();
-          if(snap.empty){c.innerHTML='<p style="color:var(--text-m);font-size:.82rem">データなし</p>';return}
-          c.innerHTML=snap.docs.map(d=>{const v=d.data();const t=v.createdAt?new Date(v.createdAt.seconds*1000).toLocaleString('ja-JP'):'-';return'<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><span style="font-size:.68rem;color:var(--text-m)">'+esc(v.userId||'-')+' / '+t+'</span><button class="btn btn-d btn-sm" onclick="delFB(\'foresight_queries\',\''+d.id+'\')">削除</button></div><div style="font-weight:600;font-size:.82rem;margin-bottom:4px">'+esc(v.question||'')+'</div><details><summary style="font-size:.75rem;color:var(--accent);cursor:pointer">回答を表示</summary><div style="font-size:.75rem;color:var(--text-s);margin-top:4px;white-space:pre-line">'+esc(v.answer||'')+'</div></details></div>'}).join('');
-        }
-      }catch(e){c.innerHTML='<p style="color:var(--red);font-size:.82rem">エラー: '+esc(e.message)+'</p>'}
-    };
+    // === ANALYTICS TAB ===
+    async function loadAnalytics(){
+      // User activity stats
+      const totalReports=cachedUserReports.length;
+      const totalForesight=cachedForesightQueries.length;
+      const totalComments=cachedComments.length;
 
-    window.delFB = async function(col,id){
-      if(!confirm('削除しますか？'))return;
-      try{await db.collection(col).doc(id).delete();toast('削除完了','ok');const m={'news_comments':'comments','news_bookmarks':'bookmarks','foresight_queries':'foresight'};showFB(m[col]);loadFBStats()}catch(e){toast('削除失敗','err')}
-    };
+      document.getElementById('analyticsUserStats').innerHTML=
+        '<div class="stat-card"><div class="stat-val">'+totalReports+'</div><div class="stat-lbl">読者レポート総数</div></div>'+
+        '<div class="stat-card"><div class="stat-val">'+totalForesight+'</div><div class="stat-lbl">洞察クエリ総数</div></div>'+
+        '<div class="stat-card"><div class="stat-val">'+totalComments+'</div><div class="stat-lbl">コメント総数</div></div>';
+
+      // Active users
+      const userActivity={};
+      cachedUserReports.forEach(r=>{const u=r.userName||r.userId||'anonymous';userActivity[u]=(userActivity[u]||0)+1});
+      cachedForesightQueries.forEach(r=>{const u=r.userName||r.userId||'anonymous';userActivity[u]=(userActivity[u]||0)+1});
+      const sortedUsers=Object.entries(userActivity).sort((a,b)=>b[1]-a[1]).slice(0,10);
+      const maxActivity=sortedUsers.length>0?sortedUsers[0][1]:1;
+
+      if(sortedUsers.length===0){
+        document.getElementById('analyticsActiveUsers').innerHTML='<p style="color:var(--text-m);font-size:.82rem">データなし</p>';
+      }else{
+        document.getElementById('analyticsActiveUsers').innerHTML='<div class="bar-chart">'+sortedUsers.map(([user,count])=>{
+          const pct=Math.round(count/maxActivity*100);
+          return '<div class="bar-row">'+
+            '<div class="bar-label">'+esc(user)+'</div>'+
+            '<div class="bar-track"><div class="bar-fill" style="width:'+pct+'%;background:var(--accent)"></div></div>'+
+            '<div class="bar-val">'+count+'</div>'+
+          '</div>';
+        }).join('')+'</div>';
+      }
+
+      // Reports by date
+      const reportsByDate={};
+      cachedUserReports.forEach(r=>{const d=fmtDate(r.createdAt);if(d!=='-'){reportsByDate[d]=(reportsByDate[d]||0)+1}});
+      const sortedRDates=Object.entries(reportsByDate).sort((a,b)=>b[0].localeCompare(a[0])).slice(0,14);
+      const maxRByDate=sortedRDates.length>0?Math.max(...sortedRDates.map(e=>e[1])):1;
+
+      if(sortedRDates.length===0){
+        document.getElementById('analyticsReportsByDate').innerHTML='<p style="color:var(--text-m);font-size:.82rem">データなし</p>';
+      }else{
+        document.getElementById('analyticsReportsByDate').innerHTML='<div class="bar-chart">'+sortedRDates.map(([date,count])=>{
+          const pct=Math.round(count/maxRByDate*100);
+          return '<div class="bar-row">'+
+            '<div class="bar-label">'+esc(date)+'</div>'+
+            '<div class="bar-track"><div class="bar-fill" style="width:'+pct+'%;background:var(--T)"></div></div>'+
+            '<div class="bar-val">'+count+'</div>'+
+          '</div>';
+        }).join('')+'</div>';
+      }
+
+      // Foresight by date
+      const foresightByDate={};
+      cachedForesightQueries.forEach(r=>{const d=fmtDate(r.createdAt);if(d!=='-'){foresightByDate[d]=(foresightByDate[d]||0)+1}});
+      const sortedFDates=Object.entries(foresightByDate).sort((a,b)=>b[0].localeCompare(a[0])).slice(0,14);
+      const maxFByDate=sortedFDates.length>0?Math.max(...sortedFDates.map(e=>e[1])):1;
+
+      if(sortedFDates.length===0){
+        document.getElementById('analyticsForesightByDate').innerHTML='<p style="color:var(--text-m);font-size:.82rem">データなし</p>';
+      }else{
+        document.getElementById('analyticsForesightByDate').innerHTML='<div class="bar-chart">'+sortedFDates.map(([date,count])=>{
+          const pct=Math.round(count/maxFByDate*100);
+          return '<div class="bar-row">'+
+            '<div class="bar-label">'+esc(date)+'</div>'+
+            '<div class="bar-track"><div class="bar-fill" style="width:'+pct+'%;background:var(--S)"></div></div>'+
+            '<div class="bar-val">'+count+'</div>'+
+          '</div>';
+        }).join('')+'</div>';
+      }
+
+      // Content analysis: IR by category
+      const irJson=await fetchJSON('insight_reports.json');
+      const irArr=Array.isArray(irJson)?irJson:(irJson?.reports||[]);
+
+      const irByCat={};
+      irArr.forEach(r=>{const cat=r.category||'不明';irByCat[cat]=(irByCat[cat]||0)+1});
+      const sortedCats=Object.entries(irByCat).sort((a,b)=>b[1]-a[1]);
+      const maxCat=sortedCats.length>0?Math.max(...sortedCats.map(e=>e[1])):1;
+
+      if(sortedCats.length===0){
+        document.getElementById('analyticsIRByCategory').innerHTML='<p style="color:var(--text-m);font-size:.82rem">データなし</p>';
+      }else{
+        document.getElementById('analyticsIRByCategory').innerHTML='<div class="bar-chart">'+sortedCats.map(([cat,count])=>{
+          const pct=Math.round(count/maxCat*100);
+          const clr=PESTLE_COLORS[cat]||'var(--accent)';
+          return '<div class="bar-row">'+
+            '<div class="bar-label"><span class="pestle-dot" style="background:'+clr+'"></span>'+esc(PESTLE_JA[cat]||cat)+'</div>'+
+            '<div class="bar-track"><div class="bar-fill" style="width:'+pct+'%;background:'+clr+'"></div></div>'+
+            '<div class="bar-val">'+count+'</div>'+
+          '</div>';
+        }).join('')+'</div>';
+      }
+
+      // Myth relation distribution
+      let strengthens=0,changes=0,other=0;
+      irArr.forEach(r=>{
+        if(r.myth_relation==='strengthens')strengthens++;
+        else if(r.myth_relation==='changes')changes++;
+        else other++;
+      });
+      const totalMyth=strengthens+changes+other;
+      document.getElementById('analyticsMythDist').innerHTML=
+        '<div style="display:flex;gap:16px;flex-wrap:wrap">'+
+          '<div class="stat-card" style="flex:1;min-width:120px"><div class="stat-val" style="color:var(--green)">'+strengthens+'</div><div class="stat-lbl">強化 (strengthens)</div><div class="card-sub">'+(totalMyth>0?Math.round(strengthens/totalMyth*100):0)+'%</div></div>'+
+          '<div class="stat-card" style="flex:1;min-width:120px"><div class="stat-val" style="color:var(--yellow)">'+changes+'</div><div class="stat-lbl">変化 (changes)</div><div class="card-sub">'+(totalMyth>0?Math.round(changes/totalMyth*100):0)+'%</div></div>'+
+          '<div class="stat-card" style="flex:1;min-width:120px"><div class="stat-val" style="color:var(--text-m)">'+other+'</div><div class="stat-lbl">その他/未設定</div><div class="card-sub">'+(totalMyth>0?Math.round(other/totalMyth*100):0)+'%</div></div>'+
+        '</div>';
+
+      // Average report length
+      const lengths=irArr.map(r=>(r.full_report||r.body||r.content||'').length).filter(l=>l>0);
+      const avgLen=lengths.length>0?Math.round(lengths.reduce((a,b)=>a+b,0)/lengths.length):0;
+      const maxLen=lengths.length>0?Math.max(...lengths):0;
+      const minLen=lengths.length>0?Math.min(...lengths):0;
+      document.getElementById('analyticsCharStats').innerHTML=
+        '<div style="display:flex;gap:16px;flex-wrap:wrap">'+
+          '<div class="stat-card" style="flex:1;min-width:120px"><div class="stat-val">'+avgLen+'</div><div class="stat-lbl">平均文字数</div></div>'+
+          '<div class="stat-card" style="flex:1;min-width:120px"><div class="stat-val">'+maxLen+'</div><div class="stat-lbl">最大文字数</div></div>'+
+          '<div class="stat-card" style="flex:1;min-width:120px"><div class="stat-val">'+minLen+'</div><div class="stat-lbl">最小文字数</div></div>'+
+          '<div class="stat-card" style="flex:1;min-width:120px"><div class="stat-val">'+lengths.length+'</div><div class="stat-lbl">レポート本数</div></div>'+
+        '</div>';
+    }
 
     // === INSIGHT REPORTS ===
-    let irData = [];       // Original data from JSON
-    let irEdits = {};      // Firestore edits overlay
-    let irStatuses = {};   // Firestore status overlay
+    let irData = [];
+    let irEdits = {};
+    let irStatuses = {};
     let irEditingId = null;
     let irTimelineEntries = [];
 
-    // Category color map for insight reports
     const IR_CAT_COLORS = {
       'Political':'var(--P)','Economic':'var(--E)','Social':'var(--S)',
       'Technological':'var(--T)','Legal':'var(--L)','Environmental':'var(--En)',
@@ -1078,7 +1536,6 @@
       }catch(e){console.error('IR config load error:',e)}
     }
 
-    // Save insight report config to Firestore
     window.saveIRConfig = async function(){
       try{
         await db.collection('insight_report_config').doc('default').set({
@@ -1105,7 +1562,6 @@
       article_count: 10
     };
 
-    // Map field keys to element IDs
     const AR_FIELDS = {
       summary_rule: 'arSummaryRule',
       timeline_rule: 'arTimelineRule',
@@ -1116,7 +1572,6 @@
       article_count: 'arArticleCount'
     };
 
-    // Populate article rules fields from a data object
     function populateArticleRules(data) {
       for (const [key, elId] of Object.entries(AR_FIELDS)) {
         const el = document.getElementById(elId);
@@ -1124,14 +1579,12 @@
       }
     }
 
-    // Load article rules from Firestore
     async function loadArticleRules() {
       try {
         const doc = await db.collection('insight_report_config').doc('article_rules').get();
         if (doc.exists) {
           populateArticleRules(doc.data());
         } else {
-          // No saved rules yet — use defaults
           populateArticleRules(ARTICLE_RULES_DEFAULTS);
         }
       } catch(e) {
@@ -1140,7 +1593,6 @@
       }
     }
 
-    // Save article rules to Firestore
     window.saveArticleRules = async function() {
       try {
         const data = { updated_at: firebase.firestore.FieldValue.serverTimestamp() };
@@ -1155,7 +1607,6 @@
       }
     };
 
-    // Reset article rules to defaults
     window.resetArticleRules = function() {
       populateArticleRules(ARTICLE_RULES_DEFAULTS);
       toast('デフォルト値に戻しました（保存はまだされていません）', 'warn');
@@ -1164,21 +1615,17 @@
     // Load insight reports data + Firestore overlays
     async function loadIRData(){
       try{
-        // Load JSON data
         const data=await fetchJSON('insight_reports.json');
         irData=Array.isArray(data)?data:(data?.reports||[]);
 
-        // Load Firestore status overlays
         const statusSnap=await db.collection('insight_report_status').get();
         irStatuses={};
         statusSnap.forEach(doc=>{irStatuses[doc.id]=doc.data()});
 
-        // Load Firestore edit overlays
         const editSnap=await db.collection('insight_report_edits').get();
         irEdits={};
         editSnap.forEach(doc=>{irEdits[doc.id]=doc.data()});
 
-        // Populate category filter
         const cats=new Set();
         irData.forEach(r=>{if(r.category)cats.add(r.category)});
         const catSel=document.getElementById('irFilterCat');
@@ -1195,7 +1642,6 @@
       }
     }
 
-    // Get merged report (original + edits)
     function getMergedIR(report,idx){
       const date=report.date||report.generated_date||'';
       const id=report.id||idx;
@@ -1213,7 +1659,6 @@
       };
     }
 
-    // Render stats
     function renderIRStats(){
       const merged=irData.map((r,i)=>getMergedIR(r,i)).filter(r=>!r._deleted);
       const total=merged.length;
@@ -1224,7 +1669,6 @@
       },0);
       const avgChars=total>0?Math.round(totalChars/total):0;
 
-      // Find last generated date
       let lastGen='-';
       if(irData.length>0){
         const dates=irData.map(r=>r.date||r.generated_date||r.generated_at||'').filter(d=>d).sort().reverse();
@@ -1238,7 +1682,6 @@
         '<div class="stat-card"><div class="stat-val">'+avgChars+'</div><div class="stat-lbl">平均文字数</div></div>';
     }
 
-    // Render reports table
     window.renderIR = function(){
       const cat=document.getElementById('irFilterCat').value;
       const myth=document.getElementById('irFilterMyth').value;
@@ -1247,13 +1690,11 @@
 
       let rows=irData.map((r,i)=>getMergedIR(r,i)).filter(r=>!r._deleted);
 
-      // Filter
       if(cat)rows=rows.filter(r=>(r.category||'')==cat);
       if(myth)rows=rows.filter(r=>(r.myth_relation||'')==myth);
       if(statusF==='published')rows=rows.filter(r=>r._published);
       if(statusF==='unpublished')rows=rows.filter(r=>!r._published);
 
-      // Sort
       if(sort==='category')rows.sort((a,b)=>(a.category||'').localeCompare(b.category||''));
       else if(sort==='chars'){
         rows.sort((a,b)=>{
@@ -1299,14 +1740,12 @@
       }).join('');
     };
 
-    // Toggle preview row
     window.toggleIRPreview = function(idx,event){
       if(event.target.closest('button,input,label,.toggle'))return;
       const row=document.getElementById('ir-prev-'+idx);
       if(row)row.classList.toggle('show');
     };
 
-    // Toggle publish status
     window.toggleIRStatus = async function(key,published){
       try{
         await db.collection('insight_report_status').doc(key).set({published:published},{merge:true});
@@ -1317,7 +1756,6 @@
       }catch(e){toast('ステータス更新失敗: '+e.message,'err')}
     };
 
-    // Mark for regeneration
     window.regenerateIR = async function(key){
       if(!confirm('このレポートを再生成対象としてマークしますか?'))return;
       try{
@@ -1328,7 +1766,6 @@
       }catch(e){toast('更新失敗: '+e.message,'err')}
     };
 
-    // Soft delete
     window.deleteIR = async function(key){
       if(!confirm('このレポートを削除しますか?'))return;
       try{
@@ -1340,7 +1777,6 @@
       }catch(e){toast('削除失敗: '+e.message,'err')}
     };
 
-    // Open edit modal
     window.openIREdit = function(idx){
       const report=getMergedIR(irData[idx],idx);
       irEditingId=report._key;
@@ -1358,7 +1794,6 @@
       document.getElementById('irEdMyth').value=report.related_myth||report.myth||'';
       document.getElementById('irEdMythRel').value=report.myth_relation||'strengthens';
 
-      // Timeline
       irTimelineEntries=Array.isArray(report.timeline)?[...report.timeline]:[];
       renderIRTimeline();
 
@@ -1371,7 +1806,6 @@
       irEditingId=null;
     };
 
-    // Timeline management
     function renderIRTimeline(){
       const c=document.getElementById('irEdTimeline');
       if(irTimelineEntries.length===0){c.innerHTML='<div style="font-size:.72rem;color:var(--text-m);padding:4px">エントリなし</div>';return}
@@ -1411,7 +1845,6 @@
       renderIRTimeline();
     };
 
-    // Save edit to Firestore
     window.saveIREdit = async function(){
       if(!irEditingId){toast('編集対象が選択されていません','err');return}
 
@@ -1443,7 +1876,6 @@
       }catch(e){toast('保存失敗: '+e.message,'err')}
     };
 
-    // Preview
     window.previewIREdit = function(){
       const prev=document.getElementById('irPreview');
       if(prev.style.display==='block'){prev.style.display='none';return}
@@ -1475,10 +1907,18 @@
       prev.style.display='block';
     };
 
-    // Initialize IR tab on tab switch
+    // === TAB LAZY LOADING ===
     let irLoaded=false;
+    let ucLoaded=false;
+    let pipeLoaded=false;
+    let analyticsLoaded=false;
+
     document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',function(){
-      if(this.dataset.tab==='insight'&&!irLoaded){irLoaded=true;loadIRConfig();loadArticleRules();loadIRData()}
+      const tab=this.dataset.tab;
+      if(tab==='insight'&&!irLoaded){irLoaded=true;loadIRConfig();loadArticleRules();loadIRData()}
+      if(tab==='usercontent'&&!ucLoaded){ucLoaded=true;renderUCReports()}
+      if(tab==='pipeline'&&!pipeLoaded){pipeLoaded=true;loadPipeline()}
+      if(tab==='analytics'&&!analyticsLoaded){analyticsLoaded=true;loadAnalytics()}
     }));
 
   })();
