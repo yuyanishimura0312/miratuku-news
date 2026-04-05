@@ -1684,7 +1684,8 @@
     async function loadIRData(){
       try{
         const data=await fetchJSON('insight_reports.json');
-        irData=Array.isArray(data)?data:(data?.reports||[]);
+        const topDate=data?.date||data?.generated_at||'';
+        irData=(Array.isArray(data)?data:(data?.reports||[])).map(r=>({...r,date:r.date||r.generated_date||topDate}));
 
         const statusSnap=await db.collection('insight_report_status').get();
         irStatuses={};
