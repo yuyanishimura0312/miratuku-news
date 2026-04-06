@@ -1887,11 +1887,11 @@
         <span class="section-subtitle">Causal Layered Analysis</span>
       </div>
 
-      <div id="claContent">
+      <div id="claMetaContent"></div>
+
+      <div id="claContent" style="margin-top:1.5rem">
         <div class="loading-indicator"><div class="loading-spinner"></div><div>CLA分析を読み込み中...</div></div>
       </div>
-
-      <div id="claMetaContent" style="margin-top:1.5rem"></div>
 
       <div id="claArchive" style="margin-top:1.5rem">
         <h2 class="section-title">CLA 変遷アーカイブ（1990-2026）</h2>
@@ -2748,8 +2748,12 @@
       const cla = aiData.cla;
       const catKeys = Object.keys(cla);
 
-      // Render as PESTLE-style card grid — one card per category
-      let html = '<h2 class="section-title">最新CLA分析</h2>';
+      // Render as collapsible PESTLE-style card grid
+      let html = '<details class="report-card"><summary class="report-summary">' +
+        '<span class="report-chevron">&#9654;</span>' +
+        '<span class="report-label">最新CLA分析</span>' +
+        '<span class="report-count">' + catKeys.length + '分野</span>' +
+        '</summary><div class="report-body">';
       html += '<div class="pestle-grid">';
 
       catKeys.forEach(catKey => {
@@ -2780,7 +2784,7 @@
         html += '</div></div>';
       });
 
-      html += '</div>';
+      html += '</div></div></details>';
       container.innerHTML = html;
       loadCLAArchive();
     }
