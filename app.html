@@ -3023,6 +3023,57 @@
       });
     };
 
+    // CLA Firestore import — callable from console or admin: importCLAToFirestore()
+    window.importCLAToFirestore = async function() {
+      console.log('CLA Firestore import started...');
+      const v = Date.now();
+      const [yearlyRes, quarterlyRes, metaRes] = await Promise.all([
+        fetch(DATA_BASE + '/cla_historical_yearly.json?v=' + v),
+        fetch(DATA_BASE + '/cla_historical_quarterly.json?v=' + v),
+        fetch(DATA_BASE + '/cla_meta_report.json?v=' + v),
+      ]);
+      const yearlyRaw = yearlyRes.ok ? await yearlyRes.json() : [];
+      const quarterlyRaw = quarterlyRes.ok ? await quarterlyRes.json() : [];
+      const meta = metaRes.ok ? await metaRes.json() : null;
+      const yearly = Array.isArray(yearlyRaw) ? yearlyRaw : (yearlyRaw.entries || []);
+      const quarterly = Array.isArray(quarterlyRaw) ? quarterlyRaw : (quarterlyRaw.entries || []);
+      console.log('Fetched: ' + yearly.length + ' yearly, ' + quarterly.length + ' quarterly');
+
+      let batch = db.batch();
+      let count = 0;
+      for (const entry of [...yearly, ...quarterly]) {
+        if (!entry.period) continue;
+        const ref = db.collection('cla_historical').doc(entry.period);
+        const type = entry.type || (entry.period.includes('-') || entry.period.includes('Q') ? 'quarterly' : 'yearly');
+        batch.set(ref, {
+          period: entry.period, type: type,
+          categories: entry.categories || {},
+          cross_category_synthesis: entry.cross_category_synthesis || '',
+          imported_at: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        count++;
+        if (count % 400 === 0) { await batch.commit(); batch = db.batch(); console.log('Committed ' + count + '...'); }
+      }
+      if (count % 400 !== 0) await batch.commit();
+      console.log('Historical: ' + count + ' entries imported');
+
+      if (meta) {
+        for (const region of ['japan', 'global']) {
+          if (meta[region]) {
+            await db.collection('cla_meta').doc(region).set({
+              ...meta[region],
+              data_coverage: meta.data_coverage || {},
+              generated_at: meta.generated_at || '',
+              imported_at: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            console.log('Meta (' + region + '): ' + (meta[region].report_text || '').length + ' chars');
+          }
+        }
+      }
+      console.log('CLA import complete! ' + count + ' historical + meta reports');
+      return count;
+    };
+
     // CLA Archive — tries Firestore first, falls back to static JSON
     async function loadCLAArchive() {
       try {
