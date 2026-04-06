@@ -670,75 +670,7 @@
        CLA (Causal Layered Analysis)
        ================================================================ */
 
-    /* Tab bar for category switching */
-    .cla-tab-bar {
-      display: flex;
-      gap: 6px;
-      margin-bottom: 1.25rem;
-      flex-wrap: wrap;
-    }
-    .cla-tab-btn {
-      padding: 8px 16px;
-      border-radius: var(--radius-xs);
-      font-size: 0.8rem;
-      font-weight: 600;
-      border: 1px solid var(--border);
-      background: transparent;
-      color: var(--text-secondary);
-      cursor: pointer;
-      font-family: var(--font);
-      transition: all 0.2s;
-    }
-    .cla-tab-btn:hover { background: var(--accent-light); border-color: var(--accent); color: var(--accent); }
-    .cla-tab-btn.active {
-      background: var(--accent);
-      color: #fff;
-      border-color: var(--accent);
-    }
-
-    /* CLA layer stack */
-    .cla-layers { border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); max-width: 800px; }
-    .cla-layer { padding: 16px 20px; position: relative; }
-    .cla-layer-1 { background: var(--cla-1); }
-    .cla-layer-2 { background: var(--cla-2); }
-    .cla-layer-3 { background: var(--cla-3); }
-    .cla-layer-4 { background: var(--cla-4); }
-    .cla-layer + .cla-layer { border-top: 1px solid var(--border-light); }
-    .cla-layer::before {
-      content: '';
-      position: absolute;
-      left: 0; top: 0; bottom: 0;
-      width: 4px;
-    }
-    .cla-layer-1::before { background: var(--accent-warm); }
-    .cla-layer-2::before { background: var(--accent-soft); }
-    .cla-layer-3::before { background: var(--accent); }
-    .cla-layer-4::before { background: var(--P); }
-    .cla-layer-label {
-      font-size: 0.68rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--text-muted);
-      margin-bottom: 4px;
-    }
-    .cla-layer-text { font-size: 0.84rem; line-height: 1.75; white-space: pre-line; }
-
-    .cla-extra-block { padding: 14px 20px; border-top: 1px solid var(--border-light); }
-    .cla-extra-block-highlight { background: var(--accent-light); }
-    .cla-extra-block-surface { background: var(--surface); }
-    .cla-extra-label {
-      font-size: 0.68rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--accent);
-      margin-bottom: 4px;
-    }
-    .cla-extra-text { font-size: 0.82rem; line-height: 1.7; }
-
     /* CLA Archive */
-    .cla-archive { margin-top: 2rem; }
 
     /* Detail panel */
     .cla-detail-panel {
@@ -1436,10 +1368,6 @@
       .ws-card-body { padding: 0 14px 14px; }
 
       /* CLA */
-      .cla-tab-bar { gap: 4px; }
-      .cla-tab-btn { padding: 7px 12px; font-size: 0.75rem; }
-      .cla-layer-text { font-size: 0.8rem; }
-      .cla-period-bar { gap: 3px; }
       .cla-period-btn { padding: 4px 8px; font-size: 0.68rem; }
 
       /* Papers */
@@ -1481,7 +1409,6 @@
       .section-title { font-size: 1.05rem; }
       .nav-link { padding: 6px 10px; font-size: 0.75rem; }
       .region-btn { padding: 4px 8px; font-size: 0.68rem; }
-      .cla-tab-btn { padding: 6px 10px; font-size: 0.72rem; }
       .ws-badge { font-size: 0.6rem; padding: 2px 6px; }
     }
 
@@ -2820,83 +2747,43 @@
 
       const cla = aiData.cla;
       const catKeys = Object.keys(cla);
-      const dateStr = aiData.date || '';
 
-      // Build overall summary text for preview
-      let overviewParts = [];
-      CLA_LAYERS.forEach(layer => {
-        const texts = [];
-        for (const [catKey, catData] of Object.entries(cla)) {
-          if (catData[layer.key]) texts.push(catData[layer.key]);
+      // Render as PESTLE-style card grid — one card per category
+      let html = '<h2 class="section-title">最新CLA分析</h2>';
+      html += '<div class="pestle-grid">';
+
+      catKeys.forEach(catKey => {
+        const catData = cla[catKey];
+        if (!catData) return;
+        const info = PESTLE_CATS[catKey] || { labelJa: catKey, color: 'var(--accent)' };
+
+        html += '<div class="pestle-card">';
+        html += '<div class="pestle-card-top" style="background:' + info.color + '"></div>';
+        html += '<div class="pestle-card-header"><span class="pestle-cat-name" style="color:' + info.color + '">' + info.labelJa + '</span></div>';
+        html += '<div style="padding:0 20px 16px">';
+
+        CLA_LAYERS.forEach(layer => {
+          if (catData[layer.key]) {
+            html += '<div style="padding:8px 0;border-bottom:1px solid var(--border-light)">' +
+              '<div style="font-size:0.68rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:3px">' + layer.labelJa + '</div>' +
+              '<div style="font-size:0.82rem;line-height:1.7">' + escapeHtml(catData[layer.key]) + '</div></div>';
+          }
+        });
+
+        if (catData.key_tension) {
+          html += '<div style="padding:8px 0;color:var(--highlight);font-size:0.8rem;line-height:1.65;font-style:italic">' + escapeHtml(catData.key_tension) + '</div>';
         }
-        if (texts.length > 0) overviewParts.push(texts[0]);
+        if (catData.emerging_narrative) {
+          html += '<div style="padding:8px 0;color:var(--accent);font-size:0.8rem;line-height:1.65">' + escapeHtml(catData.emerging_narrative) + '</div>';
+        }
+
+        html += '</div></div>';
       });
-      const preview = overviewParts.join(' ').substring(0, 400);
 
-      // Render as report-card style
-      let html = '<details open class="report-card">' +
-        '<summary class="report-summary">' +
-          '<span class="report-chevron">&#9654;</span>' +
-          '<span class="report-label">最新CLA分析</span>' +
-          '<span class="report-count">' + catKeys.length + '分野</span>' +
-        '</summary><div class="report-body">' +
-        '<div class="report-preview">' + escapeHtml(preview) + '...</div>';
-
-      // Tab bar for category switching
-      html += '<div class="cla-tab-bar">';
-      const allTabs = ['Overall', ...catKeys];
-      allTabs.forEach((key, idx) => {
-        const label = key === 'Overall' ? '全体' : (PESTLE_CATS[key]?.labelJa || key);
-        html += '<button class="cla-tab-btn' + (idx === 0 ? ' active' : '') + '" data-cla-tab="' + key + '" onclick="switchCLATab(\'' + key + '\')">' + label + '</button>';
-      });
-      html += '</div><div id="claTabContent">' + renderCLATabContent('Overall', cla) + '</div>';
-      html += '</div></details>';
-
+      html += '</div>';
       container.innerHTML = html;
       loadCLAArchive();
     }
-
-    function renderCLATabContent(tabKey, claData) {
-      if (tabKey === 'Overall') {
-        const allLayers = {};
-        CLA_LAYERS.forEach(layer => {
-          const texts = [];
-          for (const [catKey, catData] of Object.entries(claData)) {
-            if (catData[layer.key]) texts.push('[' + (PESTLE_CATS[catKey]?.labelJa || catKey) + '] ' + catData[layer.key]);
-          }
-          allLayers[layer.key] = texts.join('\n');
-        });
-        return '<div class="cla-layers">' +
-          CLA_LAYERS.map(layer => '<div class="cla-layer cla-layer-' + layer.depth + '">' +
-            '<div class="cla-layer-label">' + layer.labelJa + '</div>' +
-            '<div class="cla-layer-text">' + escapeHtml(allLayers[layer.key] || '') + '</div></div>'
-          ).join('') + '</div>';
-      }
-      const catData = claData[tabKey];
-      if (!catData) return '<p class="text-muted">データがありません</p>';
-      let html = '<div class="cla-layers">' +
-        CLA_LAYERS.map(layer => '<div class="cla-layer cla-layer-' + layer.depth + '" data-depth="' + layer.depth + '" onclick="this.classList.toggle(\'expanded\')">' +
-          '<div class="cla-layer-label">' + layer.labelJa + ' <span style="font-size:0.55rem;opacity:0.5;font-weight:400">click to expand</span></div>' +
-          '<div class="cla-layer-text">' + escapeHtml(catData[layer.key] || '') + '</div></div>'
-        ).join('');
-      if (catData.key_tension) {
-        html += '<div class="cla-extra-block cla-extra-block-highlight"><div class="cla-extra-label">主要な緊張</div><div class="cla-extra-text">' + escapeHtml(catData.key_tension) + '</div></div>';
-      }
-      if (catData.emerging_narrative) {
-        html += '<div class="cla-extra-block cla-extra-block-surface"><div class="cla-extra-label">浮上する物語</div><div class="cla-extra-text">' + escapeHtml(catData.emerging_narrative) + '</div></div>';
-      }
-      html += '</div>';
-      return html;
-    }
-
-    window.switchCLATab = function(tabKey) {
-      const aiData = dataCache['ai_analysis.json'];
-      if (!aiData?.cla) return;
-      document.getElementById('claTabContent').innerHTML = renderCLATabContent(tabKey, aiData.cla);
-      document.querySelectorAll('.cla-tab-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.claTab === tabKey);
-      });
-    };
 
     // CLA Firestore import — callable from console or admin: importCLAToFirestore()
     window.importCLAToFirestore = async function() {
