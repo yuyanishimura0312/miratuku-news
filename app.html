@@ -735,9 +735,9 @@
       width: 4px;
     }
     .cla-layer-1::before { background: var(--accent-warm); }
-    .cla-layer-2::before { background: var(--accent-soft); }
-    .cla-layer-3::before { background: var(--accent); }
-    .cla-layer-4::before { background: var(--P); }
+    .cla-layer-2::before { background: var(--accent-soft); width: 5px; }
+    .cla-layer-3::before { background: var(--accent); width: 6px; }
+    .cla-layer-4::before { background: var(--P); width: 7px; }
 
     .cla-layer-label {
       font-size: 0.65rem;
@@ -893,9 +893,15 @@
     .cla-filter-bar {
       display: flex;
       gap: 6px;
-      margin-bottom: 14px;
+      margin-bottom: 10px;
       flex-wrap: wrap;
       align-items: center;
+      padding: 10px 14px;
+      background: var(--surface);
+      border-radius: var(--radius-xs);
+    }
+    .cla-filter-bar + .cla-filter-bar {
+      margin-top: -4px;
     }
     .cla-filter-label {
       font-size: 0.78rem;
@@ -903,7 +909,8 @@
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.06em;
-      margin-right: 2px;
+      margin-right: 4px;
+      min-width: 2.5em;
     }
     .cla-filter-btn {
       padding: 6px 14px;
@@ -921,11 +928,13 @@
       margin-bottom: 28px;
     }
     .cla-layer-section-title {
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       font-weight: 700;
       color: var(--accent);
       margin-bottom: 12px;
-      padding-left: 10px;
+      padding: 8px 0 8px 12px;
+      background: var(--surface);
+      border-radius: var(--radius-xs);
       letter-spacing: -0.01em;
     }
     .cla-layer-scroll {
