@@ -621,6 +621,7 @@
             36年分のCLA（因果階層分析）データをFirestoreに格納し、分析に活用できるようにします。<br>
             データソース: <code>future-insight-app/data/cla_historical_*.json</code>
           </div>
+          <div id="claFirebaseAuth" style="font-size:.75rem;margin-bottom:8px">Firebase認証確認中...</div>
           <div id="claDbStatus" style="font-size:.75rem;color:var(--text-m);margin-bottom:10px">ステータス確認中...</div>
           <div class="form-row" style="gap:8px">
             <button class="btn btn-p btn-sm" onclick="importCLAToFirestore()">GitHub JSON からインポート</button>
@@ -774,6 +775,25 @@
 
     firebase.initializeApp({apiKey:"AIzaSyB5ubJobtiCOelI-hI6vQ9cyMnBBewyNwg",authDomain:"miratuku-afa2c.firebaseapp.com",projectId:"miratuku-afa2c",storageBucket:"miratuku-afa2c.firebasestorage.app",messagingSenderId:"344400461535",appId:"1:344400461535:web:544ebe32ad4add42f4b36a"});
     const db = firebase.firestore();
+    const auth = firebase.auth();
+
+    // Firebase auth for Firestore access (CLA data management)
+    let firebaseUser = null;
+    auth.onAuthStateChanged(user => {
+      firebaseUser = user;
+      const el = document.getElementById('claFirebaseAuth');
+      if (el) {
+        el.innerHTML = user
+          ? '<span style="color:var(--green)">Firebase認証: ' + (user.email || user.displayName) + '</span>'
+          : '<span style="color:var(--yellow)">Firebase未認証（Firestoreアクセスにはログインが必要）</span> <button class="btn btn-s btn-sm" onclick="signInWithGoogle()" style="margin-left:6px">Googleログイン</button>';
+      }
+    });
+    window.signInWithGoogle = async function() {
+      try {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        await auth.signInWithPopup(provider);
+      } catch (e) { alert('ログインエラー: ' + e.message); }
+    };
 
     let feedConfig = null;
     let editingFeedIdx = -1;
