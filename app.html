@@ -2070,10 +2070,12 @@
     };
 
     const CLA_LAYERS = [
-      { key: 'litany',          labelJa: 'リタニー（表層事象）', depth: 1 },
-      { key: 'systemic_causes', labelJa: '社会的原因',           depth: 2 },
-      { key: 'worldview',       labelJa: 'ディスコース（世界観）', depth: 3 },
-      { key: 'myth_metaphor',   labelJa: '神話・メタファー',      depth: 4 }
+      { key: 'litany',              labelJa: 'リタニー（表層事象）', depth: 1 },
+      { key: 'systemic_causes',     labelJa: '社会的原因',           depth: 2 },
+      { key: 'worldview',           labelJa: 'ディスコース（世界観）', depth: 3 },
+      { key: 'myth_metaphor',       labelJa: '神話・メタファー',      depth: 4 },
+      { key: 'key_tension',         labelJa: '核心的緊張',           depth: 5 },
+      { key: 'emerging_narrative',  labelJa: '新たな物語',           depth: 6 }
     ];
 
     const JA_SOURCES = ['nhk', 'yahoo', 'nikkei', '日経', '毎日', '朝日', '読売', 'mainichi', 'asahi', 'yomiuri', 'tokyo', 'sankei', 'kyodo', 'jiji', 'nifty'];
@@ -2773,13 +2775,6 @@
               '<div style="font-size:0.82rem;line-height:1.7">' + escapeHtml(catData[layer.key]) + '</div></div>';
           }
         });
-
-        if (catData.key_tension) {
-          html += '<div style="padding:8px 0;color:var(--highlight);font-size:0.8rem;line-height:1.65;font-style:italic">' + escapeHtml(catData.key_tension) + '</div>';
-        }
-        if (catData.emerging_narrative) {
-          html += '<div style="padding:8px 0;color:var(--accent);font-size:0.8rem;line-height:1.65">' + escapeHtml(catData.emerging_narrative) + '</div>';
-        }
 
         html += '</div></div>';
       });
