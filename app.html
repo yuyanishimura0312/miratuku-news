@@ -3100,46 +3100,51 @@
           { key: 'litany', label: 'Layer 1: リタニー（表層）', border: 'var(--accent-warm)' },
           { key: 'systemic_causes', label: 'Layer 2: 社会的・システム的原因', border: 'var(--accent-soft)' },
           { key: 'worldview', label: 'Layer 3: 世界観・ディスコース', border: 'var(--accent)' },
-          { key: 'myth_metaphor', label: 'Layer 4: 神話・メタファー', border: '#4A7A8C' }
+          { key: 'myth_metaphor', label: 'Layer 4: 神話・メタファー', border: '#4A7A8C' },
+          { key: 'key_tension', label: '核心的緊張', border: 'var(--highlight)' },
+          { key: 'emerging_narrative', label: '新たな物語', border: 'var(--S)' }
         ];
+
+        // Helper to render a set of entries as layer-based horizontal scroll
+        function renderLayerSections(entries, isQuarterly) {
+          let sectionHtml = '';
+          layers.forEach(layer => {
+            // Check if any entry has data for this layer
+            const hasData = entries.some(entry => {
+              const text = getCLAEntryText(entry, layer.key, claArchiveCatFilter);
+              return text && text.trim().length > 0;
+            });
+            if (!hasData) return; // Skip empty layers
+
+            sectionHtml += '<div class="cla-layer-section">';
+            sectionHtml += '<div class="cla-layer-section-title" style="border-left:3px solid ' + layer.border + '">' + layer.label + '</div>';
+            sectionHtml += '<div class="cla-layer-scroll">';
+            entries.forEach((entry, idx) => {
+              const text = getCLAEntryText(entry, layer.key, claArchiveCatFilter);
+              const isCurrent = isQuarterly && idx === entries.length - 1;
+              const periodLabel = isQuarterly
+                ? formatCLAPeriod(entry.period) + (isCurrent ? '（現在）' : '')
+                : entry.period + '年';
+              sectionHtml += '<div class="cla-year-card' + (isCurrent ? ' current' : '') + '">';
+              sectionHtml += '<div class="cla-year-card-period">' + escapeHtml(periodLabel) + '</div>';
+              sectionHtml += '<div class="cla-year-card-text">' + (escapeHtml(text) || '<span style="color:var(--text-muted)">—</span>') + '</div>';
+              sectionHtml += '</div>';
+            });
+            sectionHtml += '</div></div>';
+          });
+          return sectionHtml;
+        }
 
         // Render yearly section
         if (yearly.length > 0) {
           html += '<h4 class="cla-timeline-heading" style="margin-bottom:16px">年次 CLA 変遷（1990-2020）</h4>';
-          layers.forEach(layer => {
-            html += '<div class="cla-layer-section">';
-            html += '<div class="cla-layer-section-title" style="border-left:3px solid ' + layer.border + '">' + layer.label + '</div>';
-            html += '<div class="cla-layer-scroll">';
-            yearly.forEach((entry, idx) => {
-              const text = getCLAEntryText(entry, layer.key, claArchiveCatFilter);
-              const periodLabel = entry.period + '年';
-              html += '<div class="cla-year-card">';
-              html += '<div class="cla-year-card-period">' + escapeHtml(periodLabel) + '</div>';
-              html += '<div class="cla-year-card-text">' + (escapeHtml(text) || '<span style="color:var(--text-muted)">—</span>') + '</div>';
-              html += '</div>';
-            });
-            html += '</div></div>';
-          });
+          html += renderLayerSections(yearly, false);
         }
 
         // Render quarterly section
         if (quarterly.length > 0) {
           html += '<h4 class="cla-timeline-heading" style="margin-bottom:16px;margin-top:1.5rem">四半期 CLA 変遷（2021-2026）</h4>';
-          layers.forEach(layer => {
-            html += '<div class="cla-layer-section">';
-            html += '<div class="cla-layer-section-title" style="border-left:3px solid ' + layer.border + '">' + layer.label + '</div>';
-            html += '<div class="cla-layer-scroll">';
-            quarterly.forEach((entry, idx) => {
-              const text = getCLAEntryText(entry, layer.key, claArchiveCatFilter);
-              const isCurrent = idx === quarterly.length - 1;
-              const periodLabel = formatCLAPeriod(entry.period) + (isCurrent ? '（現在）' : '');
-              html += '<div class="cla-year-card' + (isCurrent ? ' current' : '') + '">';
-              html += '<div class="cla-year-card-period">' + escapeHtml(periodLabel) + '</div>';
-              html += '<div class="cla-year-card-text">' + (escapeHtml(text) || '<span style="color:var(--text-muted)">—</span>') + '</div>';
-              html += '</div>';
-            });
-            html += '</div></div>';
-          });
+          html += renderLayerSections(quarterly, true);
         }
       } else {
         // Individual card view (original style)
@@ -3161,9 +3166,27 @@
     }
 
     function getCLAEntryText(entry, layerKey, catFilter) {
-      if (!entry?.categories) return '';
+      if (!entry) return '';
+      // For fields that may exist at entry level (key_tension, emerging_narrative)
+      if (layerKey === 'key_tension' || layerKey === 'emerging_narrative') {
+        // Check entry-level first
+        if (entry[layerKey]) return entry[layerKey];
+        // Then check inside categories
+        if (!entry.categories) return '';
+        if (catFilter === 'Overall') {
+          const parts = [];
+          for (const [catKey, catData] of Object.entries(entry.categories)) {
+            if (catData[layerKey]) parts.push(catData[layerKey]);
+          }
+          return parts.join('\n\n');
+        } else {
+          const catData = entry.categories[catFilter];
+          return catData ? (catData[layerKey] || '') : '';
+        }
+      }
+      // Standard CLA layer fields (litany, systemic_causes, worldview, myth_metaphor)
+      if (!entry.categories) return '';
       if (catFilter === 'Overall') {
-        // Merge all categories
         const parts = [];
         for (const [catKey, catData] of Object.entries(entry.categories)) {
           if (catData[layerKey]) {
