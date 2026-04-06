@@ -613,6 +613,22 @@
           <div style="font-size:.72rem;color:var(--text-m);margin-bottom:8px">このブラウザのみに適用されます。他のブラウザや端末には反映されません。</div>
           <div class="form-row" style="margin-top:8px"><input type="password" class="inp inp-sm" id="newPw" placeholder="新しいパスワード" style="max-width:300px"><button class="btn btn-p btn-sm" onclick="changePw()">変更</button></div>
         </div>
+
+        <!-- CLA Data Management -->
+        <div class="card section-gap">
+          <h3 class="card-title">CLA データベース管理</h3>
+          <div style="font-size:.78rem;color:var(--text-s);margin-bottom:12px;line-height:1.6">
+            36年分のCLA（因果階層分析）データをFirestoreに格納し、分析に活用できるようにします。<br>
+            データソース: <code>future-insight-app/data/cla_historical_*.json</code>
+          </div>
+          <div id="claDbStatus" style="font-size:.75rem;color:var(--text-m);margin-bottom:10px">ステータス確認中...</div>
+          <div class="form-row" style="gap:8px">
+            <button class="btn btn-p btn-sm" onclick="importCLAToFirestore()">GitHub JSON からインポート</button>
+            <button class="btn btn-s btn-sm" onclick="checkCLAFirestoreStatus()">ステータス確認</button>
+            <button class="btn btn-s btn-sm" onclick="clearCLAFirestore()" style="color:var(--red)">全データ削除</button>
+          </div>
+          <div id="claDbLog" style="font-size:.72rem;color:var(--text-m);margin-top:10px;max-height:200px;overflow-y:auto;white-space:pre-line"></div>
+        </div>
       </div>
 
     </div>
@@ -2045,6 +2061,160 @@
       if(tab==='pipeline'&&!pipeLoaded){pipeLoaded=true;loadPipeline()}
       if(tab==='analytics'&&!analyticsLoaded){analyticsLoaded=true;loadAnalytics()}
     }));
+
+    // === CLA DATABASE MANAGEMENT ===
+    const CLA_DATA_BASE = 'https://yuyanishimura0312.github.io/future-insight-app/data';
+    const CLA_COLLECTION = 'cla_historical';
+    const CLA_META_COLLECTION = 'cla_meta';
+
+    function claLog(msg) {
+      const el = document.getElementById('claDbLog');
+      if (el) el.textContent += msg + '\n';
+    }
+
+    async function checkCLAFirestoreStatus() {
+      const statusEl = document.getElementById('claDbStatus');
+      try {
+        const snap = await db.collection(CLA_COLLECTION).get();
+        const metaSnap = await db.collection(CLA_META_COLLECTION).get();
+        const count = snap.size;
+        const metaCount = metaSnap.size;
+
+        // Count by type
+        let yearlyCount = 0, quarterlyCount = 0;
+        snap.forEach(doc => {
+          const d = doc.data();
+          if (d.type === 'quarterly' || (d.period && (d.period.includes('-') || d.period.includes('Q')))) quarterlyCount++;
+          else yearlyCount++;
+        });
+
+        statusEl.innerHTML = '<span style="color:var(--green)">Firestore: ' + count + '件</span> (年次: ' + yearlyCount + ', 四半期: ' + quarterlyCount + ') + メタ分析: ' + metaCount + '件';
+      } catch (e) {
+        statusEl.innerHTML = '<span style="color:var(--red)">確認エラー: ' + e.message + '</span>';
+      }
+    }
+
+    async function importCLAToFirestore() {
+      const logEl = document.getElementById('claDbLog');
+      logEl.textContent = '';
+      claLog('CLA データインポート開始...');
+
+      try {
+        // Fetch data from GitHub Pages
+        const v = Date.now();
+        claLog('GitHub Pages からデータ取得中...');
+        const [yearlyRes, quarterlyRes, metaRes] = await Promise.all([
+          fetch(CLA_DATA_BASE + '/cla_historical_yearly.json?v=' + v),
+          fetch(CLA_DATA_BASE + '/cla_historical_quarterly.json?v=' + v),
+          fetch(CLA_DATA_BASE + '/cla_meta_report.json?v=' + v),
+        ]);
+
+        const yearly = yearlyRes.ok ? await yearlyRes.json() : [];
+        const quarterly = quarterlyRes.ok ? await quarterlyRes.json() : [];
+        const meta = metaRes.ok ? await metaRes.json() : null;
+
+        const yearlyEntries = Array.isArray(yearly) ? yearly : (yearly.entries || []);
+        const quarterlyEntries = Array.isArray(quarterly) ? quarterly : (quarterly.entries || []);
+
+        claLog('年次: ' + yearlyEntries.length + '件, 四半期: ' + quarterlyEntries.length + '件');
+
+        // Import historical data using batched writes
+        const allEntries = [...yearlyEntries, ...quarterlyEntries];
+        let batch = db.batch();
+        let batchCount = 0;
+        let totalCount = 0;
+
+        for (const entry of allEntries) {
+          if (!entry.period) continue;
+          const docRef = db.collection(CLA_COLLECTION).doc(entry.period);
+          const type = entry.type || (entry.period.includes('-') || entry.period.includes('Q') ? 'quarterly' : 'yearly');
+          batch.set(docRef, {
+            period: entry.period,
+            type: type,
+            categories: entry.categories || {},
+            cross_category_synthesis: entry.cross_category_synthesis || '',
+            imported_at: firebase.firestore.FieldValue.serverTimestamp()
+          });
+          batchCount++;
+          totalCount++;
+
+          if (batchCount >= 400) {
+            await batch.commit();
+            claLog('  ' + totalCount + '件 コミット済み...');
+            batch = db.batch();
+            batchCount = 0;
+          }
+        }
+        if (batchCount > 0) {
+          await batch.commit();
+        }
+        claLog('CLA歴史データ: ' + totalCount + '件 インポート完了');
+
+        // Import meta reports
+        if (meta) {
+          let metaCount = 0;
+          for (const region of ['japan', 'global']) {
+            if (meta[region]) {
+              await db.collection(CLA_META_COLLECTION).doc(region).set({
+                ...meta[region],
+                data_coverage: meta.data_coverage || {},
+                generated_at: meta.generated_at || '',
+                imported_at: firebase.firestore.FieldValue.serverTimestamp()
+              });
+              metaCount++;
+              claLog('メタ分析 (' + region + '): ' + (meta[region].report_text || '').length + '文字');
+            }
+          }
+          claLog('メタ分析: ' + metaCount + '件 インポート完了');
+        }
+
+        claLog('\nインポート完了! 合計: ' + totalCount + '件のCLAデータ');
+        checkCLAFirestoreStatus();
+
+      } catch (e) {
+        claLog('エラー: ' + e.message);
+        console.error('CLA import error:', e);
+      }
+    }
+
+    async function clearCLAFirestore() {
+      if (!confirm('CLA Firestoreデータを全て削除しますか？')) return;
+      const logEl = document.getElementById('claDbLog');
+      logEl.textContent = '';
+      claLog('CLA データ削除中...');
+
+      try {
+        // Delete historical
+        const snap = await db.collection(CLA_COLLECTION).get();
+        let batch = db.batch();
+        let count = 0;
+        snap.forEach(doc => {
+          batch.delete(doc.ref);
+          count++;
+          if (count % 400 === 0) {
+            batch.commit();
+            batch = db.batch();
+          }
+        });
+        await batch.commit();
+        claLog('CLA歴史データ: ' + count + '件 削除');
+
+        // Delete meta
+        const metaSnap = await db.collection(CLA_META_COLLECTION).get();
+        const metaBatch = db.batch();
+        metaSnap.forEach(doc => metaBatch.delete(doc.ref));
+        await metaBatch.commit();
+        claLog('メタ分析: ' + metaSnap.size + '件 削除');
+
+        claLog('削除完了');
+        checkCLAFirestoreStatus();
+      } catch (e) {
+        claLog('削除エラー: ' + e.message);
+      }
+    }
+
+    // Check CLA status on settings tab load
+    setTimeout(() => checkCLAFirestoreStatus(), 2000);
 
   })();
   </script>

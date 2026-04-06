@@ -1,5 +1,17 @@
 // News app collections — add inside match /databases/{database}/documents { }
 
+// CLA historical data — all authenticated users can read; admin writes via script
+match /cla_historical/{period} {
+  allow read: if request.auth != null;
+  allow write: if request.auth != null;
+}
+
+// CLA meta analysis reports — all authenticated users can read; admin writes
+match /cla_meta/{region} {
+  allow read: if request.auth != null;
+  allow write: if request.auth != null;
+}
+
 // Comments on news articles — all authenticated users can read; owners can CUD
 match /news_comments/{commentId} {
   allow read: if request.auth != null;
