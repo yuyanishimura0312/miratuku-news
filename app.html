@@ -753,97 +753,56 @@
       border-top: 1px solid var(--border);
     }
 
-    .cla-archive-details { margin-bottom: 1rem; }
-    .cla-archive-summary {
-      cursor: pointer;
-      font-weight: 500;
-      color: var(--accent);
-      padding: 12px 16px;
-      background: var(--surface);
-      border-radius: var(--radius-xs);
-      list-style: none;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .cla-archive-summary::-webkit-details-marker { display: none; }
-    .cla-archive-body {
-      padding: 16px;
+    /* CLA detail panel for individual view */
+    .cla-detail-panel {
       background: var(--card);
       border: 1px solid var(--border);
-      border-top: none;
-      border-radius: 0 0 var(--radius-xs) var(--radius-xs);
-      max-height: 600px;
-      overflow-y: auto;
+      border-radius: var(--radius);
+      padding: 20px;
+      min-height: 200px;
     }
+    .cla-detail-placeholder { color: var(--text-muted); font-size: 0.82rem; text-align: center; padding: 3rem 0; }
+    .cla-detail-cat-block { margin-bottom: 1.25rem; }
+    .cla-detail-cat-label { font-weight: 600; font-size: 0.88rem; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+    .cla-detail-cat-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .cla-detail-layer {
+      padding: 10px 14px;
+      margin-bottom: 2px;
+      border-radius: 6px;
+    }
+    .cla-detail-layer-label { font-size: 0.68rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+    .cla-detail-layer-text { font-size: 0.82rem; line-height: 1.7; margin-top: 4px; }
+    .cla-cross-synthesis {
+      background: var(--accent-light);
+      padding: 14px 16px;
+      border-radius: 8px;
+      margin-top: 12px;
+    }
+    .cla-cross-synthesis-label { font-size: 0.72rem; font-weight: 700; color: var(--accent); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .cla-cross-synthesis-text { font-size: 0.82rem; line-height: 1.65; }
 
-    .cla-timeline-grid {
-      display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
-    .cla-timeline-col {
-      flex: 1;
-      min-width: 300px;
-    }
-    .cla-timeline-heading {
-      font-size: 0.85rem;
-      font-weight: 500;
-      color: var(--text-secondary);
-      margin-bottom: 8px;
-    }
-    .cla-timeline-buttons {
+    /* Period selector for individual view */
+    .cla-period-bar {
       display: flex;
       flex-wrap: wrap;
       gap: 4px;
-      margin-bottom: 12px;
+      margin-bottom: 16px;
     }
     .cla-period-btn {
-      padding: 4px 10px;
-      font-size: 0.7rem;
+      padding: 5px 12px;
+      font-size: 0.72rem;
       border: 1px solid var(--border);
       background: var(--card);
       color: var(--text-secondary);
-      border-radius: 4px;
+      border-radius: 6px;
       cursor: pointer;
       font-family: var(--font);
       transition: all 0.2s;
     }
     .cla-period-btn:hover { background: var(--accent-light); border-color: var(--accent); color: var(--accent); }
     .cla-period-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
-    .cla-detail-panel {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-xs);
-      padding: 16px;
-      min-height: 200px;
-    }
-    .cla-detail-placeholder { color: var(--text-muted); font-size: 0.82rem; }
 
-    .cla-detail-cat-label { font-weight: 600; font-size: 0.82rem; margin-bottom: 6px; }
-    .cla-detail-cat-block { margin-bottom: 1rem; }
-    .cla-detail-layer {
-      padding: 8px 12px;
-      margin-bottom: 2px;
-      border-radius: 4px;
-    }
-    .cla-detail-layer-label { font-size: 0.68rem; font-weight: 600; color: var(--text-muted); }
-    .cla-detail-layer-text { font-size: 0.78rem; line-height: 1.6; margin-top: 3px; }
-    .cla-cross-synthesis {
-      background: var(--accent-light);
-      padding: 12px;
-      border-radius: 6px;
-      margin-top: 8px;
-    }
-    .cla-cross-synthesis-label { font-size: 0.72rem; font-weight: 600; color: var(--accent); margin-bottom: 4px; }
-    .cla-cross-synthesis-text { font-size: 0.82rem; line-height: 1.65; }
-
-    /* CLA Year List (transition overview) */
-    .cla-year-list-toggle {
-      margin-bottom: 1rem;
-      display: flex;
-      gap: 8px;
-    }
+    /* CLA Archive Controls */
     .cla-filter-bar {
       display: flex;
       gap: 6px;
@@ -912,53 +871,6 @@
       font-size: 0.8rem;
       line-height: 1.6;
       color: var(--text);
-    }
-    /* Individual view card (kept for backward compat) */
-    .cla-year-list-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-      gap: 12px;
-      margin-bottom: 1.5rem;
-    }
-    .cla-year-list-item {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-xs);
-      padding: 14px 16px;
-      transition: border-color 0.2s;
-    }
-    .cla-year-list-item:hover { border-color: var(--accent); }
-    .cla-year-list-period {
-      font-weight: 700;
-      font-size: 0.9rem;
-      color: var(--accent);
-      margin-bottom: 8px;
-      padding-bottom: 6px;
-      border-bottom: 2px solid var(--accent-light);
-    }
-    .cla-year-list-layer {
-      padding: 4px 0;
-      font-size: 0.78rem;
-      line-height: 1.55;
-    }
-    .cla-year-list-layer-label {
-      font-size: 0.65rem;
-      font-weight: 700;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-    }
-    .cla-year-list-layer-text {
-      color: var(--text-secondary);
-      margin-top: 2px;
-    }
-    .cla-year-list-synthesis {
-      margin-top: 8px;
-      padding-top: 8px;
-      border-top: 1px solid var(--border-light);
-      font-size: 0.75rem;
-      color: var(--accent-soft);
-      line-height: 1.5;
     }
 
     /* PESTLE article bookmark */
@@ -1530,8 +1442,8 @@
       .cla-tab-btn { padding: 7px 12px; font-size: 0.75rem; }
       .cla-layer { padding: 12px 14px; }
       .cla-layer-text { font-size: 0.8rem; }
-      .cla-timeline-grid { flex-direction: column; }
-      .cla-timeline-col { min-width: unset; }
+      .cla-period-bar { gap: 3px; }
+      .cla-period-btn { padding: 4px 8px; font-size: 0.68rem; }
 
       /* Papers */
       .papers-field-header { padding: 12px 14px; }
@@ -1560,8 +1472,6 @@
       .home-stack { gap: 1.5rem; }
 
       /* CLA archive year list */
-      .cla-year-list-grid { grid-template-columns: 1fr !important; }
-      .cla-year-list-item { padding: 12px !important; }
       .cla-year-card { min-width: 200px; max-width: 260px; }
       .cla-filter-bar { gap: 4px; }
       .cla-filter-btn { padding: 4px 8px; font-size: 0.72rem; }
@@ -2050,39 +1960,23 @@
         <h2 class="section-title">因果階層分析</h2>
         <span class="section-subtitle">Causal Layered Analysis</span>
       </div>
+
+      <!-- Current CLA Analysis (report-card style) -->
       <div id="claContent">
         <div class="loading-indicator"><div class="loading-spinner"></div><div>CLA分析を読み込み中...</div></div>
       </div>
+
+      <!-- Meta Analysis Report (report-card style) -->
+      <div id="claMetaSection" style="margin-top:1.5rem">
+        <div id="claMetaContent"></div>
+      </div>
+
+      <!-- CLA Historical Archive -->
       <div class="cla-archive" id="claArchive">
-        <h3 class="cla-archive-title">CLA アーカイブ</h3>
-        <details class="cla-archive-details">
-          <summary class="cla-archive-summary"><span class="report-chevron">&#9654;</span> メタ分析レポート</summary>
-          <div class="cla-archive-body" id="claMetaContent">
-            <div class="loading-indicator"><div class="loading-spinner loading-spinner-sm"></div><div>読み込み中...</div></div>
-          </div>
-        </details>
-        <div class="cla-year-list-toggle">
-          <button class="btn-secondary" id="claViewToggle" onclick="toggleCLAView()">年次変遷を一覧表示</button>
+        <h3 class="cla-archive-title">CLA 変遷アーカイブ（1990-2026）</h3>
+        <div id="claArchiveView">
+          <div class="loading-indicator"><div class="loading-spinner loading-spinner-sm"></div><div>読み込み中...</div></div>
         </div>
-        <div id="claTimelineView">
-          <div class="cla-timeline-grid">
-            <div class="cla-timeline-col">
-              <h4 class="cla-timeline-heading">年次 CLA（1990-2020）</h4>
-              <div class="cla-timeline-buttons" id="claYearlyTimeline"></div>
-              <div class="cla-detail-panel" id="claYearlyDetail">
-                <div class="cla-detail-placeholder">年を選択してください</div>
-              </div>
-            </div>
-            <div class="cla-timeline-col">
-              <h4 class="cla-timeline-heading">四半期 CLA（2021-2026）</h4>
-              <div class="cla-timeline-buttons" id="claQuarterlyTimeline"></div>
-              <div class="cla-detail-panel" id="claQuarterlyDetail">
-                <div class="cla-detail-placeholder">四半期を選択してください</div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div id="claYearListView" style="display:none"></div>
       </div>
     </section>
 
@@ -2929,15 +2823,41 @@
     function renderCLASummary(aiData) {
       const container = document.getElementById('claContent');
       if (!aiData?.cla) { container.innerHTML = '<p class="text-muted">CLA分析データを取得できませんでした。</p>'; return; }
-      const cla = aiData.cla;
-      const claTabKeys = ['Overall', ...Object.keys(cla)];
 
-      let html = '<div class="cla-tab-bar">';
-      claTabKeys.forEach((key, idx) => {
+      const cla = aiData.cla;
+      const catKeys = Object.keys(cla);
+      const dateStr = aiData.date || '';
+
+      // Build overall summary text for preview
+      let overviewParts = [];
+      CLA_LAYERS.forEach(layer => {
+        const texts = [];
+        for (const [catKey, catData] of Object.entries(cla)) {
+          if (catData[layer.key]) texts.push(catData[layer.key]);
+        }
+        if (texts.length > 0) overviewParts.push(texts[0]);
+      });
+      const preview = overviewParts.join(' ').substring(0, 400);
+
+      // Render as report-card style
+      let html = '<details open class="report-card">' +
+        '<summary class="report-summary">' +
+          '<span class="report-chevron">&#9654;</span>' +
+          '<span class="report-label">最新CLA分析</span>' +
+          '<span class="report-count">' + catKeys.length + '分野</span>' +
+        '</summary><div class="report-body">' +
+        '<div class="report-preview">' + escapeHtml(preview) + '...</div>';
+
+      // Tab bar for category switching
+      html += '<div class="cla-tab-bar">';
+      const allTabs = ['Overall', ...catKeys];
+      allTabs.forEach((key, idx) => {
         const label = key === 'Overall' ? '全体' : (PESTLE_CATS[key]?.labelJa || key);
         html += '<button class="cla-tab-btn' + (idx === 0 ? ' active' : '') + '" data-cla-tab="' + key + '" onclick="switchCLATab(\'' + key + '\')">' + label + '</button>';
       });
       html += '</div><div id="claTabContent">' + renderCLATabContent('Overall', cla) + '</div>';
+      html += '</div></details>';
+
       container.innerHTML = html;
       loadCLAArchive();
     }
@@ -2994,70 +2914,85 @@
           fetch(DATA_BASE + '/cla_meta_report.json?v=' + v).then(r => r.ok ? r.json() : null).catch(() => null),
         ]);
 
+        // Render meta report as report-card
         if (metaData) {
-          const region = metaData[currentRegion] || metaData.japan || metaData.global;
-          const metaContainer = document.getElementById('claMetaContent');
-          if (metaContainer) {
-            metaContainer.innerHTML = region?.report_text
-              ? '<div class="md-body">' + renderMarkdown(region.report_text) + '</div>'
-              : '<p class="text-muted">メタ分析データがありません。</p>';
-          }
+          renderCLAMetaReport(metaData);
         }
 
-        const yearlyEntries = Array.isArray(yearlyData) ? yearlyData : (yearlyData?.entries || []);
-        if (yearlyEntries.length > 0) {
-          const el = document.getElementById('claYearlyTimeline');
-          if (el) {
-            el.innerHTML = yearlyEntries.map(e => '<button class="cla-period-btn" onclick="showCLADetail(\'yearly\',\'' + e.period + '\')">' + e.period + '</button>').join('');
-          }
-          window._claYearly = yearlyEntries;
-        }
+        window._claYearly = Array.isArray(yearlyData) ? yearlyData : (yearlyData?.entries || []);
+        window._claQuarterly = Array.isArray(quarterlyData) ? quarterlyData : (quarterlyData?.entries || []);
 
-        const quarterlyEntries = Array.isArray(quarterlyData) ? quarterlyData : (quarterlyData?.entries || []);
-        if (quarterlyEntries.length > 0) {
-          const el = document.getElementById('claQuarterlyTimeline');
-          if (el) {
-            el.innerHTML = quarterlyEntries.map(e => '<button class="cla-period-btn" onclick="showCLADetail(\'quarterly\',\'' + e.period + '\')">' + e.period + '</button>').join('');
-          }
-          window._claQuarterly = quarterlyEntries;
-        }
+        renderCLAArchiveView();
       } catch (e) { console.error('CLA archive load error:', e); }
     }
 
-    // CLA Year List View toggle
-    let claListViewActive = false;
+    // Meta report as report-card
+    function renderCLAMetaReport(metaData) {
+      const metaContainer = document.getElementById('claMetaContent');
+      if (!metaContainer) return;
+
+      const regions = [
+        { key: 'japan', label: '日本メディアの視点' },
+        { key: 'global', label: 'グローバルの視点' }
+      ];
+
+      let html = '<h2 class="section-title" style="margin-bottom:12px">メタ分析レポート</h2>';
+      regions.forEach(region => {
+        const data = metaData[region.key];
+        if (!data?.report_text) return;
+        const preview = (data.report_text || '').replace(/^#{1,6}\s+.*/gm, '').replace(/\n+/g, ' ').trim().substring(0, 350);
+        const shifts = data.key_paradigm_shifts || [];
+
+        html += '<details class="report-card" style="margin-bottom:10px">' +
+          '<summary class="report-summary">' +
+            '<span class="report-chevron">&#9654;</span>' +
+            '<span class="report-label">' + escapeHtml(data.title || region.label) + '</span>' +
+            (shifts.length > 0 ? '<span class="report-count">' + shifts.length + '件のパラダイムシフト</span>' : '') +
+          '</summary><div class="report-body">' +
+          '<div class="report-preview">' + escapeHtml(preview) + '...</div>';
+
+        // Show paradigm shifts grid
+        if (shifts.length > 0) {
+          html += '<div class="myth-grid" style="margin-bottom:1rem">';
+          shifts.slice(0, 4).forEach(shift => {
+            html += '<div class="myth-box"><div class="myth-label" style="color:var(--accent)">' + escapeHtml(shift.period || '') + '</div>' +
+              '<div class="myth-item">' + escapeHtml(shift.description || shift.shift || '') + '</div></div>';
+          });
+          html += '</div>';
+        }
+
+        html += '<details><summary class="fulltext-toggle">全文を読む</summary>' +
+          '<div class="fulltext-body md-body">' + renderMarkdown(data.report_text) + '</div></details>';
+        html += '</div></details>';
+      });
+
+      metaContainer.innerHTML = html;
+    }
+
+    // Unified CLA Archive View
     let claArchiveCatFilter = 'Overall';
     let claArchiveViewMode = 'timeline';
-
-    window.toggleCLAView = function() {
-      claListViewActive = !claListViewActive;
-      const timelineView = document.getElementById('claTimelineView');
-      const listView = document.getElementById('claYearListView');
-      const toggleBtn = document.getElementById('claViewToggle');
-      if (claListViewActive) {
-        timelineView.style.display = 'none';
-        listView.style.display = 'block';
-        toggleBtn.textContent = '個別選択に戻す';
-        renderCLAYearList();
-      } else {
-        timelineView.style.display = '';
-        listView.style.display = 'none';
-        toggleBtn.textContent = '年次変遷を一覧表示';
-      }
-    };
+    let claArchiveSelectedPeriod = null;
 
     window.setCLAArchiveFilter = function(cat) {
       claArchiveCatFilter = cat;
-      renderCLAYearList();
+      renderCLAArchiveView();
     };
 
     window.setCLAArchiveViewMode = function(mode) {
       claArchiveViewMode = mode;
-      renderCLAYearList();
+      renderCLAArchiveView();
     };
 
-    function renderCLAYearList() {
-      const container = document.getElementById('claYearListView');
+    window.selectCLAPeriod = function(period) {
+      claArchiveSelectedPeriod = period;
+      renderCLAArchiveView();
+    };
+
+    function renderCLAArchiveView() {
+      const container = document.getElementById('claArchiveView');
+      if (!container) return;
+
       const yearly = window._claYearly || [];
       const quarterly = window._claQuarterly || [];
       if (yearly.length === 0 && quarterly.length === 0) {
@@ -3065,6 +3000,7 @@
         return;
       }
 
+      // Merge all entries into one unified list
       const allEntries = [...yearly, ...quarterly];
 
       // Build filter buttons
@@ -3095,7 +3031,7 @@
       html += '</div>';
 
       if (claArchiveViewMode === 'timeline') {
-        // Layer-based horizontal scroll view (FIW style)
+        // Unified layer-based horizontal scroll (1990-2026 in one scroll)
         const layers = [
           { key: 'litany', label: 'Layer 1: リタニー（表層）', border: 'var(--accent-warm)' },
           { key: 'systemic_causes', label: 'Layer 2: 社会的・システム的原因', border: 'var(--accent-soft)' },
@@ -3105,73 +3041,104 @@
           { key: 'emerging_narrative', label: '新たな物語', border: 'var(--S)' }
         ];
 
-        // Helper to render a set of entries as layer-based horizontal scroll
-        function renderLayerSections(entries, isQuarterly) {
-          let sectionHtml = '';
-          layers.forEach(layer => {
-            // Check if any entry has data for this layer
-            const hasData = entries.some(entry => {
-              const text = getCLAEntryText(entry, layer.key, claArchiveCatFilter);
-              return text && text.trim().length > 0;
-            });
-            if (!hasData) return; // Skip empty layers
-
-            sectionHtml += '<div class="cla-layer-section">';
-            sectionHtml += '<div class="cla-layer-section-title" style="border-left:3px solid ' + layer.border + '">' + layer.label + '</div>';
-            sectionHtml += '<div class="cla-layer-scroll">';
-            entries.forEach((entry, idx) => {
-              const text = getCLAEntryText(entry, layer.key, claArchiveCatFilter);
-              const isCurrent = isQuarterly && idx === entries.length - 1;
-              const periodLabel = isQuarterly
-                ? formatCLAPeriod(entry.period) + (isCurrent ? '（現在）' : '')
-                : entry.period + '年';
-              sectionHtml += '<div class="cla-year-card' + (isCurrent ? ' current' : '') + '">';
-              sectionHtml += '<div class="cla-year-card-period">' + escapeHtml(periodLabel) + '</div>';
-              sectionHtml += '<div class="cla-year-card-text">' + (escapeHtml(text) || '<span style="color:var(--text-muted)">—</span>') + '</div>';
-              sectionHtml += '</div>';
-            });
-            sectionHtml += '</div></div>';
+        layers.forEach(layer => {
+          const hasData = allEntries.some(entry => {
+            const text = getCLAEntryText(entry, layer.key, claArchiveCatFilter);
+            return text && text.trim().length > 0;
           });
-          return sectionHtml;
-        }
+          if (!hasData) return;
 
-        // Render yearly section
-        if (yearly.length > 0) {
-          html += '<h4 class="cla-timeline-heading" style="margin-bottom:16px">年次 CLA 変遷（1990-2020）</h4>';
-          html += renderLayerSections(yearly, false);
-        }
+          html += '<div class="cla-layer-section">';
+          html += '<div class="cla-layer-section-title" style="border-left:3px solid ' + layer.border + '">' + layer.label + '</div>';
+          html += '<div class="cla-layer-scroll">';
+          allEntries.forEach((entry, idx) => {
+            const text = getCLAEntryText(entry, layer.key, claArchiveCatFilter);
+            const isCurrent = idx === allEntries.length - 1;
+            const periodLabel = formatCLAPeriodLabel(entry) + (isCurrent ? '（現在）' : '');
+            html += '<div class="cla-year-card' + (isCurrent ? ' current' : '') + '">';
+            html += '<div class="cla-year-card-period">' + escapeHtml(periodLabel) + '</div>';
+            html += '<div class="cla-year-card-text">' + (escapeHtml(text) || '<span style="color:var(--text-muted)">—</span>') + '</div>';
+            html += '</div>';
+          });
+          html += '</div></div>';
+        });
 
-        // Render quarterly section
-        if (quarterly.length > 0) {
-          html += '<h4 class="cla-timeline-heading" style="margin-bottom:16px;margin-top:1.5rem">四半期 CLA 変遷（2021-2026）</h4>';
-          html += renderLayerSections(quarterly, true);
-        }
       } else {
-        // Individual card view (original style)
-        if (yearly.length > 0) {
-          html += '<h4 class="cla-timeline-heading" style="margin-bottom:12px">年次 CLA 変遷（1990-2020）</h4>';
-          html += '<div class="cla-year-list-grid">';
-          yearly.forEach(entry => { html += renderCLAYearListItem(entry); });
-          html += '</div>';
+        // Individual view: period selector + detail panel
+        if (!claArchiveSelectedPeriod && allEntries.length > 0) {
+          claArchiveSelectedPeriod = allEntries[allEntries.length - 1].period;
         }
-        if (quarterly.length > 0) {
-          html += '<h4 class="cla-timeline-heading" style="margin-bottom:12px;margin-top:1.5rem">四半期 CLA 変遷（2021-2026）</h4>';
-          html += '<div class="cla-year-list-grid">';
-          quarterly.forEach(entry => { html += renderCLAYearListItem(entry); });
-          html += '</div>';
+
+        html += '<div class="cla-period-bar">';
+        allEntries.forEach(entry => {
+          const isActive = entry.period === claArchiveSelectedPeriod;
+          const label = formatCLAPeriodLabel(entry);
+          html += '<button class="cla-period-btn' + (isActive ? ' active' : '') + '" onclick="selectCLAPeriod(\'' + escapeAttr(entry.period) + '\')">' + escapeHtml(label) + '</button>';
+        });
+        html += '</div>';
+
+        const selected = allEntries.find(e => e.period === claArchiveSelectedPeriod);
+        if (selected) {
+          html += renderCLADetailPanel(selected, claArchiveCatFilter);
+        } else {
+          html += '<div class="cla-detail-panel"><div class="cla-detail-placeholder">年を選択してください</div></div>';
         }
       }
 
       container.innerHTML = html;
     }
 
+    function renderCLADetailPanel(entry, catFilter) {
+      if (!entry?.categories) return '<div class="cla-detail-panel"><p class="text-muted">データがありません。</p></div>';
+
+      let html = '<div class="cla-detail-panel">';
+      html += '<h4 style="font-size:1rem;font-weight:700;color:var(--accent);margin-bottom:16px">' + escapeHtml(formatCLAPeriodLabel(entry)) + '</h4>';
+
+      if (catFilter === 'Overall') {
+        for (const [catKey, catData] of Object.entries(entry.categories)) {
+          const info = PESTLE_CATS[catKey] || { labelJa: catKey, color: 'var(--accent)' };
+          html += '<div class="cla-detail-cat-block">' +
+            '<div class="cla-detail-cat-label"><span class="cla-detail-cat-dot" style="background:' + info.color + '"></span>' + info.labelJa + '</div>';
+          CLA_LAYERS.forEach(layer => {
+            if (catData[layer.key]) {
+              html += '<div class="cla-detail-layer cla-layer-' + layer.depth + '">' +
+                '<div class="cla-detail-layer-label">' + layer.labelJa + '</div>' +
+                '<div class="cla-detail-layer-text">' + escapeHtml(catData[layer.key]) + '</div></div>';
+            }
+          });
+          html += '</div>';
+        }
+      } else {
+        const catData = entry.categories[catFilter];
+        if (catData) {
+          const info = PESTLE_CATS[catFilter] || { labelJa: catFilter, color: 'var(--accent)' };
+          html += '<div class="cla-detail-cat-block">' +
+            '<div class="cla-detail-cat-label"><span class="cla-detail-cat-dot" style="background:' + info.color + '"></span>' + info.labelJa + '</div>';
+          CLA_LAYERS.forEach(layer => {
+            if (catData[layer.key]) {
+              html += '<div class="cla-detail-layer cla-layer-' + layer.depth + '">' +
+                '<div class="cla-detail-layer-label">' + layer.labelJa + '</div>' +
+                '<div class="cla-detail-layer-text">' + escapeHtml(catData[layer.key]) + '</div></div>';
+            }
+          });
+          html += '</div>';
+        } else {
+          html += '<p class="text-muted">この分野のデータがありません。</p>';
+        }
+      }
+
+      if (entry.cross_category_synthesis) {
+        html += '<div class="cla-cross-synthesis"><div class="cla-cross-synthesis-label">カテゴリ横断統合</div>' +
+          '<div class="cla-cross-synthesis-text">' + escapeHtml(entry.cross_category_synthesis) + '</div></div>';
+      }
+      html += '</div>';
+      return html;
+    }
+
     function getCLAEntryText(entry, layerKey, catFilter) {
       if (!entry) return '';
-      // For fields that may exist at entry level (key_tension, emerging_narrative)
       if (layerKey === 'key_tension' || layerKey === 'emerging_narrative') {
-        // Check entry-level first
         if (entry[layerKey]) return entry[layerKey];
-        // Then check inside categories
         if (!entry.categories) return '';
         if (catFilter === 'Overall') {
           const parts = [];
@@ -3184,14 +3151,11 @@
           return catData ? (catData[layerKey] || '') : '';
         }
       }
-      // Standard CLA layer fields (litany, systemic_causes, worldview, myth_metaphor)
       if (!entry.categories) return '';
       if (catFilter === 'Overall') {
         const parts = [];
         for (const [catKey, catData] of Object.entries(entry.categories)) {
-          if (catData[layerKey]) {
-            parts.push(catData[layerKey]);
-          }
+          if (catData[layerKey]) parts.push(catData[layerKey]);
         }
         return parts.join('\n\n');
       } else {
@@ -3200,97 +3164,16 @@
       }
     }
 
-    function formatCLAPeriod(period) {
-      if (!period) return '';
-      // Handle quarterly format like "2025Q1" or "2025-Q1" or "2025-04"
-      if (period.includes('Q')) {
-        return period.replace(/(\d{4})-?Q(\d)/, '$1年Q$2');
-      }
-      if (period.includes('-')) {
-        const parts = period.split('-');
+    function formatCLAPeriodLabel(entry) {
+      const p = entry.period;
+      if (!p) return '';
+      if (p.includes('Q')) return p.replace(/(\d{4})-?Q(\d)/, '$1年Q$2');
+      if (p.includes('-')) {
+        const parts = p.split('-');
         return parts[0] + '年' + parseInt(parts[1]) + '月';
       }
-      return period + '年';
+      return p + '年';
     }
-
-    function renderCLAYearListItem(entry) {
-      if (!entry?.categories) return '';
-      const catFilter = claArchiveCatFilter;
-      let html = '<div class="cla-year-list-item">';
-      html += '<div class="cla-year-list-period">' + escapeHtml(entry.period) + '</div>';
-
-      if (catFilter === 'Overall') {
-        CLA_LAYERS.forEach(layer => {
-          const parts = [];
-          for (const [catKey, catData] of Object.entries(entry.categories)) {
-            if (catData[layer.key]) {
-              const label = PESTLE_CATS[catKey]?.labelJa || catKey;
-              const text = catData[layer.key].length > 80
-                ? catData[layer.key].substring(0, 80) + '...'
-                : catData[layer.key];
-              parts.push('[' + label + '] ' + text);
-            }
-          }
-          if (parts.length > 0) {
-            html += '<div class="cla-year-list-layer">' +
-              '<div class="cla-year-list-layer-label">' + layer.labelJa + '</div>' +
-              '<div class="cla-year-list-layer-text">' + escapeHtml(parts.join('\n')) + '</div></div>';
-          }
-        });
-      } else {
-        const catData = entry.categories[catFilter];
-        if (catData) {
-          CLA_LAYERS.forEach(layer => {
-            if (catData[layer.key]) {
-              html += '<div class="cla-year-list-layer">' +
-                '<div class="cla-year-list-layer-label">' + layer.labelJa + '</div>' +
-                '<div class="cla-year-list-layer-text">' + escapeHtml(catData[layer.key]) + '</div></div>';
-            }
-          });
-        }
-      }
-
-      if (entry.cross_category_synthesis) {
-        const synth = entry.cross_category_synthesis.length > 120
-          ? entry.cross_category_synthesis.substring(0, 120) + '...'
-          : entry.cross_category_synthesis;
-        html += '<div class="cla-year-list-synthesis">' + escapeHtml(synth) + '</div>';
-      }
-      html += '</div>';
-      return html;
-    }
-
-    window.showCLADetail = function(type, period) {
-      const entries = type === 'yearly' ? window._claYearly : window._claQuarterly;
-      const detailEl = document.getElementById(type === 'yearly' ? 'claYearlyDetail' : 'claQuarterlyDetail');
-      if (!entries || !detailEl) return;
-      const entry = entries.find(e => e.period === period);
-      if (!entry?.categories) { detailEl.innerHTML = '<p class="text-muted">データがありません。</p>'; return; }
-
-      // Highlight active button
-      detailEl.parentElement.querySelectorAll('.cla-period-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.textContent === period);
-      });
-
-      let html = '';
-      for (const [catKey, catData] of Object.entries(entry.categories)) {
-        const info = PESTLE_CATS[catKey] || { labelJa: catKey, color: 'var(--accent)' };
-        html += '<div class="cla-detail-cat-block"><div class="cla-detail-cat-label" style="color:' + info.color + '">' + info.labelJa + '</div>';
-        CLA_LAYERS.forEach(layer => {
-          if (catData[layer.key]) {
-            html += '<div class="cla-detail-layer cla-layer-' + layer.depth + '">' +
-              '<span class="cla-detail-layer-label">' + layer.labelJa + '</span>' +
-              '<div class="cla-detail-layer-text">' + escapeHtml(catData[layer.key]) + '</div></div>';
-          }
-        });
-        html += '</div>';
-      }
-      if (entry.cross_category_synthesis) {
-        html += '<div class="cla-cross-synthesis"><div class="cla-cross-synthesis-label">カテゴリ横断統合</div>' +
-          '<div class="cla-cross-synthesis-text">' + escapeHtml(entry.cross_category_synthesis) + '</div></div>';
-      }
-      detailEl.innerHTML = html;
-    };
 
     // ==============================================================
     // RENDER: SIGNALS
