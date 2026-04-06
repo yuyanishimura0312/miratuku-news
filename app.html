@@ -667,512 +667,209 @@
     }
 
     /* ================================================================
-       CLA (Causal Layered Analysis) — Premium Analytical Dashboard
+       CLA (Causal Layered Analysis)
        ================================================================ */
 
-    /* Hero intro */
-    .cla-section-intro {
-      font-size: 0.92rem;
-      line-height: 1.85;
-      color: var(--text-secondary);
-      margin-bottom: 2rem;
-      max-width: 760px;
-      padding: 20px 24px;
-      background: linear-gradient(135deg, var(--surface), var(--cla-1));
-      border-radius: var(--radius);
-      border-left: 4px solid var(--accent);
-    }
-
-    /* Category tab bar — segmented control style */
+    /* Tab bar for category switching */
     .cla-tab-bar {
       display: flex;
-      gap: 2px;
-      margin-bottom: 1.5rem;
+      gap: 6px;
+      margin-bottom: 1.25rem;
       flex-wrap: wrap;
-      padding: 3px;
-      background: var(--surface2);
-      border-radius: 10px;
-      border: 1px solid var(--border-light);
     }
     .cla-tab-btn {
-      padding: 8px 18px;
-      border-radius: 8px;
-      font-size: 0.78rem;
+      padding: 8px 16px;
+      border-radius: var(--radius-xs);
+      font-size: 0.8rem;
       font-weight: 600;
-      border: none;
+      border: 1px solid var(--border);
       background: transparent;
-      color: var(--text-muted);
+      color: var(--text-secondary);
       cursor: pointer;
       font-family: var(--font);
-      transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
+      transition: all 0.2s;
     }
-    .cla-tab-btn:hover { background: var(--surface); color: var(--text); }
+    .cla-tab-btn:hover { background: var(--accent-light); border-color: var(--accent); color: var(--accent); }
     .cla-tab-btn.active {
-      background: var(--card);
-      color: var(--accent);
-      box-shadow: 0 1px 4px rgba(61,46,34,0.1), 0 2px 8px rgba(122,64,51,0.08);
-      font-weight: 700;
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
     }
 
-    /* CLA layer stack — deep iceberg visualization */
-    .cla-layers {
-      border-radius: var(--radius);
-      overflow: hidden;
-      border: 1px solid var(--border);
-      box-shadow: 0 2px 12px rgba(122,64,51,0.06), 0 8px 32px rgba(61,46,34,0.04);
-    }
-    .cla-layer {
-      padding: 22px 28px 22px 32px;
-      position: relative;
-      transition: background 0.3s;
-    }
-    .cla-layer:hover { filter: brightness(0.98); }
+    /* CLA layer stack */
+    .cla-layers { border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); }
+    .cla-layer { padding: 16px 20px; position: relative; }
     .cla-layer-1 { background: var(--cla-1); }
     .cla-layer-2 { background: var(--cla-2); }
     .cla-layer-3 { background: var(--cla-3); }
     .cla-layer-4 { background: var(--cla-4); }
     .cla-layer + .cla-layer { border-top: 1px solid var(--border-light); }
-
-    /* Depth bar — progressively wider to visualize depth */
     .cla-layer::before {
       content: '';
       position: absolute;
-      left: 0;
-      top: 0;
-      bottom: 0;
+      left: 0; top: 0; bottom: 0;
       width: 4px;
-      transition: width 0.3s;
     }
-    .cla-layer-1::before { background: var(--accent-warm); width: 4px; }
-    .cla-layer-2::before { background: var(--accent-soft); width: 5px; }
-    .cla-layer-3::before { background: var(--accent); width: 6px; }
-    .cla-layer-4::before { background: var(--P); width: 8px; }
-
-    /* Depth number badge */
-    .cla-layer::after {
-      content: attr(data-depth);
-      position: absolute;
-      right: 16px;
-      top: 16px;
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.6rem;
-      font-weight: 800;
-      color: var(--text-muted);
-      background: var(--surface2);
-      border: 1px solid var(--border-light);
-    }
-
+    .cla-layer-1::before { background: var(--accent-warm); }
+    .cla-layer-2::before { background: var(--accent-soft); }
+    .cla-layer-3::before { background: var(--accent); }
+    .cla-layer-4::before { background: var(--P); }
     .cla-layer-label {
-      font-size: 0.62rem;
-      font-weight: 800;
+      font-size: 0.68rem;
+      font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.14em;
+      letter-spacing: 0.08em;
       color: var(--text-muted);
-      margin-bottom: 8px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
+      margin-bottom: 4px;
     }
-    .cla-layer-label::before {
-      content: '';
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: currentColor;
-      opacity: 0.4;
-    }
-    .cla-layer-text {
-      font-size: 0.86rem;
-      line-height: 1.85;
-      white-space: pre-line;
-      color: var(--text);
-    }
+    .cla-layer-text { font-size: 0.84rem; line-height: 1.75; white-space: pre-line; }
 
-    .cla-extra-block {
-      padding: 18px 28px 18px 32px;
-      border-top: 1px solid var(--border-light);
-    }
+    .cla-extra-block { padding: 14px 20px; border-top: 1px solid var(--border-light); }
     .cla-extra-block-highlight { background: var(--accent-light); }
     .cla-extra-block-surface { background: var(--surface); }
     .cla-extra-label {
-      font-size: 0.62rem;
-      font-weight: 800;
+      font-size: 0.68rem;
+      font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.14em;
+      letter-spacing: 0.08em;
       color: var(--accent);
-      margin-bottom: 6px;
+      margin-bottom: 4px;
     }
-    .cla-extra-text { font-size: 0.84rem; line-height: 1.75; }
+    .cla-extra-text { font-size: 0.82rem; line-height: 1.7; }
 
-    /* Archive Section — clear visual break */
-    .cla-archive {
-      margin-top: 3rem;
-      padding-top: 2.5rem;
-      border-top: 1px solid var(--border);
-      position: relative;
-    }
-    .cla-archive::before {
-      content: '';
-      position: absolute;
-      top: -1px;
-      left: 0;
-      width: 80px;
-      height: 3px;
-      background: linear-gradient(90deg, var(--accent), var(--accent-warm));
-      border-radius: 2px;
-    }
-    .cla-archive-title {
-      font-weight: 800;
-      font-size: 1.2rem;
-      margin-bottom: 0.5rem;
-      letter-spacing: -0.02em;
-      color: var(--text);
-    }
-    .cla-archive-desc {
-      font-size: 0.84rem;
-      color: var(--text-secondary);
-      margin-bottom: 1.5rem;
-      line-height: 1.65;
-    }
+    /* CLA Archive */
+    .cla-archive { margin-top: 2rem; }
 
-    /* Detail panel — individual view */
+    /* Detail panel */
     .cla-detail-panel {
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 28px 32px;
-      min-height: 240px;
-      box-shadow: 0 2px 12px rgba(122,64,51,0.05);
+      padding: 20px;
     }
-    .cla-detail-placeholder {
-      color: var(--text-muted);
-      font-size: 0.88rem;
-      text-align: center;
-      padding: 4rem 0;
-    }
-    .cla-detail-cat-block {
-      margin-bottom: 2rem;
-      padding-bottom: 1.5rem;
-      border-bottom: 1px solid var(--border-light);
-    }
-    .cla-detail-cat-block:last-of-type { border-bottom: none; padding-bottom: 0; margin-bottom: 0; }
-    .cla-detail-cat-label {
-      font-weight: 700;
-      font-size: 0.92rem;
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .cla-detail-cat-dot {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      flex-shrink: 0;
-      box-shadow: 0 0 0 3px var(--border-light);
-    }
-    .cla-detail-layer {
-      padding: 14px 18px;
-      margin-bottom: 4px;
-      border-radius: 10px;
-      transition: background 0.2s;
-    }
-    .cla-detail-layer::before,
-    .cla-detail-layer::after { display: none; }
-    .cla-detail-layer:hover { filter: brightness(0.97); }
-    .cla-detail-layer-label {
-      font-size: 0.62rem;
-      font-weight: 800;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-    }
-    .cla-detail-layer-text {
-      font-size: 0.86rem;
-      line-height: 1.85;
-      margin-top: 6px;
-    }
+    .cla-detail-placeholder { color: var(--text-muted); font-size: 0.82rem; text-align: center; padding: 3rem 0; }
+    .cla-detail-cat-block { margin-bottom: 1.25rem; }
+    .cla-detail-cat-label { font-weight: 600; font-size: 0.88rem; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+    .cla-detail-cat-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .cla-detail-layer { padding: 10px 14px; margin-bottom: 2px; border-radius: 6px; }
+    .cla-detail-layer::before, .cla-detail-layer::after { display: none; }
+    .cla-detail-layer-label { font-size: 0.68rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+    .cla-detail-layer-text { font-size: 0.84rem; line-height: 1.75; margin-top: 4px; }
     .cla-cross-synthesis {
-      background: linear-gradient(135deg, var(--accent-light), var(--surface));
-      padding: 20px 24px;
-      border-radius: 12px;
-      margin-top: 20px;
-      border: 1px solid var(--border);
-      position: relative;
-      overflow: hidden;
+      background: var(--accent-light);
+      padding: 14px 16px;
+      border-radius: var(--radius-xs);
+      margin-top: 12px;
     }
-    .cla-cross-synthesis::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 3px;
-      background: linear-gradient(90deg, var(--accent), var(--accent-warm), var(--accent-soft));
-    }
-    .cla-cross-synthesis-label {
-      font-size: 0.65rem;
-      font-weight: 800;
-      color: var(--accent);
-      margin-bottom: 8px;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-    }
-    .cla-cross-synthesis-text {
-      font-size: 0.86rem;
-      line-height: 1.8;
-    }
+    .cla-cross-synthesis-label { font-size: 0.72rem; font-weight: 700; color: var(--accent); margin-bottom: 4px; }
+    .cla-cross-synthesis-text { font-size: 0.82rem; line-height: 1.7; }
 
-    /* Period selector — pill bar */
-    .cla-period-bar {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 4px;
-      margin-bottom: 24px;
-      padding: 6px 8px;
-      background: var(--surface);
-      border-radius: 10px;
-      border: 1px solid var(--border-light);
-    }
+    /* Period selector */
     .cla-period-btn {
-      padding: 6px 14px;
+      padding: 5px 12px;
       font-size: 0.72rem;
-      border: none;
-      background: transparent;
-      color: var(--text-muted);
-      border-radius: 7px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text-secondary);
+      border-radius: var(--radius-xs);
       cursor: pointer;
       font-family: var(--font);
       transition: all 0.2s;
-      font-weight: 500;
     }
-    .cla-period-btn:hover {
-      background: var(--card);
-      color: var(--text);
-      box-shadow: 0 1px 3px rgba(61,46,34,0.08);
-    }
-    .cla-period-btn.active {
-      background: var(--accent);
-      color: #fff;
-      box-shadow: 0 2px 8px rgba(122,64,51,0.25);
-      font-weight: 600;
-    }
+    .cla-period-btn:hover { background: var(--accent-light); border-color: var(--accent); color: var(--accent); }
+    .cla-period-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
 
-    /* Archive Controls — unified control bar */
+    /* Archive controls */
     .cla-controls {
       display: flex;
-      gap: 16px;
-      margin-bottom: 20px;
+      gap: 12px;
+      margin-bottom: 1rem;
       flex-wrap: wrap;
       align-items: center;
-      padding: 12px 16px;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      box-shadow: var(--shadow-sm);
     }
     .cla-control-group {
       display: flex;
-      gap: 6px;
+      gap: 4px;
       align-items: center;
     }
     .cla-control-group + .cla-control-group {
-      padding-left: 16px;
+      padding-left: 12px;
       border-left: 1px solid var(--border-light);
     }
     .cla-filter-label {
       font-size: 0.72rem;
       color: var(--text-muted);
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      white-space: nowrap;
+      font-weight: 600;
+      margin-right: 4px;
     }
     .cla-filter-btn {
       padding: 5px 12px;
-      border-radius: 6px;
+      border-radius: var(--radius-xs);
       cursor: pointer;
       font-size: 0.75rem;
       font-family: var(--font);
       font-weight: 500;
       transition: all 0.2s;
     }
-    .cla-filter-btn:hover { opacity: 0.85; transform: translateY(-1px); }
+    .cla-filter-btn:hover { opacity: 0.85; }
 
     /* Layer sections in timeline */
-    .cla-layer-section {
-      margin-bottom: 36px;
-    }
+    .cla-layer-section { margin-bottom: 1.5rem; }
     .cla-layer-section-title {
-      font-size: 0.88rem;
-      font-weight: 700;
-      color: var(--text);
-      margin-bottom: 14px;
-      padding: 10px 16px;
-      background: var(--card);
-      border: 1px solid var(--border-light);
-      border-radius: 10px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
       display: flex;
       align-items: center;
-      gap: 10px;
-      box-shadow: var(--shadow-sm);
+      gap: 8px;
     }
-
-    /* Decade group labels in scroll */
-    .cla-decade-label {
-      min-width: 2px;
-      flex: 0 0 auto;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      padding-top: 4px;
-      position: relative;
-    }
-    .cla-decade-label-text {
-      font-size: 0.6rem;
-      font-weight: 800;
-      color: var(--accent);
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      writing-mode: vertical-lr;
-      transform: rotate(180deg);
-      white-space: nowrap;
-      padding: 8px 0;
-    }
-    .cla-decade-label::before {
-      content: '';
-      width: 2px;
-      flex: 1;
-      background: linear-gradient(to bottom, var(--accent), transparent);
-      border-radius: 1px;
-    }
-
     .cla-layer-scroll {
       display: flex;
-      gap: 14px;
+      gap: 12px;
       overflow-x: auto;
-      padding: 4px 2px 14px;
-      scroll-snap-type: x proximity;
+      padding-bottom: 10px;
     }
-    .cla-layer-scroll::-webkit-scrollbar { height: 5px; }
-    .cla-layer-scroll::-webkit-scrollbar-track { background: transparent; }
+    .cla-layer-scroll::-webkit-scrollbar { height: 6px; }
+    .cla-layer-scroll::-webkit-scrollbar-track { background: var(--surface); border-radius: 3px; }
     .cla-layer-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-    .cla-layer-scroll::-webkit-scrollbar-thumb:hover { background: var(--accent-soft); }
 
-    /* Year cards — editorial magazine style */
+    /* Year cards */
     .cla-year-card {
-      min-width: 280px;
-      max-width: 340px;
+      min-width: 260px;
+      max-width: 320px;
       flex: 0 0 auto;
       background: var(--card);
-      border: 1px solid var(--border-light);
-      border-radius: 14px;
-      padding: 20px;
-      transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
-      scroll-snap-align: start;
-      box-shadow: 0 1px 4px rgba(61,46,34,0.04);
-      position: relative;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xs);
+      padding: 14px 16px;
+      transition: border-color 0.2s;
     }
-    .cla-year-card:hover {
-      border-color: var(--accent-soft);
-      box-shadow: 0 8px 24px rgba(122,64,51,0.1);
-      transform: translateY(-3px);
-    }
-    .cla-year-card.current {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 2px var(--accent), 0 8px 28px rgba(122,64,51,0.15);
-      background: linear-gradient(160deg, var(--card), var(--cla-1));
-    }
-    .cla-year-card.current::after {
-      content: 'NOW';
-      position: absolute;
-      top: 10px;
-      right: 12px;
-      font-size: 0.55rem;
-      font-weight: 800;
-      color: #fff;
-      background: var(--accent);
-      padding: 2px 8px;
-      border-radius: 4px;
-      letter-spacing: 0.1em;
-    }
+    .cla-year-card:hover { border-color: var(--accent); }
+    .cla-year-card.current { border-color: var(--accent); border-width: 2px; }
     .cla-year-card-period {
-      font-size: 0.82rem;
-      font-weight: 800;
-      color: var(--text-muted);
-      margin-bottom: 10px;
-      padding-bottom: 8px;
-      border-bottom: 2px solid var(--border-light);
-      letter-spacing: -0.01em;
-    }
-    .cla-year-card.current .cla-year-card-period {
+      font-weight: 700;
+      font-size: 0.8rem;
       color: var(--accent);
-      border-bottom-color: var(--accent-light);
+      margin-bottom: 6px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid var(--border-light);
     }
     .cla-year-card-text {
-      font-size: 0.82rem;
-      line-height: 1.75;
+      font-size: 0.8rem;
+      line-height: 1.65;
       color: var(--text);
     }
 
-    /* Decade period groups in individual view */
-    .cla-decade-group {
-      margin-bottom: 24px;
-    }
+    /* Decade groups in individual view */
+    .cla-decade-group { margin-bottom: 12px; }
     .cla-decade-group-title {
-      font-size: 0.72rem;
-      font-weight: 800;
-      color: var(--accent);
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      margin-bottom: 8px;
-      padding: 6px 12px;
-      background: var(--surface);
-      border-radius: 6px;
-      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-bottom: 6px;
     }
-    .cla-decade-group-btns {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 4px;
-    }
-
-    /* CLA layer stack progressive disclosure */
-    .cla-layers-interactive .cla-layer {
-      cursor: pointer;
-    }
-    .cla-layers-interactive .cla-layer-text {
-      max-height: 4.2em;
-      overflow: hidden;
-      position: relative;
-      transition: max-height 0.4s cubic-bezier(0.4,0,0.2,1);
-    }
-    .cla-layers-interactive .cla-layer-text::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 2em;
-      background: linear-gradient(to bottom, transparent, var(--cla-1));
-      pointer-events: none;
-      transition: opacity 0.3s;
-    }
-    .cla-layers-interactive .cla-layer-2 .cla-layer-text::after { background: linear-gradient(to bottom, transparent, var(--cla-2)); }
-    .cla-layers-interactive .cla-layer-3 .cla-layer-text::after { background: linear-gradient(to bottom, transparent, var(--cla-3)); }
-    .cla-layers-interactive .cla-layer-4 .cla-layer-text::after { background: linear-gradient(to bottom, transparent, var(--cla-4)); }
-    .cla-layers-interactive .cla-layer.expanded .cla-layer-text {
-      max-height: 2000px;
-    }
-    .cla-layers-interactive .cla-layer.expanded .cla-layer-text::after {
-      opacity: 0;
-    }
+    .cla-decade-group-btns { display: flex; flex-wrap: wrap; gap: 4px; }
 
     /* PESTLE article bookmark */
     .pestle-article-row {
@@ -1773,12 +1470,10 @@
 
       /* CLA archive year list */
       .cla-year-card { min-width: 220px; max-width: 280px; padding: 14px; }
-      .cla-controls { padding: 10px 12px; gap: 10px; }
-      .cla-control-group + .cla-control-group { padding-left: 10px; }
+      .cla-controls { gap: 8px; }
+      .cla-control-group + .cla-control-group { padding-left: 8px; }
       .cla-filter-btn { padding: 4px 8px; font-size: 0.7rem; }
-      .cla-section-intro { padding: 14px 16px; font-size: 0.84rem; }
-      .cla-layer { padding: 16px 20px 16px 24px; }
-      .cla-layer::after { display: none; }
+      .cla-year-card { min-width: 220px; max-width: 280px; }
     }
     @media (max-width: 375px) {
       .container { padding: 0 10px; }
@@ -2264,22 +1959,15 @@
         <h2 class="section-title">因果階層分析</h2>
         <span class="section-subtitle">Causal Layered Analysis</span>
       </div>
-      <p class="cla-section-intro">PESTLEニュースの深層構造を、リタニー（表層事象）、社会的原因、世界観・ディスコース、神話・メタファーの4層で分析します。1990年から現在までの36年間の構造変動を追跡しています。</p>
 
-      <!-- Current CLA Analysis (report-card style) -->
       <div id="claContent">
         <div class="loading-indicator"><div class="loading-spinner"></div><div>CLA分析を読み込み中...</div></div>
       </div>
 
-      <!-- Meta Analysis Report (report-card style) -->
-      <div id="claMetaSection" style="margin-top:2rem">
-        <div id="claMetaContent"></div>
-      </div>
+      <div id="claMetaContent" style="margin-top:1.5rem"></div>
 
-      <!-- CLA Historical Archive -->
-      <div class="cla-archive" id="claArchive">
-        <h3 class="cla-archive-title">CLA 変遷アーカイブ（1990-2026）</h3>
-        <p class="cla-archive-desc">36年間の因果階層分析の結果を、レイヤーごとの変遷一覧、または年次ごとの個別表示で閲覧できます。</p>
+      <div id="claArchive" style="margin-top:1.5rem">
+        <h2 class="section-title">CLA 変遷アーカイブ（1990-2026）</h2>
         <div id="claArchiveView">
           <div class="loading-indicator"><div class="loading-spinner loading-spinner-sm"></div><div>読み込み中...</div></div>
         </div>
@@ -3178,15 +2866,15 @@
           }
           allLayers[layer.key] = texts.join('\n');
         });
-        return '<div class="cla-layers cla-layers-interactive">' +
-          CLA_LAYERS.map(layer => '<div class="cla-layer cla-layer-' + layer.depth + '" data-depth="' + layer.depth + '" onclick="this.classList.toggle(\'expanded\')">' +
-            '<div class="cla-layer-label">' + layer.labelJa + ' <span style="font-size:0.55rem;opacity:0.5;font-weight:400">click to expand</span></div>' +
+        return '<div class="cla-layers">' +
+          CLA_LAYERS.map(layer => '<div class="cla-layer cla-layer-' + layer.depth + '">' +
+            '<div class="cla-layer-label">' + layer.labelJa + '</div>' +
             '<div class="cla-layer-text">' + escapeHtml(allLayers[layer.key] || '') + '</div></div>'
           ).join('') + '</div>';
       }
       const catData = claData[tabKey];
       if (!catData) return '<p class="text-muted">データがありません</p>';
-      let html = '<div class="cla-layers cla-layers-interactive">' +
+      let html = '<div class="cla-layers">' +
         CLA_LAYERS.map(layer => '<div class="cla-layer cla-layer-' + layer.depth + '" data-depth="' + layer.depth + '" onclick="this.classList.toggle(\'expanded\')">' +
           '<div class="cla-layer-label">' + layer.labelJa + ' <span style="font-size:0.55rem;opacity:0.5;font-weight:400">click to expand</span></div>' +
           '<div class="cla-layer-text">' + escapeHtml(catData[layer.key] || '') + '</div></div>'
@@ -3435,13 +3123,6 @@
           { key: 'emerging_narrative', label: '新たな物語', border: 'var(--S)' }
         ];
 
-        // Compute decade boundaries for labels
-        function getDecade(period) {
-          const year = parseInt(period);
-          if (isNaN(year)) return '2020s';
-          return Math.floor(year / 10) * 10 + 's';
-        }
-
         layers.forEach(layer => {
           const hasData = allEntries.some(entry => {
             const text = getCLAEntryText(entry, layer.key, claArchiveCatFilter);
@@ -3450,18 +3131,11 @@
           if (!hasData) return;
 
           html += '<div class="cla-layer-section">';
-          html += '<div class="cla-layer-section-title"><span style="width:10px;height:10px;border-radius:50%;background:' + layer.border + ';flex-shrink:0"></span>' + layer.label + '</div>';
+          html += '<div class="cla-layer-section-title"><span style="width:8px;height:8px;border-radius:50%;background:' + layer.border + ';flex-shrink:0"></span>' + layer.label + '</div>';
           html += '<div class="cla-layer-scroll">';
-          let lastDecade = '';
           allEntries.forEach((entry, idx) => {
             const text = getCLAEntryText(entry, layer.key, claArchiveCatFilter);
             if (!text || !text.trim()) return;
-            // Insert decade separator
-            const decade = getDecade(entry.period);
-            if (decade !== lastDecade) {
-              html += '<div class="cla-decade-label"><div class="cla-decade-label-text">' + decade + '</div></div>';
-              lastDecade = decade;
-            }
             const isCurrent = idx === allEntries.length - 1;
             const periodLabel = formatCLAPeriodLabel(entry);
             html += '<div class="cla-year-card' + (isCurrent ? ' current' : '') + '">';
