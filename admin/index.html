@@ -522,16 +522,35 @@
       <!-- ===== PIPELINE ===== -->
       <div class="panel" id="panel-pipeline">
         <h2 class="panel-title">パイプライン制御</h2>
-        <p class="panel-desc">パイプラインの状態確認と手動実行コマンド</p>
+        <p class="panel-desc">データパイプラインの監視・制御・オンデマンド実行</p>
 
-        <!-- Section A: Pipeline Status -->
+        <!-- Section A: Daemon & Schedule -->
         <div class="card">
-          <h3 class="card-title">パイプライン状態</h3>
-          <div class="card-sub" style="margin-bottom:10px">各ステップの最終実行状況とデータファイルの状態</div>
-          <div id="pipelineSteps"></div>
+          <h3 class="card-title">デーモン状態 / スケジュール</h3>
+          <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center;margin-bottom:12px">
+            <div id="daemonStatus" style="font-size:.78rem">確認中...</div>
+            <div id="scheduleDisplay" style="font-size:.78rem;color:var(--text-m)"></div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <span style="font-size:.75rem;color:var(--text-m)">スケジュール変更:</span>
+            <select id="schedHour" class="inp inp-sm" style="width:70px"></select>
+            <span style="font-size:.78rem">:</span>
+            <select id="schedMin" class="inp inp-sm" style="width:70px"></select>
+            <button class="btn btn-p btn-sm" onclick="changeSchedule()">変更</button>
+          </div>
         </div>
 
-        <!-- Section B: Data File Status -->
+        <!-- Section B: Pipeline Steps with Run Buttons -->
+        <div class="card section-gap">
+          <h3 class="card-title">パイプラインステップ</h3>
+          <div class="card-sub" style="margin-bottom:10px">各ステップの実行状況。ボタンで個別にオンデマンド実行できます。</div>
+          <div style="margin-bottom:12px">
+            <button class="btn btn-p btn-sm" onclick="runPipelineCommand('run_all')" id="btnRunAll">全パイプライン実行</button>
+          </div>
+          <div id="pipelineStepsLive"></div>
+        </div>
+
+        <!-- Section C: Data File Status (existing) -->
         <div class="card section-gap">
           <h3 class="card-title">データファイル状態</h3>
           <div class="card-sub" style="margin-bottom:10px">GitHub Pages上のデータファイルのサイズと更新日時</div>
@@ -539,11 +558,18 @@
           <tbody id="pipeFilesBody"><tr><td colspan="5" class="loading"><span class="spin"></span> 確認中...</td></tr></tbody></table></div>
         </div>
 
-        <!-- Section C: Manual Execution Commands -->
+        <!-- Section D: Recent Logs -->
         <div class="card section-gap">
-          <h3 class="card-title">手動実行コマンド</h3>
-          <div class="card-sub" style="margin-bottom:10px">シェルアクセスが必要です。以下のコマンドをターミナルで実行してください。</div>
-          <div id="pipeCommands"></div>
+          <h3 class="card-title">実行ログ</h3>
+          <div class="card-sub" style="margin-bottom:10px">直近のパイプライン実行ログ</div>
+          <div id="pipelineLogs" style="background:#1a1410;color:#e8ddd4;font-family:monospace;font-size:.72rem;padding:12px;border-radius:8px;max-height:400px;overflow-y:auto;white-space:pre-wrap;line-height:1.5">ログを読み込み中...</div>
+        </div>
+
+        <!-- Section E: Command History -->
+        <div class="card section-gap">
+          <h3 class="card-title">コマンド履歴</h3>
+          <div class="tw"><table class="dt"><thead><tr><th>時刻</th><th>コマンド</th><th>ステップ</th><th>状態</th><th>所要時間</th></tr></thead>
+          <tbody id="cmdHistoryBody"><tr><td colspan="5" style="font-size:.75rem;color:var(--text-m)">読み込み中...</td></tr></tbody></table></div>
         </div>
       </div>
 
@@ -2081,6 +2107,177 @@
       if(tab==='pipeline'&&!pipeLoaded){pipeLoaded=true;loadPipeline()}
       if(tab==='analytics'&&!analyticsLoaded){analyticsLoaded=true;loadAnalytics()}
     }));
+
+    // === PIPELINE MANAGEMENT (Firestore-backed) ===
+    const PIPE_STEP_DEFS = [
+      { key: 'collect_news', label: 'ニュース収集', script: 'collect_news.py', freq: '日次' },
+      { key: 'ai_analyze', label: 'AI分析', script: 'ai_analyze.py', freq: '日次' },
+      { key: 'curate_daily_papers', label: '論文キュレーション', script: 'curate_daily_papers.py', freq: '日次' },
+      { key: 'generate_insight_reports', label: 'インサイトレポート', script: 'generate_insight_reports.py', freq: '日次' },
+      { key: 'detect_alerts', label: 'アラート検出', script: 'detect_alerts.py', freq: '日次' },
+      { key: 'collect_historical_daily', label: '歴史データ収集', script: 'collect_historical_daily.py', freq: '日次' },
+      { key: 'update_history', label: '履歴更新', script: 'update_history.py', freq: '日次' },
+      { key: 'deploy', label: 'Git デプロイ', script: 'git push', freq: '日次' },
+    ];
+
+    let _pipeStatusUnsub = null;
+    let _pipeCmdUnsub = null;
+    let _pipeLogUnsub = null;
+
+    function initPipelineRealtime() {
+      // Populate schedule dropdowns
+      const hSel = document.getElementById('schedHour');
+      const mSel = document.getElementById('schedMin');
+      if (hSel && hSel.options.length === 0) {
+        for (let h = 0; h < 24; h++) hSel.innerHTML += '<option value="' + h + '">' + String(h).padStart(2, '0') + '</option>';
+        for (let m = 0; m < 60; m += 5) mSel.innerHTML += '<option value="' + m + '">' + String(m).padStart(2, '0') + '</option>';
+      }
+
+      // Listen to pipeline_status/current
+      if (!_pipeStatusUnsub) {
+        _pipeStatusUnsub = db.collection('pipeline_status').doc('current').onSnapshot(doc => {
+          const d = doc.data() || {};
+          // Daemon status
+          const daemonEl = document.getElementById('daemonStatus');
+          if (d.daemonAlive) {
+            const ts = d.daemonAlive.toDate ? d.daemonAlive.toDate() : new Date(d.daemonAlive);
+            const ago = Math.round((Date.now() - ts.getTime()) / 1000);
+            if (ago < 120) {
+              daemonEl.innerHTML = '<span class="badge badge-ok">Daemon: Online</span> <span style="color:var(--text-m)">(heartbeat ' + ago + '秒前)</span>';
+            } else {
+              daemonEl.innerHTML = '<span class="badge badge-err">Daemon: Offline</span> <span style="color:var(--text-m)">(最終: ' + ago + '秒前)</span>';
+            }
+          } else {
+            daemonEl.innerHTML = '<span class="badge badge-warn">Daemon: 未接続</span>';
+          }
+
+          // Schedule
+          const h = d.scheduleHour ?? 4;
+          const m = d.scheduleMinute ?? 0;
+          document.getElementById('scheduleDisplay').textContent = '現在のスケジュール: 毎日 ' + String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0') + ' JST';
+          if (hSel) hSel.value = h;
+          if (mSel) mSel.value = m;
+
+          // Steps status
+          const steps = d.steps || {};
+          const stepsEl = document.getElementById('pipelineStepsLive');
+          if (stepsEl) {
+            let html = '<table class="dt"><thead><tr><th>ステップ</th><th>スクリプト</th><th>状態</th><th>所要時間</th><th>頻度</th><th></th></tr></thead><tbody>';
+            PIPE_STEP_DEFS.forEach(s => {
+              const st = steps[s.key] || {};
+              const statusBadge = st.status === 'success' ? '<span class="badge badge-ok">成功</span>' :
+                                  st.status === 'error' ? '<span class="badge badge-err">エラー</span>' :
+                                  st.status === 'running' ? '<span class="badge badge-warn">実行中</span>' :
+                                  '<span style="color:var(--text-m)">—</span>';
+              const dur = st.durationSec ? st.durationSec + '秒' : '—';
+              html += '<tr><td style="font-weight:600">' + s.label + '</td><td><code style="font-size:.68rem">' + s.script + '</code></td><td>' + statusBadge + '</td><td>' + dur + '</td><td style="font-size:.7rem;color:var(--text-m)">' + s.freq + '</td>' +
+                '<td><button class="btn btn-s btn-sm" onclick="runPipelineCommand(\'run_step\',\'' + s.key + '\')" style="font-size:.68rem">実行</button></td></tr>';
+            });
+            html += '</tbody></table>';
+
+            // Last run summary
+            if (d.lastRunDate) {
+              const runStatus = d.lastRunStatus === 'success' ? '<span class="badge badge-ok">成功</span>' :
+                                d.lastRunStatus === 'error' ? '<span class="badge badge-err">エラー</span>' :
+                                d.lastRunStatus === 'running' ? '<span class="badge badge-warn">実行中</span>' : '—';
+              html = '<div style="margin-bottom:12px;font-size:.78rem;display:flex;gap:12px;align-items:center">' +
+                '<span>最終実行: <strong>' + d.lastRunDate + '</strong></span>' + runStatus +
+                (d.lastRunDuration ? '<span>' + d.lastRunDuration + '秒</span>' : '') +
+                '</div>' + html;
+            }
+            stepsEl.innerHTML = html;
+          }
+        }, err => { console.error('Pipeline status listen error:', err); });
+      }
+
+      // Listen to pipeline_commands (last 20)
+      if (!_pipeCmdUnsub) {
+        _pipeCmdUnsub = db.collection('pipeline_commands').orderBy('requestedAt', 'desc').limit(20).onSnapshot(snap => {
+          const body = document.getElementById('cmdHistoryBody');
+          if (!body) return;
+          if (snap.empty) { body.innerHTML = '<tr><td colspan="5" style="font-size:.75rem;color:var(--text-m)">コマンド履歴なし</td></tr>'; return; }
+          let html = '';
+          snap.forEach(doc => {
+            const d = doc.data();
+            const time = d.requestedAt?.toDate ? d.requestedAt.toDate().toLocaleString('ja-JP') : '—';
+            const badge = d.status === 'success' ? '<span class="badge badge-ok">成功</span>' :
+                          d.status === 'error' ? '<span class="badge badge-err">エラー</span>' :
+                          d.status === 'running' ? '<span class="badge badge-warn">実行中</span>' :
+                          '<span class="badge">待機中</span>';
+            const dur = d.durationSec ? d.durationSec + '秒' : '—';
+            html += '<tr><td style="font-size:.7rem">' + time + '</td><td>' + (d.type || '') + '</td><td>' + (d.step || '全体') + '</td><td>' + badge + '</td><td>' + dur + '</td></tr>';
+          });
+          body.innerHTML = html;
+        }, err => { console.error('Pipeline commands listen error:', err); });
+      }
+
+      // Listen to latest log
+      if (!_pipeLogUnsub) {
+        _pipeLogUnsub = db.collection('pipeline_logs').orderBy('date', 'desc').limit(1).onSnapshot(snap => {
+          const el = document.getElementById('pipelineLogs');
+          if (!el) return;
+          if (snap.empty) { el.textContent = 'ログなし'; return; }
+          const d = snap.docs[0].data();
+          const lines = d.lines || [];
+          el.textContent = '[' + d.date + '] ' + lines.length + '行\n' + lines.join('\n');
+          el.scrollTop = el.scrollHeight;
+        }, err => { el.textContent = 'ログ読み込みエラー: ' + err.message; });
+      }
+    }
+
+    window.runPipelineCommand = async function(type, step) {
+      if (!firebaseUser) { alert('Firestore操作にはGoogleログインが必要です'); return; }
+      if (!confirm(type === 'run_all' ? '全パイプラインを実行しますか？' : step + ' を実行しますか？')) return;
+      try {
+        await db.collection('pipeline_commands').add({
+          type: type,
+          step: step || '',
+          status: 'pending',
+          requestedAt: firebase.firestore.FieldValue.serverTimestamp(),
+          requestedBy: firebaseUser.email || firebaseUser.displayName || 'unknown',
+        });
+        showToast((step || '全パイプライン') + ' の実行をリクエストしました', 'ok');
+      } catch (e) { alert('エラー: ' + e.message); }
+    };
+
+    window.changeSchedule = async function() {
+      if (!firebaseUser) { alert('Googleログインが必要です'); return; }
+      const h = parseInt(document.getElementById('schedHour').value);
+      const m = parseInt(document.getElementById('schedMin').value);
+      if (!confirm('スケジュールを ' + String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0') + ' に変更しますか？')) return;
+      try {
+        await db.collection('pipeline_commands').add({
+          type: 'change_schedule',
+          hour: h, minute: m,
+          status: 'pending',
+          requestedAt: firebase.firestore.FieldValue.serverTimestamp(),
+          requestedBy: firebaseUser.email || '',
+        });
+        showToast('スケジュール変更をリクエストしました');
+      } catch (e) { alert('エラー: ' + e.message); }
+    };
+
+    function showToast(msg, type) {
+      const el = document.createElement('div');
+      el.style.cssText = 'position:fixed;bottom:20px;right:20px;background:var(--accent);color:#fff;padding:10px 16px;border-radius:8px;font-size:.78rem;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,.2)';
+      el.textContent = msg;
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 3500);
+    }
+
+    // Override loadPipeline to init real-time listeners
+    const _origLoadPipeline = typeof loadPipeline === 'function' ? loadPipeline : null;
+    window.loadPipeline = function() {
+      if (_origLoadPipeline) _origLoadPipeline();
+      if (firebaseUser) initPipelineRealtime();
+      else {
+        // Wait for auth
+        const check = setInterval(() => {
+          if (firebaseUser) { clearInterval(check); initPipelineRealtime(); }
+        }, 1000);
+        setTimeout(() => clearInterval(check), 30000);
+      }
+    };
 
     // === CLA DATABASE MANAGEMENT ===
     const CLA_DATA_BASE = 'https://yuyanishimura0312.github.io/future-insight-app/data';
