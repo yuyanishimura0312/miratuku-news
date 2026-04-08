@@ -1887,6 +1887,25 @@
         <span class="section-subtitle">Causal Layered Analysis</span>
       </div>
 
+      <div id="claDownloadBar" style="margin-bottom:1rem;padding:12px 16px;background:var(--cla-1);border:1px solid var(--border-light);border-radius:var(--radius-xs);display:flex;flex-wrap:wrap;gap:10px;align-items:center;font-size:0.82rem">
+        <div style="flex:1;min-width:200px;color:var(--text-secondary)">
+          <strong style="color:var(--text)">36ヵ年分のCLA分析をダウンロード</strong><br>
+          <span style="font-size:0.74rem">1990-2026 / 年次31件 + 四半期22件 / 日本・グローバルのメタ分析付き</span>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <a href="data/cla_36years_analysis.txt" download="cla_36years_analysis.txt" class="cla-download-btn" style="padding:8px 14px;background:var(--accent);color:#fff;text-decoration:none;border-radius:6px;font-size:0.78rem;font-weight:600;display:inline-flex;align-items:center;gap:6px">
+            <span>テキスト</span>
+            <span style="font-size:0.7rem;opacity:0.8">.txt</span>
+          </a>
+          <button type="button" onclick="downloadCLALiveText()" class="cla-download-btn" style="padding:8px 14px;background:transparent;color:var(--text-secondary);border:1px solid var(--border-light);border-radius:6px;font-size:0.78rem;font-weight:600;cursor:pointer">
+            最新データで生成
+          </button>
+          <button type="button" onclick="downloadCLALiveJSON()" class="cla-download-btn" style="padding:8px 14px;background:transparent;color:var(--text-secondary);border:1px solid var(--border-light);border-radius:6px;font-size:0.78rem;font-weight:600;cursor:pointer">
+            JSON
+          </button>
+        </div>
+      </div>
+
       <div id="claMetaContent"></div>
 
       <div id="claContent" style="margin-top:1.5rem">
@@ -2909,6 +2928,7 @@
 
         window._claYearly = yearly;
         window._claQuarterly = quarterly;
+        window._claMeta = metaData;
 
         renderCLAArchiveView();
       } catch (e) { console.error('CLA archive load error:', e); }
@@ -2956,6 +2976,206 @@
 
       metaContainer.innerHTML = html;
     }
+
+    // ============================================
+    // CLA ダウンロード機能
+    // 静的 .txt は data/cla_36years_analysis.txt（定期再生成）
+    // 下記のボタンは読み込み済みの window._claYearly/_claQuarterly から
+    // ブラウザ内で最新テキスト/JSONを即時生成する
+    // ============================================
+    const CLA_CATEGORY_LABELS = {
+      Political: '政治', Economic: '経済', Social: '社会',
+      Technological: '技術', Legal: '法律', Environmental: '環境'
+    };
+    const CLA_CATEGORY_ORDER = ['Political','Economic','Social','Technological','Legal','Environmental'];
+    const CLA_LAYER_LABELS = {
+      litany: 'Litany (表層・出来事)',
+      systemic_causes: 'Systemic Causes (システム的原因)',
+      worldview: 'Worldview (世界観・イデオロギー)',
+      myth_metaphor: 'Myth / Metaphor (神話・メタファー)',
+      key_tension: 'Key Tension (主要な緊張)',
+      emerging_narrative: 'Emerging Narrative (立ち現れる物語)'
+    };
+    const CLA_LAYER_ORDER = ['litany','systemic_causes','worldview','myth_metaphor','key_tension','emerging_narrative'];
+
+    function buildCLAText(yearly, quarterly, meta) {
+      const bar = '='.repeat(70);
+      const lines = [];
+      const now = new Date();
+      const jst = new Date(now.getTime() + (9*60 - now.getTimezoneOffset()) * 60000);
+      const ts = jst.toISOString().slice(0,16).replace('T',' ') + ' JST';
+      const coverage = (meta && meta.data_coverage) || {};
+
+      lines.push(bar);
+      lines.push('CLA (Causal Layered Analysis) 36年分析');
+      lines.push('1990 - 2026');
+      lines.push(bar);
+      lines.push('');
+      lines.push('生成日時: ' + ts + '（ブラウザ内生成）');
+      lines.push('データソース: miratuku-news / future-insight-app');
+      lines.push('カバレッジ: 年次 ' + (coverage.yearly_periods || yearly.length) + '件 + 四半期 ' + (coverage.quarterly_periods || quarterly.length) + '件 = 合計 ' + (coverage.total_periods || (yearly.length + quarterly.length)) + '期間');
+      lines.push('年範囲: ' + (coverage.year_range || '1990-2026'));
+      lines.push('');
+      lines.push('【CLA（因果階層分析）とは】');
+      lines.push('  Sohail Inayatullah が提唱した未来学の分析手法。社会現象を4層');
+      lines.push('  （Litany / Systemic Causes / Worldview / Myth & Metaphor）に');
+      lines.push('  分解し、表層の出来事と深層の神話を対応付けることで、');
+      lines.push('  代替的未来の可能性を構造的に探索する。');
+      lines.push('');
+
+      function formatMetaRegion(regionKey, regionData) {
+        if (!regionData) return '';
+        const out = [];
+        out.push(bar);
+        out.push('メタ分析: ' + regionKey.toUpperCase() + ' — ' + (regionData.title || regionKey));
+        out.push(bar);
+        out.push('');
+        if (regionData.report_text) {
+          out.push(String(regionData.report_text).trim());
+          out.push('');
+        }
+        const shifts = regionData.key_paradigm_shifts || [];
+        if (shifts.length) {
+          out.push('-'.repeat(60));
+          out.push('主要パラダイムシフト');
+          out.push('-'.repeat(60));
+          shifts.forEach((s, i) => {
+            const desc = s.description || s.shift || '';
+            out.push((i+1) + '. [' + (s.period || '') + '] ' + desc);
+          });
+          out.push('');
+        }
+        const myths = regionData.dominant_myths_timeline || [];
+        if (myths.length) {
+          out.push('-'.repeat(60));
+          out.push('支配的な神話・メタファーの変遷');
+          out.push('-'.repeat(60));
+          myths.forEach(m => {
+            out.push('  [' + (m.period || '') + '] ' + (m.myth || m.metaphor || ''));
+          });
+          out.push('');
+        }
+        return out.join('\n');
+      }
+
+      if (meta) {
+        ['japan','global'].forEach(rk => {
+          const block = formatMetaRegion(rk, meta[rk]);
+          if (block) { lines.push(block); lines.push(''); }
+        });
+      }
+
+      function indentText(text, indent) {
+        return String(text || '').split('\n').map(l => l ? indent + l : '').join('\n');
+      }
+
+      function formatEntry(entry) {
+        const out = [];
+        const divider = '-'.repeat(60);
+        out.push(divider);
+        if (entry.type === 'quarterly') out.push('■ ' + entry.period + '（四半期）');
+        else out.push('■ ' + entry.period + '年');
+        out.push(divider);
+        out.push('');
+        const cats = entry.categories || {};
+        CLA_CATEGORY_ORDER.forEach(catKey => {
+          const cat = cats[catKey];
+          if (!cat) return;
+          out.push('【' + CLA_CATEGORY_LABELS[catKey] + ' (' + catKey + ')】');
+          CLA_LAYER_ORDER.forEach(layerKey => {
+            const val = cat[layerKey];
+            if (!val) return;
+            out.push('  ◆ ' + CLA_LAYER_LABELS[layerKey]);
+            out.push(indentText(String(val).trim(), '    '));
+            out.push('');
+          });
+          out.push('');
+        });
+        const syn = entry.cross_category_synthesis;
+        if (syn) {
+          out.push('【分野横断の統合】');
+          if (typeof syn === 'object') {
+            Object.entries(syn).forEach(([k, v]) => {
+              out.push('  ◆ ' + k);
+              out.push(indentText(String(v || '').trim(), '    '));
+              out.push('');
+            });
+          } else {
+            out.push(indentText(String(syn).trim(), '  '));
+            out.push('');
+          }
+        }
+        return out.join('\n');
+      }
+
+      const sortedYearly = [...yearly].sort((a,b) => String(a.period).localeCompare(String(b.period)));
+      const sortedQuarterly = [...quarterly].sort((a,b) => String(a.period).localeCompare(String(b.period)));
+
+      lines.push('');
+      lines.push(bar);
+      lines.push('第I部: 年次分析 (' + sortedYearly.length + '件)');
+      lines.push(bar);
+      lines.push('');
+      sortedYearly.forEach(e => { lines.push(formatEntry(e)); lines.push(''); });
+
+      lines.push('');
+      lines.push(bar);
+      lines.push('第II部: 四半期分析 (' + sortedQuarterly.length + '件)');
+      lines.push(bar);
+      lines.push('');
+      sortedQuarterly.forEach(e => { lines.push(formatEntry(e)); lines.push(''); });
+
+      lines.push('');
+      lines.push(bar);
+      lines.push('(終わり)');
+      lines.push(bar);
+      return lines.join('\n');
+    }
+
+    function triggerDownload(content, filename, mime) {
+      const blob = new Blob([content], { type: mime });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 0);
+    }
+
+    window.downloadCLALiveText = function() {
+      const yearly = window._claYearly || [];
+      const quarterly = window._claQuarterly || [];
+      const meta = window._claMeta || null;
+      if (yearly.length === 0 && quarterly.length === 0) {
+        alert('CLAデータがまだ読み込まれていません。しばらく待ってから再度お試しください。');
+        return;
+      }
+      const text = buildCLAText(yearly, quarterly, meta);
+      const stamp = new Date().toISOString().slice(0,10);
+      triggerDownload(text, 'cla_36years_analysis_' + stamp + '.txt', 'text/plain;charset=utf-8');
+    };
+
+    window.downloadCLALiveJSON = function() {
+      const yearly = window._claYearly || [];
+      const quarterly = window._claQuarterly || [];
+      const meta = window._claMeta || null;
+      if (yearly.length === 0 && quarterly.length === 0) {
+        alert('CLAデータがまだ読み込まれていません。しばらく待ってから再度お試しください。');
+        return;
+      }
+      const bundle = {
+        generated_at: new Date().toISOString(),
+        source: 'miratuku-news / future-insight-app',
+        coverage: (meta && meta.data_coverage) || { yearly_periods: yearly.length, quarterly_periods: quarterly.length, total_periods: yearly.length + quarterly.length, year_range: '1990-2026' },
+        meta_report: meta,
+        yearly: yearly,
+        quarterly: quarterly
+      };
+      const stamp = new Date().toISOString().slice(0,10);
+      triggerDownload(JSON.stringify(bundle, null, 2), 'cla_36years_analysis_' + stamp + '.json', 'application/json');
+    };
 
     // Unified CLA Archive View
     let claArchiveCatFilter = 'Overall';
