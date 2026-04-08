@@ -105,7 +105,7 @@
 
     /* Inputs */
     .inp{width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:var(--rx);font-size:.82rem;font-family:var(--font);background:var(--bg);color:var(--text)}
-    .inp:focus{outline:none;border-color:var(--accent)}
+    .inp:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
     .inp-sm{padding:5px 8px;font-size:.75rem}
     select.inp{appearance:auto}
     .form-row{display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap;align-items:flex-end}
@@ -247,14 +247,14 @@
         </div>
       </div>
       <nav class="tabs"><div class="container">
-        <ul class="tab-list">
-          <li><button class="tab active" data-tab="dashboard">ダッシュボード</button></li>
-          <li><button class="tab" data-tab="insight">インサイトレポート</button></li>
-          <li><button class="tab" data-tab="usercontent">ユーザーコンテンツ</button></li>
-          <li><button class="tab" data-tab="feeds">フィード管理</button></li>
-          <li><button class="tab" data-tab="pipeline">パイプライン</button></li>
-          <li><button class="tab" data-tab="analytics">分析</button></li>
-          <li><button class="tab" data-tab="system">設定</button></li>
+        <ul class="tab-list" role="tablist">
+          <li role="presentation"><button class="tab active" data-tab="dashboard" role="tab" aria-selected="true">ダッシュボード</button></li>
+          <li role="presentation"><button class="tab" data-tab="insight" role="tab" aria-selected="false">インサイトレポート</button></li>
+          <li role="presentation"><button class="tab" data-tab="usercontent" role="tab" aria-selected="false">ユーザーコンテンツ</button></li>
+          <li role="presentation"><button class="tab" data-tab="feeds" role="tab" aria-selected="false">フィード管理</button></li>
+          <li role="presentation"><button class="tab" data-tab="pipeline" role="tab" aria-selected="false">パイプライン</button></li>
+          <li role="presentation"><button class="tab" data-tab="analytics" role="tab" aria-selected="false">分析</button></li>
+          <li role="presentation"><button class="tab" data-tab="system" role="tab" aria-selected="false">設定</button></li>
         </ul>
       </div></nav>
     </header>
@@ -520,7 +520,7 @@
       </div>
 
       <!-- ===== PIPELINE ===== -->
-      <div class="panel" id="panel-pipeline">
+      <div class="panel" id="panel-pipeline" role="region" aria-label="パイプライン制御">
         <h2 class="panel-title">パイプライン制御</h2>
         <p class="panel-desc">データパイプラインの監視・制御・オンデマンド実行</p>
 
@@ -528,16 +528,18 @@
         <div class="card">
           <h3 class="card-title">デーモン状態 / スケジュール</h3>
           <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center;margin-bottom:12px">
-            <div id="daemonStatus" style="font-size:.78rem">確認中...</div>
+            <div id="daemonStatus" aria-live="polite" style="font-size:.78rem">確認中...</div>
             <div id="scheduleDisplay" style="font-size:.78rem;color:var(--text-m)"></div>
           </div>
-          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-            <span style="font-size:.75rem;color:var(--text-m)">スケジュール変更:</span>
-            <select id="schedHour" class="inp inp-sm" style="width:70px"></select>
-            <span style="font-size:.78rem">:</span>
-            <select id="schedMin" class="inp inp-sm" style="width:70px"></select>
-            <button class="btn btn-p btn-sm" onclick="changeSchedule()">変更</button>
-          </div>
+          <details style="margin-top:4px">
+            <summary style="font-size:.75rem;color:var(--text-m);cursor:pointer;user-select:none">スケジュール変更...</summary>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px">
+              <select id="schedHour" class="inp inp-sm" aria-label="時" style="width:70px"></select>
+              <span style="font-size:.78rem">:</span>
+              <select id="schedMin" class="inp inp-sm" aria-label="分" style="width:70px"></select>
+              <button class="btn btn-p btn-sm" onclick="changeSchedule()">変更</button>
+            </div>
+          </details>
         </div>
 
         <!-- Section B: Pipeline Steps with Run Buttons -->
@@ -545,31 +547,31 @@
           <h3 class="card-title">パイプラインステップ</h3>
           <div class="card-sub" style="margin-bottom:10px">各ステップの実行状況。ボタンで個別にオンデマンド実行できます。</div>
           <div style="margin-bottom:12px">
-            <button class="btn btn-p btn-sm" onclick="runPipelineCommand('run_all')" id="btnRunAll">全パイプライン実行</button>
+            <button class="btn btn-p btn-sm" onclick="runPipelineCommand('run_all')" id="btnRunAll" aria-label="全パイプラインを実行">全パイプライン実行</button>
           </div>
-          <div id="pipelineStepsLive"></div>
+          <div id="pipelineStepsLive" aria-live="polite"></div>
         </div>
 
-        <!-- Section C: Data File Status (existing) -->
-        <div class="card section-gap">
-          <h3 class="card-title">データファイル状態</h3>
-          <div class="card-sub" style="margin-bottom:10px">GitHub Pages上のデータファイルのサイズと更新日時</div>
-          <div class="tw"><table class="dt"><thead><tr><th>ファイル名</th><th>ステータス</th><th>最終更新</th><th>サイズ</th><th></th></tr></thead>
-          <tbody id="pipeFilesBody"><tr><td colspan="5" class="loading"><span class="spin"></span> 確認中...</td></tr></tbody></table></div>
-        </div>
-
-        <!-- Section D: Recent Logs -->
+        <!-- Section C: Execution Log (moved up, close to step controls) -->
         <div class="card section-gap">
           <h3 class="card-title">実行ログ</h3>
           <div class="card-sub" style="margin-bottom:10px">直近のパイプライン実行ログ</div>
-          <div id="pipelineLogs" style="background:#1a1410;color:#e8ddd4;font-family:monospace;font-size:.72rem;padding:12px;border-radius:8px;max-height:400px;overflow-y:auto;white-space:pre-wrap;line-height:1.5">ログを読み込み中...</div>
+          <div id="pipelineLogs" role="log" aria-live="polite" aria-label="パイプライン実行ログ" style="background:#1a1410;color:#e8ddd4;font-family:monospace;font-size:.72rem;padding:12px;border-radius:8px;max-height:400px;overflow-y:auto;white-space:pre-wrap;line-height:1.5">ログを読み込み中...</div>
         </div>
 
-        <!-- Section E: Command History -->
+        <!-- Section D: Command History -->
         <div class="card section-gap">
           <h3 class="card-title">コマンド履歴</h3>
-          <div class="tw"><table class="dt"><thead><tr><th>時刻</th><th>コマンド</th><th>ステップ</th><th>状態</th><th>所要時間</th></tr></thead>
+          <div class="tw"><table class="dt" aria-label="コマンド実行履歴"><thead><tr><th>時刻</th><th>コマンド</th><th>ステップ</th><th>状態</th><th>所要時間</th></tr></thead>
           <tbody id="cmdHistoryBody"><tr><td colspan="5" style="font-size:.75rem;color:var(--text-m)">読み込み中...</td></tr></tbody></table></div>
+        </div>
+
+        <!-- Section E: Data File Status -->
+        <div class="card section-gap">
+          <h3 class="card-title">データファイル状態</h3>
+          <div class="card-sub" style="margin-bottom:10px">GitHub Pages上のデータファイルのサイズと更新日時</div>
+          <div class="tw"><table class="dt" aria-label="データファイル一覧"><thead><tr><th>ファイル名</th><th>ステータス</th><th>最終更新</th><th>サイズ</th><th></th></tr></thead>
+          <tbody id="pipeFilesBody"><tr><td colspan="5" class="loading"><span class="spin"></span> 確認中...</td></tr></tbody></table></div>
         </div>
       </div>
 
@@ -2095,9 +2097,9 @@
 
     document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',function(){
       // Switch active tab and panel
-      document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+      document.querySelectorAll('.tab').forEach(x=>{x.classList.remove('active');x.setAttribute('aria-selected','false')});
       document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-      this.classList.add('active');
+      this.classList.add('active');this.setAttribute('aria-selected','true');
       const p=document.getElementById('panel-'+this.dataset.tab);
       if(p)p.classList.add('active');
       // Lazy-load tab content on first visit
@@ -2170,8 +2172,11 @@
                                   st.status === 'running' ? '<span class="badge badge-warn">実行中</span>' :
                                   '<span style="color:var(--text-m)">—</span>';
               const dur = st.durationSec ? st.durationSec + '秒' : '—';
-              html += '<tr><td style="font-weight:600">' + s.label + '</td><td><code style="font-size:.68rem">' + s.script + '</code></td><td>' + statusBadge + '</td><td>' + dur + '</td><td style="font-size:.7rem;color:var(--text-m)">' + s.freq + '</td>' +
-                '<td><button class="btn btn-s btn-sm" onclick="runPipelineCommand(\'run_step\',\'' + s.key + '\')" style="font-size:.68rem">実行</button></td></tr>';
+              const isRunning = st.status === 'running';
+              const btnAttr = isRunning ? ' disabled' : '';
+              const btnLabel = isRunning ? '<span class="spin" style="width:10px;height:10px;border-width:2px;display:inline-block;vertical-align:middle"></span> 実行中' : '実行';
+              html += '<tr' + (isRunning ? ' style="background:var(--surface2)"' : '') + '><td style="font-weight:600">' + s.label + '</td><td><code style="font-size:.68rem">' + s.script + '</code></td><td>' + statusBadge + '</td><td>' + dur + '</td><td style="font-size:.7rem;color:var(--text-m)">' + s.freq + '</td>' +
+                '<td><button class="btn btn-s btn-sm" onclick="runPipelineCommand(\'run_step\',\'' + s.key + '\')" id="btn-' + s.key + '" aria-label="' + s.label + 'を実行" style="font-size:.68rem"' + btnAttr + '>' + btnLabel + '</button></td></tr>';
             });
             html += '</tbody></table>';
 
@@ -2195,7 +2200,7 @@
         _pipeCmdUnsub = db.collection('pipeline_commands').orderBy('requestedAt', 'desc').limit(20).onSnapshot(snap => {
           const body = document.getElementById('cmdHistoryBody');
           if (!body) return;
-          if (snap.empty) { body.innerHTML = '<tr><td colspan="5" style="font-size:.75rem;color:var(--text-m)">コマンド履歴なし</td></tr>'; return; }
+          if (snap.empty) { body.innerHTML = '<tr><td colspan="5" style="font-size:.75rem;color:var(--text-m)">まだコマンドが実行されていません。上の「全パイプライン実行」ボタンから開始できます。</td></tr>'; return; }
           let html = '';
           snap.forEach(doc => {
             const d = doc.data();
@@ -2227,7 +2232,13 @@
 
     window.runPipelineCommand = async function(type, step) {
       if (!firebaseUser) { alert('Firestore操作にはGoogleログインが必要です'); return; }
-      if (!confirm(type === 'run_all' ? '全パイプラインを実行しますか？' : step + ' を実行しますか？')) return;
+      const label = step ? PIPE_STEP_DEFS.find(s => s.key === step)?.label || step : '全パイプライン';
+      if (!confirm(label + ' を実行しますか？')) return;
+
+      // Disable the clicked button and show spinner
+      const btn = step ? document.getElementById('btn-' + step) : document.getElementById('btnRunAll');
+      if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spin" style="width:10px;height:10px;border-width:2px;display:inline-block;vertical-align:middle"></span> 送信中'; }
+
       try {
         await db.collection('pipeline_commands').add({
           type: type,
@@ -2236,8 +2247,15 @@
           requestedAt: firebase.firestore.FieldValue.serverTimestamp(),
           requestedBy: firebaseUser.email || firebaseUser.displayName || 'unknown',
         });
-        showToast((step || '全パイプライン') + ' の実行をリクエストしました', 'ok');
-      } catch (e) { alert('エラー: ' + e.message); }
+        showToast(label + ' の実行をリクエストしました', 'ok');
+        // Auto-scroll to log section after requesting
+        const logEl = document.getElementById('pipelineLogs');
+        if (logEl) setTimeout(() => logEl.scrollIntoView({ behavior: 'smooth', block: 'center' }), 500);
+      } catch (e) {
+        alert('エラー: ' + e.message);
+        if (btn) { btn.disabled = false; btn.textContent = '実行'; }
+      }
+      // Button state will be updated by Firestore onSnapshot when status changes
     };
 
     window.changeSchedule = async function() {
