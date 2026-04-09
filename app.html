@@ -1173,7 +1173,7 @@
     }
     /* Reader column for report content */
     .modal-reader-col {
-      max-width: 680px;
+      max-width: 720px;
       margin: 0 auto;
     }
     .modal-close {
@@ -1283,18 +1283,18 @@
     /* ================================================================
        MARKDOWN RENDERED CONTENT
        ================================================================ */
-    .md-body h2 { font-size: 1.1rem; font-weight: 700; margin: 2rem 0 0.75rem; padding-top: 0.5rem; border-top: 1px solid var(--border-light); }
-    .md-body h2:first-child { border-top: none; padding-top: 0; }
-    .md-body h3 { font-size: 0.98rem; font-weight: 700; margin: 1.5rem 0 0.5rem; }
-    .md-body p { font-size: 0.92rem; line-height: 1.85; margin-bottom: 1rem; }
-    .md-body ul { padding-left: 1.2rem; margin-bottom: 1rem; }
-    .md-body li { font-size: 0.92rem; line-height: 1.75; margin-bottom: 6px; }
-    .md-body strong { font-weight: 600; color: var(--text); }
+    .md-body h2 { font-size: 1.2rem; font-weight: 700; margin: 3rem 0 1rem; padding-top: 0.75rem; border-top: 1px solid var(--border-light); line-height: 1.4; }
+    .md-body h2:first-child { border-top: none; padding-top: 0; margin-top: 1.5rem; }
+    .md-body h3 { font-size: 1.05rem; font-weight: 700; margin: 2rem 0 0.75rem; line-height: 1.4; }
+    .md-body p { font-size: 1rem; line-height: 1.8; margin-bottom: 1.75rem; color: var(--text); letter-spacing: 0.04em; }
+    .md-body ul { padding-left: 1.4rem; margin-bottom: 1.75rem; }
+    .md-body li { font-size: 1rem; line-height: 1.8; margin-bottom: 8px; letter-spacing: 0.04em; }
+    .md-body strong { font-weight: 700; color: var(--text); }
     /* Pull quote for visual rhythm */
     .md-body blockquote {
-      font-size: 1rem; line-height: 1.8; font-style: italic; font-weight: 500;
-      color: var(--text); border-left: 3px solid var(--accent);
-      padding: 12px 20px; margin: 1.5rem 0; background: var(--surface);
+      font-size: 1.05rem; line-height: 1.8; font-style: italic; font-weight: 500;
+      color: var(--text); border-left: 4px solid var(--accent);
+      padding: 16px 24px; margin: 2rem 0; background: var(--surface);
       border-radius: 0 var(--radius-xs) var(--radius-xs) 0;
     }
 
@@ -1719,24 +1719,26 @@
     .ir-modal-section.open .ir-modal-section-chevron { transform: rotate(90deg); }
     .ir-modal-section-body {
       display: none;
-      padding: 16px 0;
-      font-size: 0.92rem;
-      line-height: 1.85;
-      color: var(--text-secondary);
+      padding: 20px 0;
+      font-size: 1rem;
+      line-height: 1.8;
+      color: var(--text);
+      letter-spacing: 0.04em;
     }
     .ir-modal-section.open .ir-modal-section-body { display: block; }
 
     /* Summary / lead text */
     .ir-summary {
-      font-size: 0.95rem;
+      font-size: 1rem;
       line-height: 1.8;
       color: var(--text);
       font-weight: 500;
-      padding: 16px 20px;
+      padding: 20px 24px;
       background: var(--surface);
-      border-left: 3px solid var(--accent);
+      border-left: 4px solid var(--accent);
       border-radius: 0 var(--radius-xs) var(--radius-xs) 0;
-      margin-bottom: 20px;
+      margin-bottom: 28px;
+      letter-spacing: 0.04em;
     }
 
     /* Vertical timeline */
@@ -4086,7 +4088,7 @@
             escapeHtml(article.source || '') + ' / ' + escapeHtml(article.published_date || '') +
             (article.url ? ' &mdash; <a href="' + escapeAttr(safeUrl(article.url)) + '" target="_blank" style="color:var(--accent)">元記事</a>' : '') +
           '</div>' +
-          '<div class="md-body" style="font-size:0.9rem;line-height:1.85">' + renderMarkdown(generatedText) + '</div></div>';
+          '<div class="md-body">' + renderMarkdown(generatedText) + '</div></div>';
         document.getElementById('articleModal').classList.add('visible');
         document.body.style.overflow = 'hidden';
 
@@ -4179,7 +4181,7 @@
             (d.createdAt ? d.createdAt.toDate().toLocaleDateString('ja-JP') : '') +
             (d.sourceUrl ? ' &mdash; <a href="' + escapeAttr(safeUrl(d.sourceUrl)) + '" target="_blank" style="color:var(--accent)">元記事</a>' : '') +
           '</div>' +
-          '<div class="md-body" style="font-size:0.9rem;line-height:1.85">' + renderMarkdown(d.generatedText || '') + '</div></div>';
+          '<div class="md-body">' + renderMarkdown(d.generatedText || '') + '</div></div>';
         document.getElementById('articleModal').classList.add('visible');
         document.body.style.overflow = 'hidden';
       } catch (err) {
