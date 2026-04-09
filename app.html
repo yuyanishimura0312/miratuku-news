@@ -2737,11 +2737,12 @@
           '<div class="pestle-card-header"><span class="pestle-cat-name" style="color:' + catInfo.color + '">' + catInfo.labelJa + '</span>' +
           '<span class="pestle-cat-count">' + articles.length + '件</span></div><div class="pestle-articles">';
 
+        const rawArticles = catData.articles || [];
         if (display.length === 0) {
           gridHtml += '<div class="pestle-no-articles">記事がありません</div>';
         } else {
           display.forEach((a, displayIdx) => {
-            const origIdx = allArticles.indexOf(a);
+            const origIdx = rawArticles.indexOf(a);
             const tr = catTrans.find(t => t.index === origIdx);
             const ja = tr?.title_translated || '';
             const bmId = 'news-' + catKey + '-' + origIdx;
@@ -2782,6 +2783,7 @@
       const articles = [...(data.pestle[catKey].articles || [])];
       articles.sort((a, b) => new Date(b.published_date || 0) - new Date(a.published_date || 0));
       const filtered = currentRegion === 'japan' ? articles.filter(a => isJaSource(a)) : articles.filter(a => !isJaSource(a));
+      const rawArticles = data.pestle[catKey].articles || [];
       const catTrans = (aiData?.translations || {})[catKey] || [];
       const cards = document.querySelectorAll('#homePestleGrid .pestle-card');
       const idx = Object.keys(PESTLE_CATS).indexOf(catKey);
@@ -2789,7 +2791,7 @@
       const el = cards[idx].querySelector('.pestle-articles');
       if (!el) return;
       el.innerHTML = filtered.map(a => {
-        const origIdx = articles.indexOf(a);
+        const origIdx = rawArticles.indexOf(a);
         const tr = catTrans.find(t => t.index === origIdx);
         const ja = tr?.title_translated || '';
         const bmId = 'news-' + catKey + '-' + origIdx;
