@@ -2825,7 +2825,7 @@
       result.innerHTML = '<div class="insight-loading"><div class="loading-spinner loading-spinner-sm"></div><span>分析中です。しばらくお待ちください...</span></div>';
       input.value = '';
 
-      const WORKER_BASE = 'https://future-insight-workspace.nishimura-69a.workers.dev';
+      const WORKER_BASE = 'https://future-insight-proxy.nishimura-69a.workers.dev';
       try {
         const resp = await fetch(WORKER_BASE + '/api/foresight', {
           method: 'POST',
@@ -4056,7 +4056,7 @@
         '6. 関連する学術的知見（2つ）\n' +
         '読者は経営者・コンサルタント。知的かつ実用的な洞察を散文形式で提供してください。';
 
-      var WORKER_BASE = 'https://future-insight-workspace.nishimura-69a.workers.dev';
+      var WORKER_BASE = 'https://future-insight-proxy.nishimura-69a.workers.dev';
       try {
         var resp = await fetch(WORKER_BASE + '/api/foresight', {
           method: 'POST',
@@ -4371,7 +4371,7 @@
       submitBtn.disabled = true;
       submitBtn.textContent = '分析中...';
 
-      const WORKER_BASE = 'https://future-insight-workspace.nishimura-69a.workers.dev';
+      const WORKER_BASE = 'https://future-insight-proxy.nishimura-69a.workers.dev';
       try {
         const resp = await fetch(WORKER_BASE + '/api/foresight', {
           method: 'POST',
