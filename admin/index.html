@@ -1896,7 +1896,7 @@
           '<td onclick="event.stopPropagation()"><label class="toggle-label"><label class="toggle"><input type="checkbox" '+checked+' onchange="toggleIRStatus(\''+r._key+'\',this.checked)"><span class="toggle-slider"></span></label>'+(r._published?'公開':'非公開')+'</label></td>'+
           '<td onclick="event.stopPropagation()">'+
             '<button class="btn btn-s btn-sm" onclick="openIREdit('+r._idx+')">編集</button> '+
-            '<button class="btn btn-s btn-sm" onclick="regenerateIR(\''+r._key+'\')">再生成</button> '+
+            '<button class="btn btn-s btn-sm" onclick="regenerateIR(\''+r._key+'\','+r._idx+')">再生成</button> '+
             '<button class="btn btn-d btn-sm" onclick="deleteIR(\''+r._key+'\')">削除</button>'+
           '</td>'+
         '</tr>'+
@@ -1920,14 +1920,90 @@
       }catch(e){toast('ステータス更新失敗: '+e.message,'err')}
     };
 
-    window.regenerateIR = async function(key){
-      if(!confirm('このレポートを再生成対象としてマークしますか?'))return;
+    window.regenerateIR = async function(key,idx){
+      if(idx===undefined){
+        // Fallback: find idx from key
+        for(var i=0;i<irData.length;i++){
+          var d=irData[i].date||irData[i].generated_date||'';
+          var id=irData[i].id||i;
+          if(d+'-'+id===key){idx=i;break}
+        }
+      }
+      if(idx===undefined||!irData[idx]){toast('レポートデータが見つかりません','err');return}
+
+      if(!confirm('このレポートをAIで再生成しますか？\n（現在の内容は上書きされます）'))return;
+
+      const report=getMergedIR(irData[idx],idx);
+      const art=irData[idx].article||{};
+
+      // Show progress
+      toast('レポートを再生成中...','info');
+      await db.collection('insight_report_status').doc(key).set({regenerate:true},{merge:true});
+      irStatuses[key]={...irStatuses[key],regenerate:true};
+      renderIR();
+
+      const WORKER_BASE='https://future-insight-proxy.nishimura-69a.workers.dev';
       try{
-        await db.collection('insight_report_status').doc(key).set({regenerate:true},{merge:true});
-        irStatuses[key]={...irStatuses[key],regenerate:true};
+        const resp=await fetch(WORKER_BASE+'/api/regenerate-report',{
+          method:'POST',
+          headers:{'Content-Type':'application/json','X-User-Id':'admin'},
+          body:JSON.stringify({
+            article:art,
+            existingReport:report.full_report||'',
+            category:report.category||art.pestle_category||''
+          })
+        });
+        if(!resp.ok){
+          const err=await resp.json().catch(()=>({}));
+          throw new Error(err.error||'HTTP '+resp.status);
+        }
+        const respData=await resp.json();
+
+        // Use pre-parsed JSON from worker, fall back to rawText
+        let parsed=respData.report;
+        if(!parsed){
+          const answer=respData.rawText||'';
+          const jsonMatch=answer.match(/```json\s*([\s\S]*?)\s*```/);
+          if(jsonMatch){
+            try{parsed=JSON.parse(jsonMatch[1])}catch(e){console.warn('JSON parse error:',e)}
+          }
+          if(!parsed){
+            try{parsed=JSON.parse(answer)}catch(e){parsed={full_report:answer}}
+          }
+        }
+
+        // Build edit data from parsed response
+        const editData={
+          title:parsed.title||report.title||'',
+          summary:(parsed.summary||'').substring(0,300),
+          full_report:parsed.full_report||parsed.report_text||answer,
+          historical_context:parsed.historical_context||'',
+          future_signals:parsed.future_signals||'',
+          watch_points:parsed.watch_points||'',
+          related_myth:parsed.related_myth||report.related_myth||'',
+          myth_relation:parsed.myth_relation||report.myth_relation||'strengthens',
+          timeline:Array.isArray(parsed.timeline)?parsed.timeline.filter(t=>t.year||t.event):[],
+          related_research:Array.isArray(parsed.related_research)?parsed.related_research:[],
+          regenerated_at:firebase.firestore.FieldValue.serverTimestamp(),
+          edited_at:firebase.firestore.FieldValue.serverTimestamp()
+        };
+
+        // Save to Firestore edits (same as manual edit)
+        await db.collection('insight_report_edits').doc(key).set(editData);
+        irEdits[key]=editData;
+
+        // Clear regenerate flag
+        await db.collection('insight_report_status').doc(key).set({regenerate:false},{merge:true});
+        irStatuses[key]={...irStatuses[key],regenerate:false};
+
+        renderIRStats();
         renderIR();
-        toast('再生成対象としてマークしました','ok');
-      }catch(e){toast('更新失敗: '+e.message,'err')}
+        toast('レポートを再生成しました','ok');
+      }catch(e){
+        console.error('Regeneration error:',e);
+        // Keep regenerate flag for retry
+        toast('再生成に失敗しました: '+e.message,'err');
+      }
     };
 
     window.deleteIR = async function(key){
