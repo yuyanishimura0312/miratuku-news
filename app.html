@@ -1143,42 +1143,57 @@
     .modal-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(61,46,34,0.5);
+      background: var(--card);
       z-index: 1000;
       display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem;
+      flex-direction: column;
     }
     .modal-overlay.visible { display: flex; }
+    /* Reading progress bar */
+    .modal-progress-bar {
+      position: sticky; top: 0; z-index: 10;
+      height: 3px; background: var(--border-light);
+      flex-shrink: 0;
+    }
+    .modal-progress-fill {
+      height: 100%; width: 0%;
+      background: var(--accent);
+      transition: width 0.15s ease-out;
+    }
     .modal-box {
       background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      max-width: 680px;
+      border: none;
+      border-radius: 0;
+      max-width: 100%;
       width: 100%;
-      max-height: 85vh;
+      flex: 1;
       overflow-y: auto;
-      padding: 24px;
+      padding: 32px 24px 48px;
       position: relative;
-      box-shadow: 0 8px 32px rgba(61,46,34,0.2);
+    }
+    /* Reader column for report content */
+    .modal-reader-col {
+      max-width: 680px;
+      margin: 0 auto;
     }
     .modal-close {
-      position: absolute;
-      top: 16px;
-      right: 16px;
-      width: 2rem;
-      height: 2rem;
+      position: sticky;
+      top: 8px;
+      float: right;
+      width: 2.2rem;
+      height: 2.2rem;
       display: flex;
       align-items: center;
       justify-content: center;
-      border: none;
-      background: transparent;
+      border: 1px solid var(--border);
+      background: var(--card);
       font-size: 1.2rem;
       cursor: pointer;
       border-radius: 50%;
       color: var(--text-muted);
       transition: background 0.2s, color 0.2s;
+      z-index: 5;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     }
     .modal-close:hover { background: var(--surface); color: var(--accent); }
     .modal-title { font-weight: 700; font-size: 1.05rem; line-height: 1.45; margin-bottom: 8px; padding-right: 2rem; }
@@ -1268,12 +1283,20 @@
     /* ================================================================
        MARKDOWN RENDERED CONTENT
        ================================================================ */
-    .md-body h2 { font-size: 1.05rem; font-weight: 700; margin: 1.25rem 0 0.5rem; }
-    .md-body h3 { font-size: 0.95rem; font-weight: 700; margin: 1rem 0 0.4rem; }
-    .md-body p { font-size: 0.84rem; line-height: 1.75; margin-bottom: 0.75rem; }
-    .md-body ul { padding-left: 1.2rem; margin-bottom: 0.75rem; }
-    .md-body li { font-size: 0.84rem; line-height: 1.6; margin-bottom: 4px; }
-    .md-body strong { font-weight: 600; }
+    .md-body h2 { font-size: 1.1rem; font-weight: 700; margin: 2rem 0 0.75rem; padding-top: 0.5rem; border-top: 1px solid var(--border-light); }
+    .md-body h2:first-child { border-top: none; padding-top: 0; }
+    .md-body h3 { font-size: 0.98rem; font-weight: 700; margin: 1.5rem 0 0.5rem; }
+    .md-body p { font-size: 0.92rem; line-height: 1.85; margin-bottom: 1rem; }
+    .md-body ul { padding-left: 1.2rem; margin-bottom: 1rem; }
+    .md-body li { font-size: 0.92rem; line-height: 1.75; margin-bottom: 6px; }
+    .md-body strong { font-weight: 600; color: var(--text); }
+    /* Pull quote for visual rhythm */
+    .md-body blockquote {
+      font-size: 1rem; line-height: 1.8; font-style: italic; font-weight: 500;
+      color: var(--text); border-left: 3px solid var(--accent);
+      padding: 12px 20px; margin: 1.5rem 0; background: var(--surface);
+      border-radius: 0 var(--radius-xs) var(--radius-xs) 0;
+    }
 
     /* ================================================================
        FOOTER — FIW style (white bg + top border)
@@ -1381,9 +1404,8 @@
       .insight-form { flex-direction: column; }
       .insight-textarea { min-height: 100px; }
 
-      /* Modal: nearly full screen on mobile */
-      .modal-overlay { padding: 0.5rem; align-items: flex-start; padding-top: 2rem; }
-      .modal-box { max-height: 90vh; padding: 16px; border-radius: var(--radius-sm); }
+      /* Modal: full screen on mobile */
+      .modal-box { padding: 20px 16px 40px; }
       .modal-title { font-size: 0.95rem; padding-right: 2.5rem; }
       .modal-close { top: 10px; right: 10px; }
 
@@ -1696,9 +1718,9 @@
     .ir-modal-section.open .ir-modal-section-chevron { transform: rotate(90deg); }
     .ir-modal-section-body {
       display: none;
-      padding: 14px 16px;
-      font-size: 0.84rem;
-      line-height: 1.75;
+      padding: 16px 0;
+      font-size: 0.92rem;
+      line-height: 1.85;
       color: var(--text-secondary);
     }
     .ir-modal-section.open .ir-modal-section-body { display: block; }
@@ -2020,9 +2042,12 @@
 
   <!-- ARTICLE MODAL -->
   <div class="modal-overlay" id="articleModal" role="dialog" aria-modal="true">
-    <div class="modal-box">
-      <button class="modal-close" onclick="closeArticleModal()" aria-label="閉じる">&times;</button>
-      <div id="articleModalContent"></div>
+    <div class="modal-progress-bar"><div class="modal-progress-fill" id="modalProgressFill"></div></div>
+    <div class="modal-box" id="modalBox">
+      <div class="modal-reader-col">
+        <button class="modal-close" onclick="closeArticleModal()" aria-label="閉じる">&times;</button>
+        <div id="articleModalContent"></div>
+      </div>
     </div>
   </div>
 
@@ -2530,18 +2555,23 @@
       var mythLabel = r.myth_relation === 'strengthens' ? '神話を強化' : '神話を変革';
       var mythClass = r.myth_relation === 'strengthens' ? 'ir-myth-badge-strengthens' : 'ir-myth-badge-transforms';
 
+      // Estimate reading time (Japanese: ~500 chars/min)
+      var totalChars = (r.report_text || '').length + (r.summary || '').length + (r.historical_context || '').length + (r.future_signals || '').length + (r.watch_points || '').length;
+      var readingMin = Math.max(1, Math.round(totalChars / 500));
+
       var content = document.getElementById('articleModalContent');
       var modalHtml = '<div class="modal-title">' + escapeHtml(r.report_title || '') + '</div>' +
-        '<div class="modal-meta" style="margin-bottom:12px">' +
+        '<div class="modal-meta" style="margin-bottom:12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">' +
           '<span class="ir-hero-cat-badge" style="background:' + catInfo.color + ';font-size:0.65rem">' + escapeHtml(catInfo.labelJa || '') + '</span> ' +
           '<span class="ir-myth-badge ' + mythClass + '">' + mythLabel + '</span>' +
+          '<span style="font-size:0.72rem;color:var(--text-muted);margin-left:auto">' + readingMin + '分で読了</span>' +
         '</div>';
 
       if (r.related_myth) {
         modalHtml += '<div style="font-style:italic;color:var(--text-secondary);margin-bottom:14px;font-size:0.88rem">' + escapeHtml(r.related_myth) + '</div>';
       }
 
-      // Summary lead text
+      // Summary lead text — executive summary style
       if (r.summary) {
         modalHtml += '<div class="ir-summary">' + escapeHtml(r.summary) + '</div>';
       }
@@ -2619,14 +2649,30 @@
         }
       }
 
-      // Full report text (deep-dive content at the bottom)
-      modalHtml += '<h4 style="font-size:0.9rem;font-weight:600;margin:24px 0 12px;padding-top:16px;border-top:1px solid var(--border)">全文レポート</h4>';
-      modalHtml += '<div class="md-body">' + renderMarkdown(r.report_text || '') + '</div>';
+      // Full report text (deep-dive content)
+      modalHtml += '<div class="ir-modal-section open">' +
+        '<div class="ir-modal-section-header" onclick="this.parentElement.classList.toggle(\'open\')">全文レポート<span class="ir-modal-section-chevron">&#9654;</span></div>' +
+        '<div class="ir-modal-section-body md-body">' + renderMarkdown(r.report_text || '') + '</div>' +
+      '</div>';
 
       content.innerHTML = modalHtml;
       window._modalReturnFocus = document.activeElement;
       document.getElementById('articleModal').classList.add('visible');
       document.body.style.overflow = 'hidden';
+
+      // Reading progress bar
+      var modalBox = document.getElementById('modalBox');
+      var progressFill = document.getElementById('modalProgressFill');
+      if (modalBox && progressFill) {
+        modalBox.addEventListener('scroll', function() {
+          var scrollTop = modalBox.scrollTop;
+          var scrollHeight = modalBox.scrollHeight - modalBox.clientHeight;
+          var pct = scrollHeight > 0 ? Math.min(100, (scrollTop / scrollHeight) * 100) : 0;
+          progressFill.style.width = pct + '%';
+        });
+        progressFill.style.width = '0%';
+      }
+
       setTimeout(function() { var btn = document.querySelector('#articleModal .modal-close'); if (btn) btn.focus(); }, 100);
     };
 
@@ -3776,6 +3822,8 @@
     window.closeArticleModal = function() {
       document.getElementById('articleModal').classList.remove('visible');
       document.body.style.overflow = '';
+      var pf = document.getElementById('modalProgressFill'); if (pf) pf.style.width = '0%';
+      var mb = document.getElementById('modalBox'); if (mb) mb.scrollTop = 0;
       if (window._modalReturnFocus) { window._modalReturnFocus.focus(); window._modalReturnFocus = null; }
     };
 
