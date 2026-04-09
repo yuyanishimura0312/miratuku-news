@@ -1692,24 +1692,25 @@
 
     /* Insight Report modal sections */
     .ir-modal-section {
-      margin-top: 20px;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-xs);
+      margin-top: 24px;
+      border: none;
+      border-radius: 0;
       overflow: hidden;
     }
     .ir-modal-section-header {
-      padding: 10px 16px;
-      background: var(--surface);
+      padding: 12px 0;
+      background: transparent;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      font-size: 0.82rem;
-      font-weight: 600;
-      color: var(--text-secondary);
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--text);
       user-select: none;
+      border-bottom: 1px solid var(--border-light);
     }
-    .ir-modal-section-header:hover { background: var(--surface2); }
+    .ir-modal-section-header:hover { color: var(--accent); }
     .ir-modal-section-chevron {
       font-size: 0.65rem;
       color: var(--text-muted);
