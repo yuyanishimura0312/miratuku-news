@@ -156,9 +156,9 @@
     .region-toggle {
       display: flex;
       background: var(--surface);
-      border-radius: 24px;
+      border-radius: 0;
       overflow: hidden;
-      border: 1px solid var(--border-light);
+      border: 1px solid var(--border);
     }
     .region-btn {
       padding: 6px 16px;
@@ -169,7 +169,7 @@
       font-family: var(--font);
       font-size: 0.78rem;
       font-weight: 500;
-      border-radius: 24px;
+      border-radius: 0;
       transition: all 0.2s;
     }
     .region-btn.active {
@@ -182,7 +182,7 @@
     .theme-toggle {
       background: var(--surface);
       border: 1px solid var(--border-light);
-      border-radius: 24px;
+      border-radius: 0;
       padding: 6px 12px;
       cursor: pointer;
       font-size: 0.82rem;
@@ -204,7 +204,7 @@
     .auth-btn {
       background: var(--surface);
       border: 1px solid var(--border-light);
-      border-radius: 24px;
+      border-radius: 0;
       padding: 5px 14px;
       font-family: var(--font);
       font-size: 0.72rem;
@@ -485,18 +485,20 @@
     .home-news-main { min-width: 0; display: flex; flex-direction: column; gap: 2.5rem; }
     .home-news-sidebar { position: sticky; top: 80px; align-self: start; }
     .home-sidebar-card {
-      background: linear-gradient(135deg, #FFFFF0, #FDF6EE);
-      border: 1px solid #E6D5C4;
-      border-radius: 20px;
+      background: var(--surface);
+      border: none;
+      border-top: 2px solid var(--accent);
+      border-radius: 0;
       padding: 16px;
     }
     .home-sidebar-title {
+      font-family: var(--font-serif);
       font-size: 0.85rem;
       font-weight: 700;
-      color: #783C28;
+      color: var(--text);
       margin-bottom: 12px;
       padding-bottom: 8px;
-      border-bottom: 2px solid #C87864;
+      border-bottom: 1px solid var(--border);
     }
     .home-signal-item {
       padding: 10px 0;
@@ -628,16 +630,17 @@
        ================================================================ */
     .signal-card {
       padding: 14px 18px;
-      background: #FFFFF8;
-      border: 1px solid #E6D5C4;
-      border-radius: 20px;
+      background: var(--card);
+      border: none;
+      border-top: 2px solid var(--border);
+      border-radius: 0;
       margin-bottom: 10px;
-      box-shadow: 0 1px 6px rgba(120,60,40,0.04);
+      box-shadow: none;
       transition: border-color 0.2s, box-shadow 0.2s;
     }
-    .signal-card:hover { border-color: #C87864; box-shadow: 0 2px 12px rgba(120,60,40,0.08); }
+    .signal-card:hover { border-color: var(--accent); box-shadow: none; }
     .signal-badges { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
-    .signal-title { font-size: 0.88rem; font-weight: 600; line-height: 1.45; margin-bottom: 4px; color: #783C28; }
+    .signal-title { font-size: 0.88rem; font-weight: 600; line-height: 1.45; margin-bottom: 4px; color: var(--text); }
     .signal-desc { font-size: 0.84rem; line-height: 1.65; color: var(--text-secondary); }
 
     /* Weak signals section — overview always visible */
@@ -663,7 +666,7 @@
       gap: 8px;
       margin-bottom: 6px;
     }
-    .ws-card-title { flex: 1; font-size: 0.82rem; font-weight: 600; line-height: 1.4; color: #783C28; }
+    .ws-card-title { flex: 1; font-size: 0.82rem; font-weight: 600; line-height: 1.4; color: var(--text); }
     .ws-card-badges { display: flex; gap: 6px; flex-shrink: 0; align-items: center; flex-wrap: wrap; }
     .ws-card-desc {
       font-size: 0.8rem;
@@ -684,9 +687,9 @@
     .ws-card-meta-tag {
       font-size: 0.7rem;
       padding: 2px 10px;
-      border-radius: 12px;
-      background: rgba(250,200,160,0.3);
-      color: #A0503C;
+      border-radius: 0;
+      background: var(--surface);
+      color: var(--text-secondary);
     }
     .ws-card-details-toggle {
       font-size: 0.78rem;
@@ -734,18 +737,18 @@
       font-size: 0.65rem;
       font-weight: 700;
       padding: 3px 10px;
-      border-radius: 12px;
+      border-radius: 0;
       color: #fff;
       text-transform: uppercase;
       letter-spacing: 0.04em;
     }
-    .ws-badge-high { background: linear-gradient(135deg, #C0392B, #E74C3C); }
-    .ws-badge-medium { background: linear-gradient(135deg, #C87864, #D4760A); }
-    .ws-badge-low { background: linear-gradient(135deg, #2E7D6B, #1E8449); }
+    .ws-badge-high { background: #CC1400; }
+    .ws-badge-medium { background: #555555; }
+    .ws-badge-low { background: #1E8449; }
     .ws-badge-horizon {
-      background: rgba(250,200,160,0.35);
-      color: #A0503C;
-      border-radius: 12px;
+      background: var(--surface);
+      color: var(--text-secondary);
+      border-radius: 0;
     }
 
     /* ================================================================
@@ -1397,11 +1400,11 @@
     .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 2000; display: flex; flex-direction: column; gap: 8px; }
     .toast {
       background: var(--card);
-      border: 1px solid #E6D5C4;
-      border-radius: 20px;
+      border: 1px solid var(--border);
+      border-radius: 0;
       padding: 12px 20px;
       font-size: 0.82rem;
-      box-shadow: 0 4px 16px rgba(120,60,40,0.1);
+      box-shadow: var(--shadow-md);
       animation: toast-in 0.3s ease-out;
     }
     .toast-success { border-left: 3px solid var(--En); }
@@ -1462,8 +1465,8 @@
        FOOTER — FIW style (white bg + top border)
        ================================================================ */
     .site-footer {
-      background: #FDF6EE;
-      border-top: 1px solid #E6D5C4;
+      background: var(--surface);
+      border-top: 2px solid var(--accent);
       padding: 2.5rem 0 1.5rem;
       margin-top: 3rem;
     }
@@ -1473,7 +1476,7 @@
       gap: 2rem;
       margin-bottom: 2rem;
     }
-    .footer-brand { font-weight: 700; font-size: 1.15rem; color: #783C28; margin-bottom: 8px; }
+    .footer-brand { font-family: var(--font-serif); font-weight: 700; font-size: 1.15rem; color: var(--text); margin-bottom: 8px; }
     .footer-desc { font-size: 0.78rem; color: var(--text-secondary); line-height: 1.6; }
     .footer-heading { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 10px; }
     .footer-links { list-style: none; }
@@ -1512,8 +1515,7 @@
       .ws-card, .insight-box, .cla-detail-panel,
       .papers-field-group { max-width: 100%; }
 
-      /* Soft warm background with subtle gradient */
-      body { background: linear-gradient(180deg, #FFFFF0 0%, var(--bg) 120px); }
+      body { background: var(--bg); }
       .container { padding: 0 16px; }
 
       /* Nav container must allow horizontal scroll-through */
@@ -1523,35 +1525,35 @@
 
       /* --- Header: compact, warm accent bar --- */
       .site-header {
-        background: #FFFFF0;
-        border-bottom: none;
-        box-shadow: 0 1px 8px rgba(120,60,40,0.06);
+        background: var(--bg);
+        border-bottom: 1px solid var(--border);
+        box-shadow: none;
       }
       .header-main { flex-wrap: wrap; padding: 10px 0; gap: 6px; }
       .header-left { flex: 1; min-width: 0; }
-      .site-title { font-size: 1.05rem; color: #783C28; }
+      .site-title { font-size: 1.05rem; color: var(--text); }
       .header-date { display: none; }
       .header-right { gap: 6px; width: 100%; justify-content: flex-end; flex-wrap: wrap; }
       .auth-area { flex-shrink: 1; min-width: 0; }
       .user-name { max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-      .region-toggle { border-radius: 20px; border-color: #E6D5C4; }
+      .region-toggle { border-radius: 0; border-color: var(--border); }
       .region-btn {
         padding: 5px 12px; font-size: 0.72rem;
-        border-radius: 20px;
+        border-radius: 0;
       }
       .region-btn.active {
-        background: linear-gradient(135deg, #A0503C, #C87864);
-        box-shadow: 0 2px 8px rgba(160,80,60,0.25);
+        background: #121212;
+        box-shadow: none;
       }
-      .theme-toggle { padding: 5px 8px; font-size: 0.75rem; border-radius: 20px; }
+      .theme-toggle { padding: 5px 8px; font-size: 0.75rem; border-radius: 0; }
       .auth-area { font-size: 0.72rem; }
-      .auth-btn { padding: 4px 10px; font-size: 0.68rem; border-radius: 20px; }
+      .auth-btn { padding: 4px 10px; font-size: 0.68rem; border-radius: 0; }
 
       /* --- Nav: pill-shaped tabs with warm tones --- */
       .site-nav {
         position: relative;
-        background: #FFFFF0;
-        border-bottom: none;
+        background: var(--bg);
+        border-bottom: 1px solid var(--border-light);
         padding: 0 4px;
       }
       .site-nav::after {
@@ -1690,11 +1692,11 @@
       }
 
       /* --- Impact badges: softer pill shapes --- */
-      .ws-badge { border-radius: 12px; font-size: 0.62rem; padding: 2px 8px; }
-      .ws-badge-high { background: linear-gradient(135deg, #C0392B, #E74C3C); }
-      .ws-badge-medium { background: linear-gradient(135deg, #C87864, #D4760A); }
-      .ws-badge-low { background: linear-gradient(135deg, #2E7D6B, #1E8449); }
-      .ws-badge-horizon { border-radius: 12px; }
+      .ws-badge { border-radius: 0; font-size: 0.62rem; padding: 2px 8px; }
+      .ws-badge-high { background: #CC1400; }
+      .ws-badge-medium { background: #555555; }
+      .ws-badge-low { background: #1E8449; }
+      .ws-badge-horizon { border-radius: 0; }
 
       /* --- CLA --- */
       .cla-period-btn { padding: 5px 10px; font-size: 0.68rem; border-radius: 16px; }
@@ -1708,20 +1710,20 @@
       /* --- Insight box --- */
       .insight-box {
         padding: 16px;
-        border-radius: 20px;
-        background: linear-gradient(135deg, #FFFFF0, #FAE8DC);
-        border-color: #E6D5C4;
+        border-radius: 0;
+        background: var(--surface);
+        border-color: var(--border);
       }
       .insight-form { flex-direction: column; }
       .insight-input {
-        border-radius: 16px;
-        border-color: #D9C8B8;
+        border-radius: 0;
+        border-color: var(--border);
         width: 100%;
         box-sizing: border-box;
       }
       .insight-textarea {
-        border-radius: 16px;
-        border-color: #D9C8B8;
+        border-radius: 0;
+        border-color: var(--border);
         min-height: 100px;
         width: 100%;
         box-sizing: border-box;
@@ -1730,15 +1732,15 @@
       /* --- Modal: friendly rounded sheet --- */
       .modal-box {
         padding: 24px 18px 40px;
-        border-radius: 24px 24px 0 0;
+        border-radius: 0;
         max-height: 92vh;
       }
-      .modal-title { font-size: 0.95rem; padding-right: 2.5rem; color: #783C28; }
+      .modal-title { font-size: 0.95rem; padding-right: 2.5rem; color: var(--text); }
       .modal-close {
         top: 12px; right: 12px;
-        border-radius: 50%;
+        border-radius: 0;
         width: 32px; height: 32px;
-        background: rgba(250,200,160,0.3);
+        background: var(--surface);
       }
 
       /* --- Footer: warm tone --- */
@@ -1746,26 +1748,26 @@
       .site-footer {
         padding: 1.5rem 0 1rem;
         margin-top: 2rem;
-        background: #FDF6EE;
-        border-top-color: #E6D5C4;
+        background: var(--surface);
+        border-top-color: var(--accent);
       }
 
       /* --- Alerts bar: softer --- */
       .alerts-bar {
-        background: linear-gradient(135deg, #A0503C, #C87864);
-        border-radius: 0 0 16px 16px;
+        background: #CC1400;
+        border-radius: 0;
       }
 
       /* --- Others --- */
       .skeleton-grid { grid-template-columns: 1fr; }
       .toast-container { left: 0.75rem; right: 0.75rem; bottom: 0.75rem; }
       .toast {
-        border-radius: 20px;
-        box-shadow: 0 4px 16px rgba(120,60,40,0.12);
+        border-radius: 0;
+        box-shadow: var(--shadow-md);
       }
 
       /* CLA archive year list */
-      .cla-year-card { min-width: 200px; max-width: calc(100vw - 64px); padding: 10px 12px; border-radius: 20px; }
+      .cla-year-card { min-width: 200px; max-width: calc(100vw - 64px); padding: 10px 12px; border-radius: 0; }
       .cla-controls { gap: 8px; flex-wrap: wrap; }
       .cla-control-group + .cla-control-group { padding-left: 0; border-left: none; }
       .cla-filter-btn { padding: 4px 8px; font-size: 0.7rem; border-radius: 16px; }
@@ -1781,7 +1783,7 @@
       /* Insight reports hero */
       .ir-hero-layout { grid-template-columns: 1fr; gap: 14px; }
       .ir-hero-body { padding: 16px; }
-      .ir-hero-card { border-radius: 20px; }
+      .ir-hero-card { border-radius: 0; }
       .ir-carousel { overflow-x: auto; -webkit-overflow-scrolling: touch; }
       .ir-carousel-card { flex: 0 0 calc(100vw - 80px); max-width: 280px; border-radius: 16px; }
       .ir-carousel-btn { display: none; }
