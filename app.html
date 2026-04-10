@@ -462,7 +462,7 @@
     .fulltext-body { margin-top: 8px; }
 
     /* ================================================================
-       HOME NEWS LAYOUT — PESTLE grid + sidebar
+       HOME NEWS LAYOUT — full-page 2-column grid with sticky sidebar
        ================================================================ */
     .home-news-layout {
       display: grid;
@@ -470,8 +470,8 @@
       gap: 20px;
       align-items: start;
     }
-    .home-news-main { min-width: 0; }
-    .home-news-sidebar { position: sticky; top: 80px; }
+    .home-news-main { min-width: 0; display: flex; flex-direction: column; gap: 2.5rem; }
+    .home-news-sidebar { position: sticky; top: 80px; align-self: start; }
     .home-sidebar-card {
       background: var(--card);
       border: 1px solid var(--border);
@@ -624,29 +624,37 @@
     .signal-desc { font-size: 0.84rem; line-height: 1.65; color: var(--text-secondary); }
 
     /* Weak signals section — overview always visible */
-    .ws-grid { display: flex; flex-direction: column; gap: 12px; }
+    .ws-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 12px;
+    }
     .ws-card {
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: var(--radius);
       overflow: hidden;
       transition: border-color 0.2s, box-shadow 0.2s;
-      padding: 16px 20px;
+      padding: 14px;
     }
     .ws-card:hover { border-color: var(--accent); box-shadow: var(--shadow-md); }
     .ws-card-header {
       display: flex;
       align-items: flex-start;
-      gap: 12px;
-      margin-bottom: 8px;
+      gap: 8px;
+      margin-bottom: 6px;
     }
-    .ws-card-title { flex: 1; font-size: 0.9rem; font-weight: 600; line-height: 1.45; }
-    .ws-card-badges { display: flex; gap: 6px; flex-shrink: 0; align-items: center; }
+    .ws-card-title { flex: 1; font-size: 0.82rem; font-weight: 600; line-height: 1.4; }
+    .ws-card-badges { display: flex; gap: 6px; flex-shrink: 0; align-items: center; flex-wrap: wrap; }
     .ws-card-desc {
-      font-size: 0.84rem;
-      line-height: 1.7;
+      font-size: 0.8rem;
+      line-height: 1.6;
       color: var(--text-secondary);
       margin-bottom: 8px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
     .ws-card-meta {
       display: flex;
@@ -799,7 +807,24 @@
     }
     .cla-filter-btn:hover { opacity: 0.85; }
 
-    /* Layer sections in timeline */
+    /* CLA Archive: synchronized horizontal scroll container */
+    .cla-timeline-container {
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 12px;
+    }
+    .cla-timeline-container::-webkit-scrollbar { height: 8px; }
+    .cla-timeline-container::-webkit-scrollbar-track { background: var(--surface); border-radius: 4px; }
+    .cla-timeline-container::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+    .cla-timeline-grid {
+      display: grid;
+      gap: 8px 12px;
+      /* rows = 6 layers, columns set dynamically via inline style */
+      grid-auto-flow: column;
+    }
+
+    /* Layer sections in timeline (used as row headers) */
     .cla-layer-section { margin-bottom: 1.5rem; }
     .cla-layer-section-title {
       font-size: 0.85rem;
@@ -820,31 +845,49 @@
     .cla-layer-scroll::-webkit-scrollbar-track { background: var(--surface); border-radius: 3px; }
     .cla-layer-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
-    /* Year cards */
+    /* Year cards — wider for horizontal grid layout */
     .cla-year-card {
-      min-width: 260px;
-      max-width: 320px;
+      min-width: 340px;
+      max-width: 420px;
       flex: 0 0 auto;
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: var(--radius-xs);
-      padding: 14px 16px;
+      padding: 10px 14px;
       transition: border-color 0.2s;
+      scroll-snap-align: start;
     }
     .cla-year-card:hover { border-color: var(--accent); }
     .cla-year-card.current { border-color: var(--accent); border-width: 2px; }
     .cla-year-card-period {
       font-weight: 700;
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       color: var(--accent);
-      margin-bottom: 6px;
-      padding-bottom: 4px;
+      margin-bottom: 4px;
+      padding-bottom: 3px;
       border-bottom: 1px solid var(--border-light);
     }
     .cla-year-card-text {
-      font-size: 0.8rem;
-      line-height: 1.65;
+      font-size: 0.78rem;
+      line-height: 1.55;
       color: var(--text);
+    }
+    /* Row label in the synchronized grid */
+    .cla-grid-row-label {
+      position: sticky;
+      left: 0;
+      z-index: 2;
+      background: var(--bg);
+      min-width: 200px;
+      max-width: 200px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      padding: 6px 8px;
+      border-right: 2px solid var(--border-light);
     }
 
     /* Decade groups in individual view */
@@ -1113,9 +1156,24 @@
       border-radius: 4px;
       background: var(--accent);
       color: #fff;
+      cursor: pointer;
+      transition: opacity 0.15s, transform 0.15s;
+      user-select: none;
     }
+    .tier-badge:hover { opacity: 0.8; transform: scale(1.1); }
     .tier-badge-2 { background: var(--accent-soft); }
     .tier-badge-3 { background: var(--text-muted); }
+    .tier-reset-btn {
+      font-size: 0.72rem;
+      color: var(--accent);
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xs);
+      padding: 4px 10px;
+      cursor: pointer;
+      margin-left: 12px;
+    }
+    .tier-reset-btn:hover { background: var(--surface); }
 
     /* ================================================================
        REPORTS ARCHIVE
@@ -1635,7 +1693,8 @@
       }
 
       /* CLA archive year list */
-      .cla-year-card { min-width: 220px; max-width: 280px; padding: 14px; border-radius: 20px; }
+      .cla-year-card { min-width: 260px; max-width: 320px; padding: 10px 12px; border-radius: 20px; }
+      .cla-grid-row-label { min-width: 140px; max-width: 140px; font-size: 0.7rem; }
       .cla-controls { gap: 8px; }
       .cla-control-group + .cla-control-group { padding-left: 8px; }
       .cla-filter-btn { padding: 4px 8px; font-size: 0.7rem; border-radius: 16px; }
@@ -2543,12 +2602,11 @@
       allPapers.sort((a, b) => new Date(b.published_date || 0) - new Date(a.published_date || 0));
       const topPapers = allPapers.slice(0, 10);
 
-      let html = '<div class="home-stack">';
+      // Build the full-page 2-column layout: main (left) + signals sidebar (right)
+      let html = '<div class="home-news-layout">';
 
-      // 0. Insight Reports Hero + Carousel (top of page)
-      if (insightReports?.reports?.length > 0) {
-        html += renderInsightReportsHero(insightReports);
-      }
+      // --- Left column: main content ---
+      html += '<div class="home-news-main">';
 
       // 1. Daily Report
       html += '<div><h2 class="section-title">月次分析レポート <span class="section-date">' + dateStr + '</span></h2>';
@@ -2556,14 +2614,45 @@
       if (glReport) html += renderDailyReportCard('海外メディアの視点', glReport);
       html += '</div>';
 
-      // 2. PESTLE grid + Signals sidebar
+      // 2. PESTLE grid (no sidebar wrapper - sidebar is at page level now)
       html += '<div><h2 class="section-title">Insight News</h2>' +
-        '<div class="home-news-layout">' +
-          '<div class="home-news-main" id="homePestleGrid"></div>' +
-          '<div class="home-news-sidebar">' +
-            '<div class="home-sidebar-card">' +
-              '<h3 class="home-sidebar-title">新着シグナル</h3>' +
-              '<div id="homeSidebarSignals">';
+        '<div id="homePestleGrid"></div></div>';
+
+      // 3. Papers
+      if (topPapers.length > 0) {
+        html += '<div><h2 class="section-title">学術研究 — 最新の研究成果</h2>';
+        topPapers.slice(0, 3).forEach(p => { html += renderHomePaperCard(p); });
+        if (topPapers.length > 3) {
+          html += '<details><summary class="fulltext-toggle">残り ' + (topPapers.length - 3) + ' 件を表示</summary><div class="fulltext-body">';
+          topPapers.slice(3).forEach(p => { html += renderHomePaperCard(p); });
+          html += '</div></details>';
+        }
+        html += '<a class="more-link" href="#section-papers" onclick="event.preventDefault();showSection(\'section-papers\');history.pushState(null,\'\',\'app.html#section-papers\')">全分野を見る &rarr;</a></div>';
+      }
+
+      // 4. Future Insight box
+      html += '<div class="insight-box">' +
+        '<h2 class="section-title">未来洞察</h2>' +
+        '<p class="insight-desc">あなたの問題意識を記述してください。蓄積されたデータから未来洞察の視点で回答します。</p>' +
+        '<form onsubmit="submitHomeForesight(event)" class="insight-form">' +
+          '<input type="text" id="homeForesightInput" placeholder="例: AI規制と雇用市場の今後3年の見通し..." class="insight-input">' +
+          '<button type="submit" class="btn-primary">問いかける</button>' +
+        '</form>' +
+        '<div id="homeForesightResult" class="insight-result"></div>' +
+      '</div>';
+
+      // 5. Insight Reports Hero (moved to bottom of left column)
+      if (insightReports?.reports?.length > 0) {
+        html += renderInsightReportsHero(insightReports);
+      }
+
+      html += '</div>'; // end home-news-main
+
+      // --- Right column: signals sidebar (sticky, always visible) ---
+      html += '<div class="home-news-sidebar">' +
+        '<div class="home-sidebar-card">' +
+          '<h3 class="home-sidebar-title">新着シグナル</h3>' +
+          '<div id="homeSidebarSignals">';
       if (signals.length > 0) {
         signals.forEach(ws => {
           const impactClass = (ws.potential_impact || '').toLowerCase() === 'high' ? 'ws-badge-high' :
@@ -2583,33 +2672,9 @@
       html += '</div>' +
               '<a class="more-link" href="#section-signals" onclick="event.preventDefault();showSection(\'section-signals\');history.pushState(null,\'\',\'app.html#section-signals\')" style="font-size:0.78rem;margin-top:10px;display:inline-block">全シグナルを見る &rarr;</a>' +
             '</div>' +
-          '</div>' +
-        '</div></div>';
+          '</div>'; // end home-news-sidebar
 
-      // 4. Papers
-      if (topPapers.length > 0) {
-        html += '<div><h2 class="section-title">学術研究 — 最新の研究成果</h2>';
-        topPapers.slice(0, 3).forEach(p => { html += renderHomePaperCard(p); });
-        if (topPapers.length > 3) {
-          html += '<details><summary class="fulltext-toggle">残り ' + (topPapers.length - 3) + ' 件を表示</summary><div class="fulltext-body">';
-          topPapers.slice(3).forEach(p => { html += renderHomePaperCard(p); });
-          html += '</div></details>';
-        }
-        html += '<a class="more-link" href="#section-papers" onclick="event.preventDefault();showSection(\'section-papers\');history.pushState(null,\'\',\'app.html#section-papers\')">全分野を見る &rarr;</a></div>';
-      }
-
-      // 5. Future Insight box
-      html += '<div class="insight-box">' +
-        '<h2 class="section-title">未来洞察</h2>' +
-        '<p class="insight-desc">あなたの問題意識を記述してください。蓄積されたデータから未来洞察の視点で回答します。</p>' +
-        '<form onsubmit="submitHomeForesight(event)" class="insight-form">' +
-          '<input type="text" id="homeForesightInput" placeholder="例: AI規制と雇用市場の今後3年の見通し..." class="insight-input">' +
-          '<button type="submit" class="btn-primary">問いかける</button>' +
-        '</form>' +
-        '<div id="homeForesightResult" class="insight-result"></div>' +
-      '</div>';
-
-      html += '</div>';
+      html += '</div>'; // end home-news-layout
       container.innerHTML = html;
 
       // Render PESTLE grid
@@ -3522,38 +3587,57 @@
       html += '</div></div>';
 
       if (claArchiveViewMode === 'timeline') {
-        // Unified layer-based horizontal scroll (1990-2026 in one scroll)
+        // Synchronized horizontal grid: 6 layers as rows, years as columns
         const layers = [
-          { key: 'litany', label: 'Layer 1: リタニー（表層）', border: 'var(--accent-warm)' },
-          { key: 'systemic_causes', label: 'Layer 2: 社会的・システム的原因', border: 'var(--accent-soft)' },
-          { key: 'worldview', label: 'Layer 3: 世界観・ディスコース', border: 'var(--accent)' },
-          { key: 'myth_metaphor', label: 'Layer 4: 神話・メタファー', border: '#4A7A8C' },
+          { key: 'litany', label: 'Layer 1: リタニー', border: 'var(--accent-warm)' },
+          { key: 'systemic_causes', label: 'Layer 2: システム的原因', border: 'var(--accent-soft)' },
+          { key: 'worldview', label: 'Layer 3: 世界観', border: 'var(--accent)' },
+          { key: 'myth_metaphor', label: 'Layer 4: 神話', border: '#4A7A8C' },
           { key: 'key_tension', label: '核心的緊張', border: 'var(--highlight)' },
           { key: 'emerging_narrative', label: '新たな物語', border: 'var(--S)' }
         ];
 
-        layers.forEach(layer => {
-          const hasData = allEntries.some(entry => {
+        // Filter layers that have data
+        const activeLayers = layers.filter(layer =>
+          allEntries.some(entry => {
             const text = getCLAEntryText(entry, layer.key, claArchiveCatFilter);
             return text && text.trim().length > 0;
-          });
-          if (!hasData) return;
+          })
+        );
 
-          html += '<div class="cla-layer-section">';
-          html += '<div class="cla-layer-section-title"><span style="width:8px;height:8px;border-radius:50%;background:' + layer.border + ';flex-shrink:0"></span>' + layer.label + '</div>';
-          html += '<div class="cla-layer-scroll">';
-          allEntries.forEach((entry, idx) => {
+        // Filter entries that have at least one layer with data
+        const activeEntries = allEntries.filter(entry =>
+          activeLayers.some(layer => {
             const text = getCLAEntryText(entry, layer.key, claArchiveCatFilter);
-            if (!text || !text.trim()) return;
-            const isCurrent = idx === allEntries.length - 1;
+            return text && text.trim().length > 0;
+          })
+        );
+
+        // Number of columns = 1 (label) + number of active entries
+        const numCols = 1 + activeEntries.length;
+        html += '<div class="cla-timeline-container">';
+        html += '<div class="cla-timeline-grid" style="grid-template-rows:repeat(' + activeLayers.length + ',auto);grid-template-columns:200px repeat(' + activeEntries.length + ',minmax(340px,420px))">';
+
+        activeLayers.forEach(layer => {
+          // Row label (sticky left)
+          html += '<div class="cla-grid-row-label"><span style="width:8px;height:8px;border-radius:50%;background:' + layer.border + ';flex-shrink:0"></span>' + layer.label + '</div>';
+          // Year cards for this layer
+          activeEntries.forEach((entry, idx) => {
+            const text = getCLAEntryText(entry, layer.key, claArchiveCatFilter);
+            const isCurrent = idx === activeEntries.length - 1;
             const periodLabel = formatCLAPeriodLabel(entry);
-            html += '<div class="cla-year-card' + (isCurrent ? ' current' : '') + '">';
-            html += '<div class="cla-year-card-period">' + escapeHtml(periodLabel) + '</div>';
-            html += '<div class="cla-year-card-text">' + escapeHtml(text) + '</div>';
-            html += '</div>';
+            if (text && text.trim()) {
+              html += '<div class="cla-year-card' + (isCurrent ? ' current' : '') + '">';
+              html += '<div class="cla-year-card-period">' + escapeHtml(periodLabel) + '</div>';
+              html += '<div class="cla-year-card-text">' + escapeHtml(text) + '</div>';
+              html += '</div>';
+            } else {
+              html += '<div class="cla-year-card" style="opacity:0.3;border-style:dashed"><div class="cla-year-card-period">' + escapeHtml(periodLabel) + '</div><div class="cla-year-card-text" style="color:var(--text-muted);font-style:italic">—</div></div>';
+            }
           });
-          html += '</div></div>';
         });
+
+        html += '</div></div>'; // end grid + container
 
       } else {
         // Individual view: decade-grouped period selector + detail panel
@@ -3809,9 +3893,39 @@
     // ==============================================================
     // RENDER: MEDIA SOURCES
     // ==============================================================
+    // --- Media tier override helpers (localStorage) ---
+    function getMediaTierOverrides() {
+      return JSON.parse(localStorage.getItem('media_tier_overrides') || '{}');
+    }
+    function setMediaTier(name, tier) {
+      const overrides = getMediaTierOverrides();
+      overrides[name] = tier;
+      localStorage.setItem('media_tier_overrides', JSON.stringify(overrides));
+    }
+    function resetMediaTiers() {
+      localStorage.removeItem('media_tier_overrides');
+      // Re-render with original tiers
+      if (window._lastMediaSourcesData) renderMediaSources(window._lastMediaSourcesData);
+    }
+    // Cycle tier: 1 → 2 → 3 → 1
+    window.cycleMediaTier = function(mediaName, originalTier) {
+      const overrides = getMediaTierOverrides();
+      const currentTier = overrides[mediaName] || originalTier || 1;
+      const nextTier = currentTier >= 3 ? 1 : currentTier + 1;
+      setMediaTier(mediaName, nextTier);
+      // Re-render
+      if (window._lastMediaSourcesData) renderMediaSources(window._lastMediaSourcesData);
+    };
+    window.resetMediaTiers = resetMediaTiers;
+
     function renderMediaSources(data) {
       const container = document.getElementById('mediaSourcesContent');
       if (!data) { container.innerHTML = '<p class="text-muted">メディアソースデータを取得できませんでした。</p>'; return; }
+
+      // Store data for re-rendering after tier changes
+      window._lastMediaSourcesData = data;
+      const tierOverrides = getMediaTierOverrides();
+      const hasOverrides = Object.keys(tierOverrides).length > 0;
 
       let sources = Array.isArray(data) ? data : (data.sources || data.feeds || []);
       if (!Array.isArray(sources) && typeof data === 'object') {
@@ -3842,18 +3956,39 @@
         }).join(', ');
       }
 
-      container.innerHTML = '<div class="media-meta">' + filtered.length + 'メディアから合計 <strong>' + totalArticles.toLocaleString() + '</strong> 件の記事を収集</div>' +
+      // Get effective tier (with override)
+      function getEffectiveTier(source) {
+        const name = source.name_ja || source.name || source.title || '';
+        const originalTier = source.tier || '-';
+        if (tierOverrides[name] !== undefined) return tierOverrides[name];
+        return originalTier;
+      }
+
+      const resetBtn = hasOverrides ? '<button class="tier-reset-btn" onclick="resetMediaTiers()">Tierリセット</button>' : '';
+
+      container.innerHTML = '<div class="media-meta">' + filtered.length + 'メディアから合計 <strong>' + totalArticles.toLocaleString() + '</strong> 件の記事を収集' + resetBtn + '</div>' +
         '<div class="media-table-wrap"><table class="media-table"><thead><tr>' +
         '<th>メディア名</th><th>分野</th><th>Tier</th><th>記事数</th><th>最終取得</th></tr></thead><tbody>' +
-        filtered.sort((a, b) => (b.articles_count || 0) - (a.articles_count || 0)).map(s => {
+        filtered.sort((a, b) => {
+          // Sort by effective tier first (ascending), then by article count (descending)
+          const tierA = getEffectiveTier(a);
+          const tierB = getEffectiveTier(b);
+          const tA = tierA === '-' ? 99 : tierA;
+          const tB = tierB === '-' ? 99 : tierB;
+          if (tA !== tB) return tA - tB;
+          return (b.articles_count || 0) - (a.articles_count || 0);
+        }).map(s => {
           const name = s.name_ja || s.name || s.title || '';
           const rawCat = s.categories || s.category || s.type || '';
           const cat = catToJa(rawCat);
-          const tier = s.tier || '-';
+          const originalTier = s.tier || '-';
+          const tier = getEffectiveTier(s);
+          const isOverridden = tierOverrides[name] !== undefined;
           const tierClass = tier === 1 ? '' : (tier === 2 ? 'tier-badge-2' : 'tier-badge-3');
+          const tierStyle = isOverridden ? ' style="box-shadow:0 0 0 2px var(--accent-warm)"' : '';
           return '<tr><td class="media-name">' + escapeHtml(name) + '</td>' +
             '<td>' + escapeHtml(cat) + '</td>' +
-            '<td>' + (tier !== '-' ? '<span class="tier-badge ' + tierClass + '">Tier ' + tier + '</span>' : '-') + '</td>' +
+            '<td>' + (tier !== '-' ? '<span class="tier-badge ' + tierClass + '"' + tierStyle + ' onclick="cycleMediaTier(\'' + escapeAttr(name) + '\',' + (originalTier === '-' ? 1 : originalTier) + ')" title="クリックでTier変更">Tier ' + tier + '</span>' : '<span class="tier-badge tier-badge-3" onclick="cycleMediaTier(\'' + escapeAttr(name) + '\',1)" title="クリックでTier設定" style="cursor:pointer;opacity:0.5">設定</span>') + '</td>' +
             '<td class="media-count">' + (s.articles_count || 0) + '</td>' +
             '<td class="media-date">' + escapeHtml(s.last_fetched || '-') + '</td></tr>';
         }).join('') + '</tbody></table></div>';
