@@ -1485,6 +1485,25 @@
     .footer-links a:hover { color: var(--accent); }
     .footer-bottom { font-size: 0.72rem; color: var(--text-muted); border-top: 1px solid var(--border-light); padding-top: 1rem; }
 
+    /* Dynamic grid classes — extracted from inline styles for media query control */
+    .ir-report-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+    .ir-archive-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 10px;
+    }
+    .ir-related-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 12px;
+      margin: 16px 0;
+    }
+
     /* Section more link */
     .more-link { display: block; margin-top: 8px; font-size: 0.78rem; font-weight: 500; }
 
@@ -1673,6 +1692,107 @@
       .home-signal-title { color: var(--text); font-size: 0.8rem; }
       .home-signal-desc { font-size: 0.74rem; }
 
+      /* --- Dynamic grids: force 1-column on mobile --- */
+      .ir-report-grid,
+      .ir-archive-grid,
+      .ir-related-grid {
+        grid-template-columns: 1fr;
+      }
+
+      /* --- ws-grid: force 1-column on mobile --- */
+      .ws-grid { grid-template-columns: 1fr; gap: 10px; }
+
+      /* --- Touch targets: minimum 44px --- */
+      .nav-link {
+        padding: 11px 14px;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+      }
+      .pestle-article-action-btn {
+        padding: 10px 12px;
+        font-size: 0.72rem;
+        min-height: 36px;
+        min-width: 64px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .pestle-article-actions {
+        flex-direction: row;
+        gap: 6px;
+        margin-top: 6px;
+      }
+      .pestle-article-row {
+        flex-direction: column;
+      }
+      .ws-card-details-toggle {
+        padding: 12px 0;
+        min-height: 44px;
+        font-size: 0.82rem;
+      }
+      .modal-close {
+        width: 44px;
+        height: 44px;
+      }
+
+      /* --- Comment input: stack vertically --- */
+      .comment-input-row {
+        flex-direction: column;
+      }
+      .comment-input-row .btn-primary {
+        width: 100%;
+      }
+
+      /* --- Insight form actions: full width buttons --- */
+      .insight-form-actions {
+        flex-direction: column;
+        gap: 10px;
+      }
+      .insight-form-actions .btn-primary,
+      .insight-form-actions .btn-secondary {
+        width: 100%;
+        min-height: 44px;
+        justify-content: center;
+      }
+      .insight-form .btn-primary {
+        width: 100%;
+        justify-content: center;
+      }
+
+      /* --- Carousel scroll hint --- */
+      .ir-carousel-wrap {
+        position: relative;
+      }
+      .ir-carousel-wrap::after {
+        content: '';
+        position: absolute;
+        right: 0;
+        top: 0;
+        bottom: 12px;
+        width: 3rem;
+        background: linear-gradient(90deg, transparent, var(--bg));
+        pointer-events: none;
+        z-index: 1;
+      }
+
+      /* --- Media table scroll hint --- */
+      .media-table-wrap {
+        position: relative;
+      }
+      .media-table-wrap::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 40px;
+        background: linear-gradient(to right, transparent, var(--bg));
+        pointer-events: none;
+      }
+      .media-table-wrap::-webkit-scrollbar { height: 4px; }
+      .media-table-wrap::-webkit-scrollbar-thumb { background: var(--border); }
+
       /* --- Buttons: rounded pill style --- */
       .btn-primary {
         border-radius: 0;
@@ -1829,7 +1949,7 @@
       .container { padding: 0 10px; }
       .site-title { font-size: 1rem; }
       .section-title { font-size: 1.05rem; }
-      .nav-link { padding: 6px 10px; font-size: 0.66rem; }
+      .nav-link { padding: 10px 10px; font-size: 0.66rem; }
       .region-btn { padding: 4px 8px; font-size: 0.68rem; }
       .home-signal-item { min-width: 200px; max-width: 220px; }
       .cla-year-card { min-width: 180px; }
@@ -1842,7 +1962,7 @@
       .report-archive-card { padding: 12px; }
       .pestle-card-header { padding: 8px 12px 6px; }
       .pestle-articles { padding: 0 12px 8px; }
-      .ir-carousel-card { flex: 0 0 calc(100vw - 48px); }
+      .ir-carousel-card { flex: 0 0 calc(100vw - 48px); max-width: none; }
     }
 
     /* ================================================================
@@ -3064,7 +3184,7 @@
           modalHtml += '<div class="ir-modal-section open">' +
             '<div class="ir-modal-section-header" onclick="this.parentElement.classList.toggle(\'open\')">関連学術成果<span class="ir-modal-section-chevron">&#9654;</span></div>' +
             '<div class="ir-modal-section-body">' +
-            '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;margin:16px 0">';
+            '<div class="ir-related-grid">';
           r.related_research.forEach(function(item) {
             modalHtml += '<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);padding:14px">' +
               '<div style="font-size:0.84rem;line-height:1.7;color:var(--text);margin-bottom:10px">' + escapeHtml(item.comment || item.summary || '') + '</div>' +
@@ -4153,7 +4273,7 @@
       const irData = dataCache['insight_reports.json'];
       if (irData?.reports?.length > 0) {
         html += '<h3 class="section-title" style="margin-bottom:12px">インサイトレポート <span class="section-date">' + escapeHtml(irData.date || '') + '</span></h3>';
-        html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;margin-bottom:28px">';
+        html += '<div class="ir-report-grid">';
         irData.reports.forEach((r, i) => {
           const color = getPestleColor(r.article?.pestle_category);
           html += '<div class="ir-carousel-card" onclick="openInsightReport(' + i + ')" style="flex:none;width:auto">' +
@@ -4259,7 +4379,7 @@
             if (!data?.reports) { target.innerHTML = '<p class="text-muted">データがありま��ん。</p>'; return; }
             // Cache for modal use
             dataCache['insight_reports_' + dateKey + '.json'] = data;
-            let inner = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px">';
+            let inner = '<div class="ir-archive-grid">';
             data.reports.forEach((r, i) => {
               const color = getPestleColor(r.article?.pestle_category);
               inner += '<div class="ir-carousel-card" style="flex:none;width:auto;cursor:pointer" onclick="openArchivedInsightReport(\'' + dateKey + '\',' + i + ')">' +
