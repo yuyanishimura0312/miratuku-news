@@ -1394,38 +1394,81 @@
     /* ================================================================
        RESPONSIVE
        ================================================================ */
+    /* ================================================================
+       MOBILE — Miratuku CI "warm & friendly" design
+       ================================================================ */
     @media (max-width: 768px) {
-      .container { padding: 0 14px; }
+      /* Soft warm background with subtle gradient */
+      body { background: linear-gradient(180deg, #FFFFF0 0%, var(--bg) 120px); }
+      .container { padding: 0 16px; }
 
-      /* Header: stack vertically on mobile */
-      .header-main { flex-wrap: wrap; padding: 10px 0; gap: 8px; }
+      /* --- Header: compact, warm accent bar --- */
+      .site-header {
+        background: #FFFFF0;
+        border-bottom: none;
+        box-shadow: 0 1px 8px rgba(120,60,40,0.06);
+      }
+      .header-main { flex-wrap: wrap; padding: 10px 0; gap: 6px; }
       .header-left { flex: 1; min-width: 0; }
+      .site-title { font-size: 1.05rem; color: #783C28; }
       .header-date { display: none; }
       .header-right { gap: 6px; width: 100%; justify-content: flex-end; }
-      .region-btn { padding: 5px 10px; font-size: 0.72rem; }
-      .theme-toggle { padding: 5px 8px; font-size: 0.75rem; }
+      .region-toggle { border-radius: 20px; border-color: #E6D5C4; }
+      .region-btn {
+        padding: 5px 12px; font-size: 0.72rem;
+        border-radius: 20px;
+      }
+      .region-btn.active {
+        background: linear-gradient(135deg, #A0503C, #C87864);
+        box-shadow: 0 2px 8px rgba(160,80,60,0.25);
+      }
+      .theme-toggle { padding: 5px 8px; font-size: 0.75rem; border-radius: 20px; }
       .auth-area { font-size: 0.72rem; }
-      .auth-btn { padding: 4px 8px; font-size: 0.68rem; }
+      .auth-btn { padding: 4px 10px; font-size: 0.68rem; border-radius: 20px; }
 
-      /* Nav: better touch targets */
-      .site-nav { position: relative; }
+      /* --- Nav: pill-shaped tabs with warm tones --- */
+      .site-nav {
+        position: relative;
+        background: #FFFFF0;
+        border-bottom: none;
+        padding: 0 4px;
+      }
       .site-nav::after {
         content: '';
         position: absolute;
         right: 0; top: 0; bottom: 0;
-        width: 2rem;
-        background: linear-gradient(90deg, transparent, var(--card));
+        width: 2.5rem;
+        background: linear-gradient(90deg, transparent, #FFFFF0);
         pointer-events: none;
       }
-      .nav-list { padding-right: 2rem; gap: 4px; padding-top: 8px; padding-bottom: 8px; }
-      .nav-link { padding: 8px 14px; font-size: 0.78rem; }
+      .nav-list { padding-right: 2.5rem; gap: 6px; padding-top: 6px; padding-bottom: 10px; }
+      .nav-link {
+        padding: 7px 14px;
+        font-size: 0.76rem;
+        border-radius: 20px;
+        background: rgba(250,200,160,0.25);
+        color: #A0503C;
+        font-weight: 500;
+      }
+      .nav-link:hover { background: rgba(250,200,160,0.45); color: #783C28; }
+      .nav-link.active {
+        background: linear-gradient(135deg, #783C28, #A0503C);
+        color: #fff;
+        box-shadow: 0 2px 10px rgba(120,60,40,0.2);
+      }
 
-      /* Section spacing */
+      /* --- Sections: generous spacing --- */
       .app-section { padding: 1.25rem 0 2rem; }
-      .section-title { font-size: 1.15rem; }
+      .section-title {
+        font-size: 1.1rem;
+        color: #783C28;
+        position: relative;
+        padding-bottom: 6px;
+      }
       .section-header { margin-bottom: 1rem; }
+      .home-stack { gap: 1.75rem; }
 
-      /* Cards & grid */
+      /* --- Cards: soft rounded, warm shadows --- */
       .pestle-grid { grid-template-columns: 1fr; gap: 14px; }
       .pestle-card-header { padding: 10px 14px 6px; }
       .pestle-articles { padding: 0 14px 10px; }
@@ -1433,84 +1476,179 @@
       .pestle-article-title { font-size: 0.82rem; }
 
       /* Report cards */
-      .report-summary { padding: 12px 14px; }
-      .report-body { padding: 0 14px 14px; }
+      .report-summary {
+        padding: 14px 16px;
+        border-radius: var(--radius);
+      }
+      .report-body { padding: 0 16px 16px; }
       .myth-grid { grid-template-columns: 1fr; }
       .report-myth-section { grid-template-columns: 1fr; }
 
-      /* Signal cards */
-      .ws-card { padding: 12px 14px; }
+      /* --- Signal cards: warm card style --- */
+      .ws-card {
+        padding: 14px 16px;
+        border-radius: 20px;
+        border-color: #E6D5C4;
+        background: #FFFFF8;
+        box-shadow: 0 1px 6px rgba(120,60,40,0.04);
+      }
+      .ws-card:hover { border-color: #C87864; }
       .ws-card-header { gap: 8px; flex-wrap: wrap; }
-      .ws-card-title { font-size: 0.84rem; }
+      .ws-card-title { font-size: 0.84rem; color: #783C28; }
       .ws-card-badges { flex-wrap: wrap; }
       .ws-card-desc { font-size: 0.8rem; -webkit-line-clamp: 4; }
-      .ws-card-meta { gap: 4px; }
-      .ws-card-meta-tag { font-size: 0.66rem; padding: 1px 6px; }
-      .ws-card-body { padding-top: 8px; margin-top: 8px; }
+      .ws-card-meta { gap: 5px; }
+      .ws-card-meta-tag {
+        font-size: 0.66rem;
+        padding: 2px 8px;
+        border-radius: 12px;
+        background: rgba(250,200,160,0.35);
+        color: #A0503C;
+      }
+      .ws-card-body { padding-top: 10px; margin-top: 10px; }
+      .ws-card-details-toggle { color: #A0503C; }
 
-      /* Home sidebar signals on mobile: horizontal scroll */
+      /* --- Home sidebar signals: horizontal cards --- */
       .home-news-sidebar { order: -1; }
-      .home-sidebar-card { padding: 12px; }
+      .home-sidebar-card {
+        padding: 14px;
+        border-radius: 20px;
+        background: linear-gradient(135deg, #FFFFF0, #FDF6EE);
+        border-color: #E6D5C4;
+      }
+      .home-sidebar-title {
+        color: #783C28;
+        border-bottom-color: #C87864;
+      }
       #homeSidebarSignals {
         display: flex;
         overflow-x: auto;
         gap: 12px;
-        padding-bottom: 4px;
+        padding-bottom: 6px;
         scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+      }
+      #homeSidebarSignals::-webkit-scrollbar { height: 3px; }
+      #homeSidebarSignals::-webkit-scrollbar-thumb {
+        background: #E6D5C4;
+        border-radius: 3px;
       }
       .home-signal-item {
-        min-width: 240px;
-        max-width: 280px;
+        min-width: 220px;
+        max-width: 260px;
         flex-shrink: 0;
         border-bottom: none;
-        border-right: 1px solid var(--border);
-        padding: 0 12px 0 0;
+        border: 1px solid #E6D5C4;
+        border-radius: 16px;
+        padding: 10px 12px;
+        background: white;
         scroll-snap-align: start;
+        box-shadow: 0 1px 4px rgba(120,60,40,0.04);
       }
-      .home-signal-item:last-child { border-right: none; padding-right: 0; }
+      .home-signal-item:last-child { border-right: 1px solid #E6D5C4; }
+      .home-signal-title { color: #783C28; font-size: 0.8rem; }
+      .home-signal-desc { font-size: 0.74rem; }
 
-      /* CLA */
-      .cla-period-btn { padding: 4px 8px; font-size: 0.68rem; }
+      /* --- Buttons: rounded pill style --- */
+      .btn-primary {
+        border-radius: 24px;
+        background: linear-gradient(135deg, #A0503C, #C87864);
+        box-shadow: 0 2px 8px rgba(160,80,60,0.2);
+        font-size: 0.82rem;
+        padding: 8px 20px;
+      }
+      .btn-secondary {
+        border-radius: 20px;
+        border-color: #D9C8B8;
+        color: #A0503C;
+      }
+      .more-link {
+        color: #A0503C;
+        font-weight: 500;
+      }
 
-      /* Papers */
+      /* --- Impact badges: softer pill shapes --- */
+      .ws-badge { border-radius: 12px; font-size: 0.62rem; padding: 2px 8px; }
+      .ws-badge-high { background: linear-gradient(135deg, #C0392B, #E74C3C); }
+      .ws-badge-medium { background: linear-gradient(135deg, #C87864, #D4760A); }
+      .ws-badge-low { background: linear-gradient(135deg, #2E7D6B, #1E8449); }
+      .ws-badge-horizon { border-radius: 12px; }
+
+      /* --- CLA --- */
+      .cla-period-btn { padding: 5px 10px; font-size: 0.68rem; border-radius: 16px; }
+
+      /* --- Papers --- */
       .papers-field-header { padding: 12px 14px; }
       .papers-field-body { padding: 0 14px 14px; }
       .paper-item { padding: 10px 0; padding-left: 10px; }
       .paper-title { font-size: 0.84rem; }
 
-      /* Insight */
-      .insight-box { padding: 14px; }
+      /* --- Insight box --- */
+      .insight-box {
+        padding: 16px;
+        border-radius: 20px;
+        background: linear-gradient(135deg, #FFFFF0, #FAE8DC);
+        border-color: #E6D5C4;
+      }
       .insight-form { flex-direction: column; }
-      .insight-textarea { min-height: 100px; }
+      .insight-input, .insight-textarea {
+        border-radius: 16px;
+        border-color: #D9C8B8;
+        min-height: 100px;
+      }
 
-      /* Modal: full screen on mobile */
-      .modal-box { padding: 20px 16px 40px; }
-      .modal-title { font-size: 0.95rem; padding-right: 2.5rem; }
-      .modal-close { top: 10px; right: 10px; }
+      /* --- Modal: friendly rounded sheet --- */
+      .modal-box {
+        padding: 24px 18px 40px;
+        border-radius: 24px 24px 0 0;
+        max-height: 92vh;
+      }
+      .modal-title { font-size: 0.95rem; padding-right: 2.5rem; color: #783C28; }
+      .modal-close {
+        top: 12px; right: 12px;
+        border-radius: 50%;
+        width: 32px; height: 32px;
+        background: rgba(250,200,160,0.3);
+      }
 
-      /* Footer */
+      /* --- Footer: warm tone --- */
       .footer-grid { grid-template-columns: 1fr; gap: 1.5rem; }
-      .site-footer { padding: 1.5rem 0 1rem; margin-top: 2rem; }
+      .site-footer {
+        padding: 1.5rem 0 1rem;
+        margin-top: 2rem;
+        background: #FDF6EE;
+        border-top-color: #E6D5C4;
+      }
 
-      /* Others */
+      /* --- Alerts bar: softer --- */
+      .alerts-bar {
+        background: linear-gradient(135deg, #A0503C, #C87864);
+        border-radius: 0 0 16px 16px;
+      }
+
+      /* --- Others --- */
       .skeleton-grid { grid-template-columns: 1fr; }
       .toast-container { left: 0.75rem; right: 0.75rem; bottom: 0.75rem; }
-      .home-stack { gap: 1.5rem; }
+      .toast {
+        border-radius: 20px;
+        box-shadow: 0 4px 16px rgba(120,60,40,0.12);
+      }
 
       /* CLA archive year list */
-      .cla-year-card { min-width: 220px; max-width: 280px; padding: 14px; }
+      .cla-year-card { min-width: 220px; max-width: 280px; padding: 14px; border-radius: 20px; }
       .cla-controls { gap: 8px; }
       .cla-control-group + .cla-control-group { padding-left: 8px; }
-      .cla-filter-btn { padding: 4px 8px; font-size: 0.7rem; }
-      .cla-year-card { min-width: 220px; max-width: 280px; }
+      .cla-filter-btn { padding: 4px 8px; font-size: 0.7rem; border-radius: 16px; }
     }
+
     @media (max-width: 375px) {
-      .container { padding: 0 10px; }
+      .container { padding: 0 12px; }
       .site-title { font-size: 1rem; }
       .section-title { font-size: 1.05rem; }
-      .nav-link { padding: 6px 10px; font-size: 0.75rem; }
+      .nav-link { padding: 6px 10px; font-size: 0.73rem; }
       .region-btn { padding: 4px 8px; font-size: 0.68rem; }
-      .ws-badge { font-size: 0.6rem; padding: 2px 6px; }
+      .ws-badge { font-size: 0.58rem; padding: 2px 6px; }
+      .home-signal-item { min-width: 200px; }
     }
 
     /* ================================================================
