@@ -601,36 +601,68 @@
     .signal-title { font-size: 0.88rem; font-weight: 600; line-height: 1.45; margin-bottom: 4px; }
     .signal-desc { font-size: 0.84rem; line-height: 1.65; color: var(--text-secondary); }
 
-    /* Weak signals section — expandable */
-    .ws-grid { display: flex; flex-direction: column; gap: 10px; }
+    /* Weak signals section — overview always visible */
+    .ws-grid { display: flex; flex-direction: column; gap: 12px; }
     .ws-card {
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: var(--radius);
       overflow: hidden;
       transition: border-color 0.2s, box-shadow 0.2s;
+      padding: 16px 20px;
     }
     .ws-card:hover { border-color: var(--accent); box-shadow: var(--shadow-md); }
     .ws-card-header {
-      padding: 14px 20px;
-      cursor: pointer;
       display: flex;
       align-items: flex-start;
       gap: 12px;
+      margin-bottom: 8px;
     }
-    .ws-card-title { flex: 1; font-size: 0.88rem; font-weight: 600; line-height: 1.45; }
+    .ws-card-title { flex: 1; font-size: 0.9rem; font-weight: 600; line-height: 1.45; }
     .ws-card-badges { display: flex; gap: 6px; flex-shrink: 0; align-items: center; }
-    .ws-card-chevron {
-      font-size: 0.7rem;
-      color: var(--text-muted);
-      transition: transform 0.25s;
-      flex-shrink: 0;
-      margin-top: 3px;
+    .ws-card-desc {
+      font-size: 0.84rem;
+      line-height: 1.7;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
     }
-    .ws-card.open .ws-card-chevron { transform: rotate(90deg); }
+    .ws-card-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+    .ws-card-meta-tag {
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: var(--surface2);
+      color: var(--text-secondary);
+    }
+    .ws-card-details-toggle {
+      font-size: 0.78rem;
+      color: var(--accent);
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 4px 0;
+      margin-top: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .ws-card-details-toggle:hover { text-decoration: underline; }
+    .ws-card-details-toggle .chevron {
+      font-size: 0.6rem;
+      transition: transform 0.25s;
+      display: inline-block;
+    }
+    .ws-card.open .ws-card-details-toggle .chevron { transform: rotate(90deg); }
     .ws-card-body {
       display: none;
-      padding: 0 20px 16px;
+      padding-top: 10px;
+      margin-top: 10px;
+      border-top: 1px solid var(--border);
       font-size: 0.84rem;
       line-height: 1.7;
       color: var(--text-secondary);
@@ -3474,7 +3506,12 @@
       const weakSignals = aiData?.weak_signals || [];
       if (weakSignals.length === 0) { container.innerHTML = '<p class="text-muted">現在検出されているシグナルはありません。</p>'; return; }
 
-      container.innerHTML = '<p class="pestle-meta-line">PESTLEニュースと学術論文の分析から検出された変化の兆し。各カードをクリックして詳細を展開できます。</p>' +
+      const hasDetails = (ws) => {
+        const cats = (ws.pestle_categories || []).join(', ');
+        return cats || (Array.isArray(ws.related_headlines) && ws.related_headlines.length > 0) || ws.counter_trend;
+      };
+
+      container.innerHTML = '<p class="pestle-meta-line">PESTLEニュースと学術論文の分析から検出された変化の兆し。</p>' +
         '<div class="ws-grid">' +
         weakSignals.map((ws, i) => {
           const impactClass = (ws.potential_impact || '').toLowerCase() === 'high' ? 'ws-badge-high' :
@@ -3482,19 +3519,20 @@
           const cats = (ws.pestle_categories || []).join(', ');
           const wsBookmarkId = 'signal-' + i;
           const wsIsBookmarked = bookmarks.some(b => b.id === wsBookmarkId);
+          const showDetails = hasDetails(ws);
           return '<div class="ws-card" id="ws-card-' + i + '">' +
-            '<div class="ws-card-header" onclick="toggleWSCard(' + i + ')">' +
+            '<div class="ws-card-header">' +
               '<div class="ws-card-title">' + escapeHtml(ws.signal || (ws.description ? ws.description.substring(0, 120) : '')) + '</div>' +
               '<div class="ws-card-badges">' +
                 '<span class="ws-badge ' + impactClass + '">' + escapeHtml(ws.potential_impact || 'N/A') + '</span>' +
                 (ws.time_horizon ? '<span class="ws-badge ws-badge-horizon">' + escapeHtml(ws.time_horizon) + '</span>' : '') +
                 '<button class="bookmark-btn ' + (wsIsBookmarked ? 'bookmarked' : '') + '" onclick="event.stopPropagation();toggleBookmark(\'' + wsBookmarkId + '\',\'' + escapeAttr(ws.description || '') + '\',\'\',this)" title="ブックマーク">&#9734;</button>' +
               '</div>' +
-              '<span class="ws-card-chevron">&#9654;</span>' +
             '</div>' +
+            '<div class="ws-card-desc">' + escapeHtml(ws.description || '') + '</div>' +
+            (cats ? '<div class="ws-card-meta">' + (ws.pestle_categories || []).map(c => '<span class="ws-card-meta-tag">' + escapeHtml(c) + '</span>').join('') + '</div>' : '') +
+            (showDetails ? '<button class="ws-card-details-toggle" onclick="toggleWSCard(' + i + ')"><span class="chevron">&#9654;</span> 関連情報</button>' : '') +
             '<div class="ws-card-body">' +
-              '<div class="ws-label">詳細</div><div>' + escapeHtml(ws.description || '') + '</div>' +
-              (cats ? '<div class="ws-label">関連カテゴリ</div><div>' + escapeHtml(cats) + '</div>' : '') +
               (Array.isArray(ws.related_headlines) && ws.related_headlines.length > 0 ?
                 '<div class="ws-label">関連ヘッドライン</div><ul>' + ws.related_headlines.map(h => '<li>' + escapeHtml(h) + '</li>').join('') + '</ul>' : '') +
               (ws.counter_trend ? '<div class="ws-label">カウンタートレンド</div><div>' + escapeHtml(ws.counter_trend) + '</div>' : '') +
