@@ -1532,7 +1532,19 @@
       /* Constrain layout containers individually (not * which breaks scrollables) */
       .app-section, .card, .pestle-card, .report-card,
       .ws-card, .insight-box, .cla-detail-panel,
-      .papers-field-group { max-width: 100%; }
+      .papers-field-group, .report-archive-card { max-width: 100%; min-width: 0; box-sizing: border-box; }
+
+      /* Global word-break for mobile text content */
+      .report-archive-preview, .report-obs-item, .report-myth-item,
+      .pestle-article-title, .pestle-article-trans, .pestle-article-summary,
+      .paper-title, .paper-title-ja, .paper-summary,
+      .signal-title, .signal-desc,
+      .ws-card-title, .ws-card-desc,
+      .insight-answer, .fulltext-body,
+      .ir-hero-title, .ir-carousel-title, .ir-carousel-preview {
+        overflow-wrap: break-word;
+        word-break: break-word;
+      }
 
       body { background: var(--bg); }
       .container { padding: 0 16px; }
@@ -1699,6 +1711,29 @@
         grid-template-columns: 1fr;
       }
 
+      /* --- Carousel cards inside grids: reset fixed widths --- */
+      .ir-report-grid .ir-carousel-card,
+      .ir-archive-grid .ir-carousel-card {
+        flex: unset !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+      }
+      .ir-report-grid .ir-carousel-body,
+      .ir-archive-grid .ir-carousel-body {
+        min-width: 0;
+        overflow: hidden;
+        word-break: break-word;
+      }
+      .ir-report-grid .ir-carousel-title,
+      .ir-archive-grid .ir-carousel-title,
+      .ir-report-grid .ir-carousel-preview,
+      .ir-archive-grid .ir-carousel-preview {
+        white-space: normal;
+        word-break: break-word;
+        overflow-wrap: break-word;
+      }
+
       /* --- ws-grid: force 1-column on mobile --- */
       .ws-grid { grid-template-columns: 1fr; gap: 10px; }
 
@@ -1735,6 +1770,9 @@
         width: 44px;
         height: 44px;
       }
+
+      /* --- Summary: reduce padding on mobile --- */
+      .ir-summary { padding: 14px 16px; font-size: 0.92rem; margin-bottom: 20px; }
 
       /* --- Comment input: stack vertically --- */
       .comment-input-row {
@@ -1820,6 +1858,8 @@
 
       /* --- CLA --- */
       .cla-period-btn { padding: 5px 10px; font-size: 0.68rem; border-radius: 16px; }
+      #claDownloadBar > div:first-child { min-width: 0 !important; }
+      .cla-download-btn { min-height: 44px; }
 
       /* --- Papers --- */
       .papers-field-header { padding: 12px 14px; }
@@ -2255,6 +2295,9 @@
       line-height: 1.8;
       color: var(--text);
       letter-spacing: 0.04em;
+      overflow-wrap: break-word;
+      word-break: break-word;
+      min-width: 0;
     }
     .ir-modal-section.open .ir-modal-section-body { display: block; }
 
@@ -2270,6 +2313,8 @@
       border-radius: 0 var(--radius-xs) var(--radius-xs) 0;
       margin-bottom: 28px;
       letter-spacing: 0.04em;
+      overflow-wrap: break-word;
+      word-break: break-word;
     }
 
     /* Vertical timeline */
