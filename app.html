@@ -93,7 +93,7 @@
     body {
       font-family: var(--font);
       color: var(--text);
-      background: var(--bg);
+      background: linear-gradient(180deg, #FFFFF0 0%, var(--bg) 300px);
       line-height: 1.7;
       letter-spacing: 0.02em;
       font-feature-settings: "palt";
@@ -110,8 +110,9 @@
        HEADER — FIW white background + bottom border
        ================================================================ */
     .site-header {
-      background: var(--card);
-      border-bottom: 1px solid var(--border);
+      background: #FFFFF0;
+      border-bottom: none;
+      box-shadow: 0 1px 12px rgba(120,60,40,0.05);
       position: sticky;
       top: 0;
       z-index: 200;
@@ -133,7 +134,7 @@
     .site-title {
       font-weight: 700;
       font-size: 1.15rem;
-      color: var(--text);
+      color: #783C28;
       letter-spacing: -0.02em;
     }
 
@@ -154,12 +155,12 @@
     .region-toggle {
       display: flex;
       background: var(--surface);
-      border-radius: var(--radius-sm);
+      border-radius: 24px;
       overflow: hidden;
-      border: 1px solid var(--border);
+      border: 1px solid var(--border-light);
     }
     .region-btn {
-      padding: 6px 14px;
+      padding: 6px 16px;
       border: none;
       background: transparent;
       color: var(--text-muted);
@@ -167,20 +168,21 @@
       font-family: var(--font);
       font-size: 0.78rem;
       font-weight: 500;
+      border-radius: 24px;
       transition: all 0.2s;
     }
     .region-btn.active {
-      background: var(--accent);
+      background: linear-gradient(135deg, #A0503C, #C87864);
       color: #fff;
-      box-shadow: 0 2px 8px rgba(122,64,51,0.25);
+      box-shadow: 0 2px 8px rgba(160,80,60,0.2);
     }
 
     /* Theme toggle */
     .theme-toggle {
       background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-xs);
-      padding: 6px 10px;
+      border: 1px solid var(--border-light);
+      border-radius: 24px;
+      padding: 6px 12px;
       cursor: pointer;
       font-size: 0.82rem;
       color: var(--text-muted);
@@ -200,9 +202,9 @@
     .user-name { font-weight: 600; color: var(--text); }
     .auth-btn {
       background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-xs);
-      padding: 5px 12px;
+      border: 1px solid var(--border-light);
+      border-radius: 24px;
+      padding: 5px 14px;
       font-family: var(--font);
       font-size: 0.72rem;
       color: var(--text-secondary);
@@ -213,36 +215,38 @@
 
     /* --- Tab Navigation (FIW rounded tab style) --- */
     .site-nav {
-      background: var(--card);
-      border-bottom: 1px solid var(--border);
+      background: #FFFFF0;
+      border-bottom: none;
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
+      padding: 0 4px;
     }
     .site-nav::-webkit-scrollbar { height: 0; }
     .nav-list {
       display: flex;
       list-style: none;
-      gap: 6px;
-      padding: 10px 0;
+      gap: 8px;
+      padding: 8px 0 12px;
     }
     .nav-link {
       display: block;
-      padding: 9px 18px;
-      border-radius: var(--radius-sm);
+      padding: 8px 20px;
+      border-radius: 24px;
       font-size: 0.82rem;
       font-weight: 500;
-      color: var(--text-muted);
+      color: #A0503C;
+      background: rgba(250,200,160,0.2);
       transition: all 0.2s;
       white-space: nowrap;
     }
     .nav-link:hover {
-      background: var(--surface);
-      color: var(--text);
+      background: rgba(250,200,160,0.4);
+      color: #783C28;
     }
     .nav-link.active {
-      background: var(--accent);
+      background: linear-gradient(135deg, #783C28, #A0503C);
       color: #fff;
-      box-shadow: 0 2px 8px rgba(122,64,51,0.25);
+      box-shadow: 0 2px 10px rgba(120,60,40,0.18);
     }
 
     /* Bookmark count badge in nav */
@@ -321,7 +325,7 @@
     .section-title {
       font-weight: 700;
       font-size: 1.3rem;
-      color: var(--text);
+      color: #783C28;
       letter-spacing: -0.02em;
       line-height: 1.35;
     }
@@ -807,24 +811,7 @@
     }
     .cla-filter-btn:hover { opacity: 0.85; }
 
-    /* CLA Archive: synchronized horizontal scroll container */
-    .cla-timeline-container {
-      overflow-x: auto;
-      scroll-snap-type: x mandatory;
-      -webkit-overflow-scrolling: touch;
-      padding-bottom: 12px;
-    }
-    .cla-timeline-container::-webkit-scrollbar { height: 8px; }
-    .cla-timeline-container::-webkit-scrollbar-track { background: var(--surface); border-radius: 4px; }
-    .cla-timeline-container::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-    .cla-timeline-grid {
-      display: grid;
-      gap: 8px 12px;
-      /* rows = 6 layers, columns set dynamically via inline style */
-      grid-auto-flow: column;
-    }
-
-    /* Layer sections in timeline (used as row headers) */
+    /* Layer sections in timeline */
     .cla-layer-section { margin-bottom: 1.5rem; }
     .cla-layer-section-title {
       font-size: 0.85rem;
@@ -845,49 +832,31 @@
     .cla-layer-scroll::-webkit-scrollbar-track { background: var(--surface); border-radius: 3px; }
     .cla-layer-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
-    /* Year cards — wider for horizontal grid layout */
+    /* Year cards */
     .cla-year-card {
-      min-width: 340px;
-      max-width: 420px;
+      min-width: 260px;
+      max-width: 320px;
       flex: 0 0 auto;
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: var(--radius-xs);
-      padding: 10px 14px;
+      padding: 14px 16px;
       transition: border-color 0.2s;
-      scroll-snap-align: start;
     }
     .cla-year-card:hover { border-color: var(--accent); }
     .cla-year-card.current { border-color: var(--accent); border-width: 2px; }
     .cla-year-card-period {
       font-weight: 700;
-      font-size: 0.75rem;
+      font-size: 0.8rem;
       color: var(--accent);
-      margin-bottom: 4px;
-      padding-bottom: 3px;
+      margin-bottom: 6px;
+      padding-bottom: 4px;
       border-bottom: 1px solid var(--border-light);
     }
     .cla-year-card-text {
-      font-size: 0.78rem;
-      line-height: 1.55;
+      font-size: 0.8rem;
+      line-height: 1.65;
       color: var(--text);
-    }
-    /* Row label in the synchronized grid */
-    .cla-grid-row-label {
-      position: sticky;
-      left: 0;
-      z-index: 2;
-      background: var(--bg);
-      min-width: 200px;
-      max-width: 200px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.78rem;
-      font-weight: 600;
-      color: var(--text-secondary);
-      padding: 6px 8px;
-      border-right: 2px solid var(--border-light);
     }
 
     /* Decade groups in individual view */
@@ -1694,7 +1663,6 @@
 
       /* CLA archive year list */
       .cla-year-card { min-width: 260px; max-width: 320px; padding: 10px 12px; border-radius: 20px; }
-      .cla-grid-row-label { min-width: 140px; max-width: 140px; font-size: 0.7rem; }
       .cla-controls { gap: 8px; }
       .cla-control-group + .cla-control-group { padding-left: 8px; }
       .cla-filter-btn { padding: 4px 8px; font-size: 0.7rem; border-radius: 16px; }
@@ -3587,57 +3555,38 @@
       html += '</div></div>';
 
       if (claArchiveViewMode === 'timeline') {
-        // Synchronized horizontal grid: 6 layers as rows, years as columns
+        // Unified layer-based horizontal scroll (1990-2026 in one scroll)
         const layers = [
-          { key: 'litany', label: 'Layer 1: リタニー', border: 'var(--accent-warm)' },
-          { key: 'systemic_causes', label: 'Layer 2: システム的原因', border: 'var(--accent-soft)' },
-          { key: 'worldview', label: 'Layer 3: 世界観', border: 'var(--accent)' },
-          { key: 'myth_metaphor', label: 'Layer 4: 神話', border: '#4A7A8C' },
+          { key: 'litany', label: 'Layer 1: リタニー（表層）', border: 'var(--accent-warm)' },
+          { key: 'systemic_causes', label: 'Layer 2: 社会的・システム的原因', border: 'var(--accent-soft)' },
+          { key: 'worldview', label: 'Layer 3: 世界観・ディスコース', border: 'var(--accent)' },
+          { key: 'myth_metaphor', label: 'Layer 4: 神話・メタファー', border: '#4A7A8C' },
           { key: 'key_tension', label: '核心的緊張', border: 'var(--highlight)' },
           { key: 'emerging_narrative', label: '新たな物語', border: 'var(--S)' }
         ];
 
-        // Filter layers that have data
-        const activeLayers = layers.filter(layer =>
-          allEntries.some(entry => {
+        layers.forEach(layer => {
+          const hasData = allEntries.some(entry => {
             const text = getCLAEntryText(entry, layer.key, claArchiveCatFilter);
             return text && text.trim().length > 0;
-          })
-        );
-
-        // Filter entries that have at least one layer with data
-        const activeEntries = allEntries.filter(entry =>
-          activeLayers.some(layer => {
-            const text = getCLAEntryText(entry, layer.key, claArchiveCatFilter);
-            return text && text.trim().length > 0;
-          })
-        );
-
-        // Number of columns = 1 (label) + number of active entries
-        const numCols = 1 + activeEntries.length;
-        html += '<div class="cla-timeline-container">';
-        html += '<div class="cla-timeline-grid" style="grid-template-rows:repeat(' + activeLayers.length + ',auto);grid-template-columns:200px repeat(' + activeEntries.length + ',minmax(340px,420px))">';
-
-        activeLayers.forEach(layer => {
-          // Row label (sticky left)
-          html += '<div class="cla-grid-row-label"><span style="width:8px;height:8px;border-radius:50%;background:' + layer.border + ';flex-shrink:0"></span>' + layer.label + '</div>';
-          // Year cards for this layer
-          activeEntries.forEach((entry, idx) => {
-            const text = getCLAEntryText(entry, layer.key, claArchiveCatFilter);
-            const isCurrent = idx === activeEntries.length - 1;
-            const periodLabel = formatCLAPeriodLabel(entry);
-            if (text && text.trim()) {
-              html += '<div class="cla-year-card' + (isCurrent ? ' current' : '') + '">';
-              html += '<div class="cla-year-card-period">' + escapeHtml(periodLabel) + '</div>';
-              html += '<div class="cla-year-card-text">' + escapeHtml(text) + '</div>';
-              html += '</div>';
-            } else {
-              html += '<div class="cla-year-card" style="opacity:0.3;border-style:dashed"><div class="cla-year-card-period">' + escapeHtml(periodLabel) + '</div><div class="cla-year-card-text" style="color:var(--text-muted);font-style:italic">—</div></div>';
-            }
           });
-        });
+          if (!hasData) return;
 
-        html += '</div></div>'; // end grid + container
+          html += '<div class="cla-layer-section">';
+          html += '<div class="cla-layer-section-title"><span style="width:8px;height:8px;border-radius:50%;background:' + layer.border + ';flex-shrink:0"></span>' + layer.label + '</div>';
+          html += '<div class="cla-layer-scroll">';
+          allEntries.forEach((entry, idx) => {
+            const text = getCLAEntryText(entry, layer.key, claArchiveCatFilter);
+            if (!text || !text.trim()) return;
+            const isCurrent = idx === allEntries.length - 1;
+            const periodLabel = formatCLAPeriodLabel(entry);
+            html += '<div class="cla-year-card' + (isCurrent ? ' current' : '') + '">';
+            html += '<div class="cla-year-card-period">' + escapeHtml(periodLabel) + '</div>';
+            html += '<div class="cla-year-card-text">' + escapeHtml(text) + '</div>';
+            html += '</div>';
+          });
+          html += '</div></div>';
+        });
 
       } else {
         // Individual view: decade-grouped period selector + detail panel
