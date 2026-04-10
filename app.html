@@ -1428,9 +1428,13 @@
        MOBILE — Miratuku CI "warm & friendly" design
        ================================================================ */
     @media (max-width: 768px) {
+      /* Prevent horizontal overflow globally */
+      html, body { overflow-x: hidden; max-width: 100vw; }
+      * { max-width: 100%; }
+
       /* Soft warm background with subtle gradient */
       body { background: linear-gradient(180deg, #FFFFF0 0%, var(--bg) 120px); }
-      .container { padding: 0 16px; }
+      .container { padding: 0 16px; overflow-x: hidden; }
 
       /* --- Header: compact, warm accent bar --- */
       .site-header {
@@ -1621,10 +1625,18 @@
         border-color: #E6D5C4;
       }
       .insight-form { flex-direction: column; }
-      .insight-input, .insight-textarea {
+      .insight-input {
+        border-radius: 16px;
+        border-color: #D9C8B8;
+        width: 100%;
+        box-sizing: border-box;
+      }
+      .insight-textarea {
         border-radius: 16px;
         border-color: #D9C8B8;
         min-height: 100px;
+        width: 100%;
+        box-sizing: border-box;
       }
 
       /* --- Modal: friendly rounded sheet --- */
@@ -1665,18 +1677,40 @@
       }
 
       /* CLA archive year list */
-      .cla-year-card { min-width: 260px; max-width: 320px; padding: 10px 12px; border-radius: 20px; }
-      .cla-controls { gap: 8px; }
+      .cla-year-card { min-width: 200px; max-width: calc(100vw - 64px); padding: 10px 12px; border-radius: 20px; }
+      .cla-controls { gap: 8px; flex-wrap: wrap; }
       .cla-control-group + .cla-control-group { padding-left: 8px; }
       .cla-filter-btn { padding: 4px 8px; font-size: 0.7rem; border-radius: 16px; }
+      .cla-detail-panel { padding: 14px; overflow-x: hidden; word-break: break-word; }
+
+      /* Home layout: full width on mobile */
+      .home-news-layout { grid-template-columns: 1fr; gap: 16px; }
+      .home-news-main { gap: 1.5rem; }
+
+      /* Modal width fix */
+      .modal-box { width: calc(100vw - 16px); max-width: 100%; }
+
+      /* Insight reports hero */
+      .ir-hero-layout { grid-template-columns: 1fr; gap: 14px; }
+      .ir-hero-body { padding: 16px; }
+      .ir-hero-card { border-radius: 20px; }
+      .ir-carousel { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+      .ir-carousel-card { flex: 0 0 calc(100vw - 80px); max-width: 280px; border-radius: 16px; }
+      .ir-carousel-btn { display: none; }
+
+      /* Table/pre overflow */
+      pre, table, code { overflow-x: auto; max-width: 100%; }
+      .md-body { overflow-x: hidden; word-break: break-word; }
     }
 
     @media (max-width: 375px) {
-      .container { padding: 0 12px; }
+      .container { padding: 0 10px; }
       .site-title { font-size: 1rem; }
       .section-title { font-size: 1.05rem; }
       .nav-link { padding: 6px 10px; font-size: 0.73rem; }
       .region-btn { padding: 4px 8px; font-size: 0.68rem; }
+      .home-signal-item { min-width: 180px; max-width: 220px; }
+      .cla-year-card { min-width: 180px; }
       .ws-badge { font-size: 0.58rem; padding: 2px 6px; }
       .home-signal-item { min-width: 200px; }
     }
@@ -2579,13 +2613,12 @@
       // --- Left column: main content ---
       html += '<div class="home-news-main">';
 
-      // 1. Daily Report
-      html += '<div><h2 class="section-title">月次分析レポート <span class="section-date">' + dateStr + '</span></h2>';
-      if (jpReport) html += renderDailyReportCard('日本メディアの視点', jpReport);
-      if (glReport) html += renderDailyReportCard('海外メディアの視点', glReport);
-      html += '</div>';
+      // 1. Insight Reports Hero (main reports at top)
+      if (insightReports?.reports?.length > 0) {
+        html += renderInsightReportsHero(insightReports);
+      }
 
-      // 2. PESTLE grid (no sidebar wrapper - sidebar is at page level now)
+      // 2. PESTLE grid (Insight News)
       html += '<div><h2 class="section-title">Insight News</h2>' +
         '<div id="homePestleGrid"></div></div>';
 
@@ -2612,10 +2645,11 @@
         '<div id="homeForesightResult" class="insight-result"></div>' +
       '</div>';
 
-      // 5. Insight Reports Hero (moved to bottom of left column)
-      if (insightReports?.reports?.length > 0) {
-        html += renderInsightReportsHero(insightReports);
-      }
+      // 5. Monthly Analysis Report (moved to bottom)
+      html += '<div><h2 class="section-title">月次分析レポート <span class="section-date">' + dateStr + '</span></h2>';
+      if (jpReport) html += renderDailyReportCard('日本メディアの視点', jpReport);
+      if (glReport) html += renderDailyReportCard('海外メディアの視点', glReport);
+      html += '</div>';
 
       html += '</div>'; // end home-news-main
 
