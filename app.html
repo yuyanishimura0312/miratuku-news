@@ -1511,6 +1511,21 @@
     .text-muted { color: var(--text-muted); font-size: 0.82rem; }
 
     /* ================================================================
+       FONT-SIZE UTILITY CLASSES — used by JS-generated content
+       Replaces inline style="font-size:..." for mobile control
+       ================================================================ */
+    .fs-h1 { font-size: 1.3rem; }
+    .fs-h2 { font-size: 1.1rem; }
+    .fs-h3 { font-size: 1rem; }
+    .fs-body { font-size: 0.84rem; }
+    .fs-body-lg { font-size: 0.92rem; }
+    .fs-body-sm { font-size: 0.82rem; }
+    .fs-meta { font-size: 0.78rem; }
+    .fs-caption { font-size: 0.72rem; }
+    .fs-label { font-size: 0.68rem; }
+    .fs-tiny { font-size: 0.65rem; }
+
+    /* ================================================================
        FOCUS STATES
        ================================================================ */
     a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible, summary:focus-visible {
@@ -1562,7 +1577,8 @@
       .report-preview, .ir-carousel-title,
       .cla-detail-layer-text, .cla-cross-synthesis-text,
       .insight-answer, .fulltext-body p,
-      .ir-carousel-preview { font-size: 0.84rem !important; }
+      .ir-carousel-preview,
+      .fs-body, .fs-body-sm, .fs-body-lg { font-size: 0.84rem !important; }
 
       /* Tier 2 — secondary/meta text: 0.72rem */
       .pestle-article-source, .pestle-article-time,
@@ -1577,12 +1593,15 @@
       .bookmark-date, .bookmark-action-btn,
       .ir-carousel-cat, .ir-carousel-myth,
       .home-paper-source, .home-paper-novelty,
-      .home-paper-sub { font-size: 0.72rem !important; }
+      .home-paper-sub,
+      .fs-meta, .fs-caption, .fs-label, .fs-tiny { font-size: 0.72rem !important; }
 
       /* Tier 3 — headings: 1rem */
       .pestle-cat-name, .papers-field-name,
       .report-label, .report-archive-title,
-      .ir-hero-title, .modal-title { font-size: 1rem !important; }
+      .ir-hero-title, .modal-title,
+      .fs-h3, .fs-h2 { font-size: 1rem !important; }
+      .fs-h1 { font-size: 1.1rem !important; }
 
       /* Nav container must allow horizontal scroll-through */
       .site-nav .container { overflow-x: visible; padding: 0; }
@@ -2549,20 +2568,20 @@
         <span class="section-subtitle">Causal Layered Analysis</span>
       </div>
 
-      <div id="claDownloadBar" style="margin-bottom:1rem;padding:12px 16px;background:var(--cla-1);border:1px solid var(--border-light);border-radius:var(--radius-xs);display:flex;flex-wrap:wrap;gap:10px;align-items:center;font-size:0.82rem">
+      <div id="claDownloadBar" class="fs-body-sm" style="margin-bottom:1rem;padding:12px 16px;background:var(--cla-1);border:1px solid var(--border-light);border-radius:var(--radius-xs);display:flex;flex-wrap:wrap;gap:10px;align-items:center">
         <div style="flex:1;min-width:200px;color:var(--text-secondary)">
           <strong style="color:var(--text)">36ヵ年分のCLA分析をダウンロード</strong><br>
-          <span style="font-size:0.74rem">1990-2026 / 年次31件 + 四半期22件 / 日本・グローバルのメタ分析付き</span>
+          <span class="fs-caption">1990-2026 / 年次31件 + 四半期22件 / 日本・グローバルのメタ分析付き</span>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <a href="data/cla_36years_analysis.txt" download="cla_36years_analysis.txt" class="cla-download-btn" style="padding:8px 14px;background:var(--accent);color:#fff;text-decoration:none;border-radius:6px;font-size:0.78rem;font-weight:600;display:inline-flex;align-items:center;gap:6px">
+          <a href="data/cla_36years_analysis.txt" download="cla_36years_analysis.txt" class="cla-download-btn fs-meta" style="padding:8px 14px;background:var(--accent);color:#fff;text-decoration:none;border-radius:6px;font-weight:600;display:inline-flex;align-items:center;gap:6px">
             <span>テキスト</span>
-            <span style="font-size:0.7rem;opacity:0.8">.txt</span>
+            <span class="fs-caption" style="opacity:0.8">.txt</span>
           </a>
-          <button type="button" onclick="downloadCLALiveText()" class="cla-download-btn" style="padding:8px 14px;background:transparent;color:var(--text-secondary);border:1px solid var(--border-light);border-radius:6px;font-size:0.78rem;font-weight:600;cursor:pointer">
+          <button type="button" onclick="downloadCLALiveText()" class="cla-download-btn fs-meta" style="padding:8px 14px;background:transparent;color:var(--text-secondary);border:1px solid var(--border-light);border-radius:6px;font-weight:600;cursor:pointer">
             最新データで生成
           </button>
-          <button type="button" onclick="downloadCLALiveJSON()" class="cla-download-btn" style="padding:8px 14px;background:transparent;color:var(--text-secondary);border:1px solid var(--border-light);border-radius:6px;font-size:0.78rem;font-weight:600;cursor:pointer">
+          <button type="button" onclick="downloadCLALiveJSON()" class="cla-download-btn fs-meta" style="padding:8px 14px;background:transparent;color:var(--text-secondary);border:1px solid var(--border-light);border-radius:6px;font-weight:600;cursor:pointer">
             JSON
           </button>
         </div>
@@ -3013,10 +3032,10 @@
           '</div>';
         });
       } else {
-        html += '<p style="font-size:0.78rem;color:var(--text-muted);line-height:1.6">現在シグナルはありません</p>';
+        html += '<p class="fs-meta" style="color:var(--text-muted);line-height:1.6">現在シグナルはありません</p>';
       }
       html += '</div>' +
-              '<a class="more-link" href="#section-signals" onclick="event.preventDefault();showSection(\'section-signals\');history.pushState(null,\'\',\'app.html#section-signals\')" style="font-size:0.78rem;margin-top:10px;display:inline-block">全シグナルを見る &rarr;</a>' +
+              '<a class="more-link fs-meta" href="#section-signals" onclick="event.preventDefault();showSection(\'section-signals\');history.pushState(null,\'\',\'app.html#section-signals\')" style="margin-top:10px;display:inline-block">全シグナルを見る &rarr;</a>' +
             '</div>' +
           '</div>'; // end home-news-sidebar
 
@@ -3207,13 +3226,13 @@
       var content = document.getElementById('articleModalContent');
       var modalHtml = '<div class="modal-title">' + escapeHtml(r.report_title || '') + '</div>' +
         '<div class="modal-meta" style="margin-bottom:12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">' +
-          '<span class="ir-hero-cat-badge" style="background:' + catInfo.color + ';font-size:0.65rem">' + escapeHtml(catInfo.labelJa || '') + '</span> ' +
+          '<span class="ir-hero-cat-badge fs-tiny" style="background:' + catInfo.color + ';">' + escapeHtml(catInfo.labelJa || '') + '</span> ' +
           '<span class="ir-myth-badge ' + mythClass + '">' + mythLabel + '</span>' +
-          '<span style="font-size:0.72rem;color:var(--text-muted);margin-left:auto">' + readingMin + '分で読了</span>' +
+          '<span class="fs-caption" style="color:var(--text-muted);margin-left:auto">' + readingMin + '分で読了</span>' +
         '</div>';
 
       if (r.related_myth) {
-        modalHtml += '<div style="font-style:italic;color:var(--text-secondary);margin-bottom:14px;font-size:0.88rem">' + escapeHtml(r.related_myth) + '</div>';
+        modalHtml += '<div class="fs-body-lg" style="font-style:italic;color:var(--text-secondary);margin-bottom:14px;">' + escapeHtml(r.related_myth) + '</div>';
       }
 
       // Summary lead text — executive summary style
@@ -3223,7 +3242,7 @@
 
       // Source article link
       if (r.article) {
-        modalHtml += '<div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:16px;padding:10px 14px;background:var(--surface);border-radius:var(--radius-xs)">' +
+        modalHtml += '<div class="fs-meta" style="color:var(--text-muted);margin-bottom:16px;padding:10px 14px;background:var(--surface);border-radius:var(--radius-xs)">' +
           '元記事: ' + escapeHtml(r.article.title_ja || r.article.title || '') +
           ' (' + escapeHtml(r.article.source || '') + ', ' + escapeHtml(r.article.published_date || '') + ')' +
           (r.article.url ? ' <a href="' + escapeAttr(safeUrl(r.article.url)) + '" target="_blank">記事を読む &rarr;</a>' : '') +
@@ -3278,8 +3297,8 @@
             '<div class="ir-related-grid">';
           r.related_research.forEach(function(item) {
             modalHtml += '<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);padding:14px">' +
-              '<div style="font-size:0.84rem;line-height:1.7;color:var(--text);margin-bottom:10px">' + escapeHtml(item.comment || item.summary || '') + '</div>' +
-              '<div style="font-size:0.78rem;color:var(--text-muted);border-top:1px solid var(--border-light);padding-top:8px">' +
+              '<div class="fs-body" style="line-height:1.7;color:var(--text);margin-bottom:10px">' + escapeHtml(item.comment || item.summary || '') + '</div>' +
+              '<div class="fs-meta" style="color:var(--text-muted);border-top:1px solid var(--border-light);padding-top:8px">' +
                 '<span style="font-weight:600">' + escapeHtml(item.title || '') + '</span>' +
                 (item.author ? ' — ' + escapeHtml(item.author) : '') +
               '</div>' +
@@ -3504,8 +3523,8 @@
         CLA_LAYERS.forEach(layer => {
           if (catData[layer.key]) {
             html += '<div style="padding:8px 0;border-bottom:1px solid var(--border-light)">' +
-              '<div style="font-size:0.68rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:3px">' + layer.labelJa + '</div>' +
-              '<div style="font-size:0.82rem;line-height:1.7">' + escapeHtml(catData[layer.key]) + '</div></div>';
+              '<div class="fs-label" style="font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:3px">' + layer.labelJa + '</div>' +
+              '<div class="fs-body-sm" style="line-height:1.7">' + escapeHtml(catData[layer.key]) + '</div></div>';
           }
         });
 
@@ -4025,7 +4044,7 @@
       if (!entry?.categories) return '<div class="cla-detail-panel"><p class="text-muted">データがありません。</p></div>';
 
       let html = '<div class="cla-detail-panel">';
-      html += '<h4 style="font-size:1rem;font-weight:700;color:var(--accent);margin-bottom:16px">' + escapeHtml(formatCLAPeriodLabel(entry)) + '</h4>';
+      html += '<h4 class="fs-h3" style="font-weight:700;color:var(--accent);margin-bottom:16px">' + escapeHtml(formatCLAPeriodLabel(entry)) + '</h4>';
 
       if (catFilter === 'Overall') {
         for (const [catKey, catData] of Object.entries(entry.categories)) {
@@ -4443,10 +4462,10 @@
       const pastDates = indexData.dates.filter(d => d.date !== currentDate);
       if (pastDates.length === 0) return;
 
-      let html = '<h4 style="font-size:0.85rem;color:var(--text-secondary);margin:16px 0 8px">過去のインサイト��ポート</h4>';
+      let html = '<h4 class="fs-body" style="color:var(--text-secondary);margin:16px 0 8px">過去のインサイト��ポート</h4>';
       pastDates.forEach(d => {
         html += '<details class="report-card" style="margin-bottom:8px">' +
-          '<summary class="report-summary" style="cursor:pointer;padding:10px 14px;font-size:0.84rem">' +
+          '<summary class="report-summary fs-body" style="cursor:pointer;padding:10px 14px;">' +
             '<span class="report-chevron">&#9654;</span>' +
             '<span style="font-weight:600">' + escapeHtml(d.date) + '</span>' +
             '<span class="report-count">' + d.count + '件</span>' +
@@ -4709,13 +4728,13 @@
       var modal = document.getElementById('articleModal');
       var content = document.getElementById('articleModalContent');
       content.innerHTML = '<div style="padding:20px 0">' +
-        '<h3 style="font-size:1.1rem;font-weight:700;margin-bottom:16px">この記事のレポートを生成しますか？</h3>' +
+        '<h3 class="fs-h2" style="font-weight:700;margin-bottom:16px">この記事のレポートを生成しますか？</h3>' +
         '<div class="card" style="margin-bottom:16px">' +
-          '<div style="font-size:0.72rem;color:var(--text-muted);margin-bottom:4px">' + escapeHtml(catLabel) + ' / ' + escapeHtml(article.source || '') + ' / ' + escapeHtml(article.published_date || '') + '</div>' +
-          '<div style="font-size:0.9rem;font-weight:600;line-height:1.5">' + escapeHtml(displayTitle) + '</div>' +
-          (article.summary ? '<div style="font-size:0.8rem;color:var(--text-secondary);margin-top:8px;line-height:1.6">' + escapeHtml(article.summary.substring(0, 200)) + '...</div>' : '') +
+          '<div class="fs-caption" style="color:var(--text-muted);margin-bottom:4px">' + escapeHtml(catLabel) + ' / ' + escapeHtml(article.source || '') + ' / ' + escapeHtml(article.published_date || '') + '</div>' +
+          '<div class="fs-body-lg" style="font-weight:600;line-height:1.5">' + escapeHtml(displayTitle) + '</div>' +
+          (article.summary ? '<div class="fs-body-sm" style="color:var(--text-secondary);margin-top:8px;line-height:1.6">' + escapeHtml(article.summary.substring(0, 200)) + '...</div>' : '') +
         '</div>' +
-        '<p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:20px;line-height:1.6">この記事をもとにCLA（因果階層分析）の視点から深層分析レポートを生成します。生成には30秒〜1分程度かかります。</p>' +
+        '<p class="fs-body-sm" style="color:var(--text-secondary);margin-bottom:20px;line-height:1.6">この記事をもとにCLA（因果階層分析）の視点から深層分析レポートを生成します。生成には30秒〜1分程度かかります。</p>' +
         '<div style="display:flex;gap:10px;justify-content:flex-end">' +
           '<button class="btn-secondary" onclick="closeArticleModal()">キャンセル</button>' +
           '<button class="btn-primary" onclick="closeArticleModal();generateNewsReport(\'' + escapeAttr(catKey) + '\',' + index + ')">レポートを生成する</button>' +
@@ -4781,9 +4800,9 @@
         var catInfo = PESTLE_CATS[catKey] || { labelJa: catKey, color: 'var(--accent)' };
         content.innerHTML = '<div style="border-top:4px solid ' + catInfo.color + ';padding-top:16px">' +
           '<span class="ir-hero-cat-badge" style="background:' + catInfo.color + '">' + escapeHtml(catInfo.labelJa) + '</span> ' +
-          '<span style="font-size:0.68rem;font-weight:600;padding:2px 10px;border-radius:12px;background:var(--accent-light);color:var(--accent)">読者レポート</span>' +
-          '<h2 style="margin:12px 0 8px;font-size:1.3rem;line-height:1.4">' + escapeHtml(reportTitle) + '</h2>' +
-          '<div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:16px">' +
+          '<span class="fs-label" style="font-weight:600;padding:2px 10px;border-radius:12px;background:var(--accent-light);color:var(--accent)">読者レポート</span>' +
+          '<h2 class="fs-h1" style="margin:12px 0 8px;line-height:1.4">' + escapeHtml(reportTitle) + '</h2>' +
+          '<div class="fs-meta" style="color:var(--text-muted);margin-bottom:16px">' +
             escapeHtml(article.source || '') + ' / ' + escapeHtml(article.published_date || '') +
             (article.url ? ' &mdash; <a href="' + escapeAttr(safeUrl(article.url)) + '" target="_blank" style="color:var(--accent)">元記事</a>' : '') +
           '</div>' +
@@ -4823,7 +4842,7 @@
       var el = document.getElementById('homeUserReports');
       if (!el) return;
       var user = auth.currentUser;
-      if (!user) { el.innerHTML = '<p class="text-muted" style="font-size:0.82rem">ログインするとレポートが表示されます</p>'; return; }
+      if (!user) { el.innerHTML = '<p class="text-muted fs-body-sm">ログインするとレポートが表示されます</p>'; return; }
       try {
         var snap = await db.collection('user_reports')
           .where('userId', '==', user.uid)
@@ -4839,7 +4858,7 @@
         docs = docs.slice(0, 5);
         // Re-wrap as iterable compatible with snap.forEach usage below
         if (docs.length === 0) {
-          el.innerHTML = '<p class="text-muted" style="font-size:0.82rem">ニュース記事の &#9998; ボタンからレポートを生成できます</p>';
+          el.innerHTML = '<p class="text-muted fs-body-sm">ニュース記事の &#9998; ボタンからレポートを生成できます</p>';
           return;
         }
         var html = '';
@@ -4852,10 +4871,10 @@
           html += '<div class="card" style="padding:12px 14px;margin-bottom:8px;cursor:pointer" onclick="openUserReportModal(\'' + doc.id + '\')">' +
             '<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">' +
               '<span style="width:6px;height:6px;border-radius:50%;background:' + catInfo.color + ';flex-shrink:0"></span>' +
-              '<span style="font-size:0.78rem;font-weight:600;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + escapeHtml(d.sourceReportTitle || '') + '</span>' +
-              '<span style="font-size:0.65rem;color:var(--text-muted);flex-shrink:0">' + dateStr + '</span>' +
+              '<span class="fs-meta" style="font-weight:600;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + escapeHtml(d.sourceReportTitle || '') + '</span>' +
+              '<span class="fs-tiny" style="color:var(--text-muted);flex-shrink:0">' + dateStr + '</span>' +
             '</div>' +
-            '<div style="font-size:0.76rem;color:var(--text-secondary);line-height:1.5">' + escapeHtml(preview) + '...</div>' +
+            '<div class="fs-meta" style="color:var(--text-secondary);line-height:1.5">' + escapeHtml(preview) + '...</div>' +
           '</div>';
         });
         el.innerHTML = html;
@@ -4873,9 +4892,9 @@
         var content = document.getElementById('articleModalContent');
         content.innerHTML = '<div style="border-top:4px solid ' + catInfo.color + ';padding-top:16px">' +
           '<span class="ir-hero-cat-badge" style="background:' + catInfo.color + '">' + escapeHtml(catInfo.labelJa || '') + '</span> ' +
-          '<span style="font-size:0.68rem;font-weight:600;padding:2px 10px;border-radius:12px;background:var(--accent-light);color:var(--accent)">読者レポート</span>' +
-          '<h2 style="margin:12px 0 8px;font-size:1.3rem;line-height:1.4">' + escapeHtml(d.sourceReportTitle || '') + '</h2>' +
-          '<div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:16px">' +
+          '<span class="fs-label" style="font-weight:600;padding:2px 10px;border-radius:12px;background:var(--accent-light);color:var(--accent)">読者レポート</span>' +
+          '<h2 class="fs-h1" style="margin:12px 0 8px;line-height:1.4">' + escapeHtml(d.sourceReportTitle || '') + '</h2>' +
+          '<div class="fs-meta" style="color:var(--text-muted);margin-bottom:16px">' +
             escapeHtml(d.userName || '') + ' / ' +
             (d.createdAt ? d.createdAt.toDate().toLocaleDateString('ja-JP') : '') +
             (d.sourceUrl ? ' &mdash; <a href="' + escapeAttr(safeUrl(d.sourceUrl)) + '" target="_blank" style="color:var(--accent)">元記事</a>' : '') +
@@ -4898,8 +4917,8 @@
       var user = auth.currentUser;
       if (!user) {
         container.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--text-secondary)">' +
-          '<p style="font-size:1rem;margin-bottom:12px">\u8aad\u8005\u30ec\u30dd\u30fc\u30c8\u3092\u8868\u793a\u3059\u308b\u306b\u306f\u30ed\u30b0\u30a4\u30f3\u304c\u5fc5\u8981\u3067\u3059\u3002</p>' +
-          '<p style="font-size:0.85rem;color:var(--text-muted)">\u53f3\u4e0a\u306e\u30ed\u30b0\u30a4\u30f3\u30dc\u30bf\u30f3\u304b\u3089Google\u30a2\u30ab\u30a6\u30f3\u30c8\u3067\u30ed\u30b0\u30a4\u30f3\u3057\u3066\u304f\u3060\u3055\u3044\u3002</p></div>';
+          '<p class="fs-h3" style="margin-bottom:12px">\u8aad\u8005\u30ec\u30dd\u30fc\u30c8\u3092\u8868\u793a\u3059\u308b\u306b\u306f\u30ed\u30b0\u30a4\u30f3\u304c\u5fc5\u8981\u3067\u3059\u3002</p>' +
+          '<p class="fs-body" style="color:var(--text-muted)">\u53f3\u4e0a\u306e\u30ed\u30b0\u30a4\u30f3\u30dc\u30bf\u30f3\u304b\u3089Google\u30a2\u30ab\u30a6\u30f3\u30c8\u3067\u30ed\u30b0\u30a4\u30f3\u3057\u3066\u304f\u3060\u3055\u3044\u3002</p></div>';
         return;
       }
 
@@ -4920,8 +4939,8 @@
 
         if (docs.length === 0) {
           container.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--text-secondary)">' +
-            '<p style="font-size:1rem;margin-bottom:8px">\u307e\u3060\u30ec\u30dd\u30fc\u30c8\u304c\u3042\u308a\u307e\u305b\u3093</p>' +
-            '<p style="font-size:0.85rem;color:var(--text-muted)">\u30ec\u30dd\u30fc\u30c8\u4e00\u89a7\u304b\u3089\u30a4\u30f3\u30b5\u30a4\u30c8\u30ec\u30dd\u30fc\u30c8\u3092\u958b\u304d\u3001\u300c\u3053\u306e\u8a18\u4e8b\u304b\u3089\u30ec\u30dd\u30fc\u30c8\u3092\u751f\u6210\u300d\u30dc\u30bf\u30f3\u3092\u4f7f\u3063\u3066\u30ec\u30dd\u30fc\u30c8\u3092\u4f5c\u6210\u3067\u304d\u307e\u3059\u3002</p></div>';
+            '<p class="fs-h3" style="margin-bottom:8px">\u307e\u3060\u30ec\u30dd\u30fc\u30c8\u304c\u3042\u308a\u307e\u305b\u3093</p>' +
+            '<p class="fs-body" style="color:var(--text-muted)">\u30ec\u30dd\u30fc\u30c8\u4e00\u89a7\u304b\u3089\u30a4\u30f3\u30b5\u30a4\u30c8\u30ec\u30dd\u30fc\u30c8\u3092\u958b\u304d\u3001\u300c\u3053\u306e\u8a18\u4e8b\u304b\u3089\u30ec\u30dd\u30fc\u30c8\u3092\u751f\u6210\u300d\u30dc\u30bf\u30f3\u3092\u4f7f\u3063\u3066\u30ec\u30dd\u30fc\u30c8\u3092\u4f5c\u6210\u3067\u304d\u307e\u3059\u3002</p></div>';
           return;
         }
 
@@ -4936,16 +4955,16 @@
           html += '<div class="card" style="padding:20px;cursor:default" id="ur-card-' + docId + '">' +
             '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">' +
               '<div>' +
-                '<div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:4px">' + escapeHtml(dateStr) + '</div>' +
-                '<div style="font-size:0.92rem;font-weight:600;color:var(--text)">' + escapeHtml(d.sourceReportTitle || '(\u7121\u984c)') + '</div>' +
+                '<div class="fs-meta" style="color:var(--text-muted);margin-bottom:4px">' + escapeHtml(dateStr) + '</div>' +
+                '<div class="fs-body-lg" style="font-weight:600;color:var(--text)">' + escapeHtml(d.sourceReportTitle || '(\u7121\u984c)') + '</div>' +
               '</div>' +
-              '<button class="btn-secondary" style="font-size:0.75rem;padding:4px 10px;flex-shrink:0;margin-left:12px" onclick="deleteUserReport(\'' + docId + '\')">\u524a\u9664</button>' +
+              '<button class="btn-secondary fs-meta" style="padding:4px 10px;flex-shrink:0;margin-left:12px" onclick="deleteUserReport(\'' + docId + '\')">\u524a\u9664</button>' +
             '</div>' +
-            '<div class="ur-preview" id="ur-preview-' + docId + '" style="font-size:0.85rem;color:var(--text-secondary);line-height:1.7;cursor:pointer" onclick="toggleUserReportExpand(\'' + docId + '\')">' +
+            '<div class="ur-preview fs-body" id="ur-preview-' + docId + '" style="color:var(--text-secondary);line-height:1.7;cursor:pointer" onclick="toggleUserReportExpand(\'' + docId + '\')">' +
               escapeHtml(preview) +
             '</div>' +
             '<div class="ur-full md-body" id="ur-full-' + docId + '" style="display:none;margin-top:12px;padding-top:12px;border-top:1px solid var(--border-light)" data-text="' + escapeAttr(d.generatedText || '') + '"></div>' +
-            '<div style="margin-top:8px"><button class="btn-secondary" style="font-size:0.78rem;padding:4px 12px" onclick="toggleUserReportExpand(\'' + docId + '\')" id="ur-toggle-' + docId + '">\u5168\u6587\u3092\u8868\u793a</button></div>' +
+            '<div style="margin-top:8px"><button class="btn-secondary fs-meta" style="padding:4px 12px" onclick="toggleUserReportExpand(\'' + docId + '\')" id="ur-toggle-' + docId + '">\u5168\u6587\u3092\u8868\u793a</button></div>' +
           '</div>';
         });
         html += '</div>';
@@ -4986,8 +5005,8 @@
         var container = document.getElementById('userReportsContent');
         if (container && !container.querySelector('.card')) {
           container.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--text-secondary)">' +
-            '<p style="font-size:1rem;margin-bottom:8px">\u307e\u3060\u30ec\u30dd\u30fc\u30c8\u304c\u3042\u308a\u307e\u305b\u3093</p>' +
-            '<p style="font-size:0.85rem;color:var(--text-muted)">\u30ec\u30dd\u30fc\u30c8\u4e00\u89a7\u304b\u3089\u30a4\u30f3\u30b5\u30a4\u30c8\u30ec\u30dd\u30fc\u30c8\u3092\u958b\u304d\u3001\u300c\u3053\u306e\u8a18\u4e8b\u304b\u3089\u30ec\u30dd\u30fc\u30c8\u3092\u751f\u6210\u300d\u30dc\u30bf\u30f3\u3092\u4f7f\u3063\u3066\u30ec\u30dd\u30fc\u30c8\u3092\u4f5c\u6210\u3067\u304d\u307e\u3059\u3002</p></div>';
+            '<p class="fs-h3" style="margin-bottom:8px">\u307e\u3060\u30ec\u30dd\u30fc\u30c8\u304c\u3042\u308a\u307e\u305b\u3093</p>' +
+            '<p class="fs-body" style="color:var(--text-muted)">\u30ec\u30dd\u30fc\u30c8\u4e00\u89a7\u304b\u3089\u30a4\u30f3\u30b5\u30a4\u30c8\u30ec\u30dd\u30fc\u30c8\u3092\u958b\u304d\u3001\u300c\u3053\u306e\u8a18\u4e8b\u304b\u3089\u30ec\u30dd\u30fc\u30c8\u3092\u751f\u6210\u300d\u30dc\u30bf\u30f3\u3092\u4f7f\u3063\u3066\u30ec\u30dd\u30fc\u30c8\u3092\u4f5c\u6210\u3067\u304d\u307e\u3059\u3002</p></div>';
         }
       } catch (err) {
         console.error('Delete user report error:', err);
@@ -5032,7 +5051,7 @@
             '<div class="card-sub">' + escapeHtml(dateStr) + '</div>' +
             '<div class="md-body">' + renderMarkdown(d.answer || '') + '</div>' +
             '<div style="margin-top:0.75rem;text-align:right;">' +
-            '<button class="btn-secondary" style="font-size:0.8rem;padding:0.3rem 0.8rem;" onclick="deleteForesightEntry(\'' + doc.id + '\')">削除</button>' +
+            '<button class="btn-secondary fs-body-sm" style="padding:0.3rem 0.8rem;" onclick="deleteForesightEntry(\'' + doc.id + '\')">削除</button>' +
             '</div></div>';
         });
         container.innerHTML = html;
