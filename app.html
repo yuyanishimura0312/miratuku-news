@@ -814,6 +814,69 @@
     }
     .cla-filter-btn:hover { opacity: 0.85; }
 
+    /* Synchronized CLA scroll: single container, all layers move together */
+    .cla-sync-scroll {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 12px;
+    }
+    .cla-sync-scroll::-webkit-scrollbar { height: 6px; }
+    .cla-sync-scroll::-webkit-scrollbar-track { background: var(--surface); border-radius: 3px; }
+    .cla-sync-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    .cla-sync-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 6px;
+      min-width: max-content;
+    }
+    .cla-sync-header { position: sticky; top: 0; z-index: 2; background: var(--bg); padding-bottom: 4px; border-bottom: 1px solid var(--border-light); margin-bottom: 10px; }
+    .cla-sync-label {
+      min-width: 180px;
+      max-width: 180px;
+      flex-shrink: 0;
+      position: sticky;
+      left: 0;
+      z-index: 1;
+      background: var(--bg);
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      padding: 6px 8px 6px 0;
+      line-height: 1.4;
+    }
+    .cla-sync-col-header {
+      min-width: 280px;
+      max-width: 280px;
+      flex-shrink: 0;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--accent);
+      padding: 4px 8px;
+      text-align: center;
+    }
+    .cla-sync-col-header.current { color: var(--text); background: var(--accent-muted); border-radius: var(--radius-xs); }
+    .cla-sync-cell {
+      min-width: 280px;
+      max-width: 280px;
+      flex-shrink: 0;
+      font-size: 0.78rem;
+      line-height: 1.6;
+      color: var(--text);
+      padding: 8px 10px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xs);
+    }
+    .cla-sync-cell.current { border-color: var(--accent); border-width: 2px; }
+    .cla-sync-cell.empty { opacity: 0.3; border-style: dashed; color: var(--text-muted); font-style: italic; }
+    @media (max-width: 768px) {
+      .cla-sync-label { min-width: 120px; max-width: 120px; font-size: 0.68rem; }
+      .cla-sync-cell, .cla-sync-col-header { min-width: 220px; max-width: 220px; }
+    }
+
     /* Layer sections in timeline */
     .cla-layer-section { margin-bottom: 1.5rem; }
     .cla-layer-section-title {
@@ -3592,7 +3655,7 @@
       html += '</div></div>';
 
       if (claArchiveViewMode === 'timeline') {
-        // Unified layer-based horizontal scroll (1990-2026 in one scroll)
+        // Synchronized scroll: all 6 layers in one container, scrolling together
         const layers = [
           { key: 'litany', label: 'Layer 1: リタニー（表層）', border: 'var(--accent-warm)' },
           { key: 'systemic_causes', label: 'Layer 2: 社会的・システム的原因', border: 'var(--accent-soft)' },
@@ -3602,28 +3665,43 @@
           { key: 'emerging_narrative', label: '新たな物語', border: 'var(--S)' }
         ];
 
+        // Filter entries that have at least one layer with data
+        const activeEntries = allEntries.filter(entry =>
+          layers.some(l => { const t = getCLAEntryText(entry, l.key, claArchiveCatFilter); return t && t.trim(); })
+        );
+
+        // Single scrollable container for all layers (synchronized)
+        html += '<div class="cla-sync-scroll" id="claSyncScroll">';
+
+        // Column headers (year labels)
+        html += '<div class="cla-sync-row cla-sync-header">';
+        html += '<div class="cla-sync-label"></div>';
+        activeEntries.forEach((entry, idx) => {
+          const isCurrent = idx === activeEntries.length - 1;
+          html += '<div class="cla-sync-col-header' + (isCurrent ? ' current' : '') + '">' + escapeHtml(formatCLAPeriodLabel(entry)) + '</div>';
+        });
+        html += '</div>';
+
+        // One row per layer
         layers.forEach(layer => {
-          const hasData = allEntries.some(entry => {
-            const text = getCLAEntryText(entry, layer.key, claArchiveCatFilter);
-            return text && text.trim().length > 0;
-          });
+          const hasData = activeEntries.some(e => { const t = getCLAEntryText(e, layer.key, claArchiveCatFilter); return t && t.trim(); });
           if (!hasData) return;
 
-          html += '<div class="cla-layer-section">';
-          html += '<div class="cla-layer-section-title"><span style="width:8px;height:8px;border-radius:50%;background:' + layer.border + ';flex-shrink:0"></span>' + layer.label + '</div>';
-          html += '<div class="cla-layer-scroll">';
-          allEntries.forEach((entry, idx) => {
+          html += '<div class="cla-sync-row">';
+          html += '<div class="cla-sync-label"><span style="width:6px;height:6px;border-radius:50%;background:' + layer.border + ';flex-shrink:0"></span>' + layer.label + '</div>';
+          activeEntries.forEach((entry, idx) => {
             const text = getCLAEntryText(entry, layer.key, claArchiveCatFilter);
-            if (!text || !text.trim()) return;
-            const isCurrent = idx === allEntries.length - 1;
-            const periodLabel = formatCLAPeriodLabel(entry);
-            html += '<div class="cla-year-card' + (isCurrent ? ' current' : '') + '">';
-            html += '<div class="cla-year-card-period">' + escapeHtml(periodLabel) + '</div>';
-            html += '<div class="cla-year-card-text">' + escapeHtml(text) + '</div>';
-            html += '</div>';
+            const isCurrent = idx === activeEntries.length - 1;
+            if (text && text.trim()) {
+              html += '<div class="cla-sync-cell' + (isCurrent ? ' current' : '') + '">' + escapeHtml(text) + '</div>';
+            } else {
+              html += '<div class="cla-sync-cell empty">—</div>';
+            }
           });
-          html += '</div></div>';
+          html += '</div>';
         });
+
+        html += '</div>';
 
       } else {
         // Individual view: decade-grouped period selector + detail panel
