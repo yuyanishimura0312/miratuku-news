@@ -5281,12 +5281,12 @@
     let _themesRendered = false;
 
     function matchNewsToThemes(articles) {
-      // Build match results: theme -> matched articles
+      // Build match results: theme -> matched articles (search both original and Japanese text)
       const results = FUTUROLOGY_THEMES.map(theme => {
         const matched = [];
         const kwLower = theme.keywords.map(k => k.toLowerCase());
         (articles || []).forEach(art => {
-          const text = ((art.title || '') + ' ' + (art.summary || '')).toLowerCase();
+          const text = ((art.title || '') + ' ' + (art.summary || '') + ' ' + (art._titleJa || '') + ' ' + (art._summaryJa || '')).toLowerCase();
           const hits = kwLower.filter(kw => text.includes(kw));
           if (hits.length > 0) {
             matched.push({ ...art, _matchScore: hits.length, _matchedKeywords: hits });
@@ -5303,9 +5303,10 @@
       const container = document.getElementById('themesContent');
       if (!container) return;
 
-      // Collect all articles across PESTLE categories and regions
+      // Collect all articles across PESTLE categories and regions, with translations
       const allArticles = [];
       const latestRaw = typeof dataCache !== 'undefined' ? dataCache['latest.json'] : null;
+      const aiTranslations = typeof dataCache !== 'undefined' ? (dataCache['ai_analysis.json']?.translations || {}) : {};
       if (latestRaw) {
         ['japan', 'global'].forEach(region => {
           const regionData = latestRaw[region] || latestRaw;
@@ -5313,9 +5314,17 @@
           if (pestle && typeof pestle === 'object') {
             Object.keys(pestle).forEach(catKey => {
               const cat = pestle[catKey];
-              (cat.articles || []).forEach(art => {
+              const catTrans = aiTranslations[catKey] || [];
+              const rawArticles = cat.articles || [];
+              rawArticles.forEach((art, idx) => {
                 if (art && art.title) {
                   if (!art.pestle_category && !art.category) art.pestle_category = catKey;
+                  // Attach Japanese translation if available
+                  const tr = catTrans.find(t => t.index === idx);
+                  if (tr) {
+                    art._titleJa = tr.title_translated || '';
+                    art._summaryJa = tr.summary_translated || '';
+                  }
                   allArticles.push(art);
                 }
               });
@@ -5366,14 +5375,18 @@
         t.matched.slice(0, 30).forEach(art => {
           const catKey = art.pestle_category || art.category || '';
           const catInfo = PESTLE_CATS[catKey] || {};
+          const displayTitle = art._titleJa || art.title || '';
+          const displaySummary = art._summaryJa || art.summary || '';
+          const hasOriginal = art._titleJa && art.title && art._titleJa !== art.title;
           html += `<div class="news-item" style="padding:10px 0;border-bottom:1px solid var(--border-light)">
             <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px">
               ${catInfo.labelJa ? `<span class="pestle-badge" style="background:${catInfo.color};color:#fff;padding:1px 6px;font-size:0.7rem">${catInfo.labelJa}</span>` : ''}
               <span style="font-size:0.76rem;color:var(--text-muted)">${escapeHtml(art.source || '')}</span>
               <span class="theme-match-count">${art._matchScore}キーワード一致</span>
             </div>
-            <div style="font-size:0.88rem;font-weight:600;color:var(--text);margin-bottom:4px;cursor:pointer" onclick="openArticleInModal(this)" data-url="${escapeHtml(art.url || '')}" data-title="${escapeHtml(art.title || '')}">${escapeHtml(art.title || '')}</div>
-            <div style="font-size:0.82rem;color:var(--text-secondary);line-height:1.6">${escapeHtml((art.summary || '').slice(0, 200))}${(art.summary || '').length > 200 ? '...' : ''}</div>
+            <div style="font-size:0.88rem;font-weight:600;color:var(--text);margin-bottom:2px;cursor:pointer" onclick="openArticleInModal(this)" data-url="${escapeHtml(art.url || '')}" data-title="${escapeHtml(art.title || '')}">${escapeHtml(displayTitle)}</div>
+            ${hasOriginal ? `<div style="font-size:0.76rem;color:var(--text-muted);margin-bottom:4px">${escapeHtml(art.title)}</div>` : ''}
+            <div style="font-size:0.82rem;color:var(--text-secondary);line-height:1.6">${escapeHtml(displaySummary.slice(0, 200))}${displaySummary.length > 200 ? '...' : ''}</div>
             <div style="margin-top:4px;display:flex;flex-wrap:wrap;gap:3px">${(art._matchedKeywords || []).map(k => `<span class="theme-keyword" style="background:color-mix(in srgb, var(--accent) 10%, transparent);border-color:var(--accent)">${escapeHtml(k)}</span>`).join('')}</div>
           </div>`;
         });
