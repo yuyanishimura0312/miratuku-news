@@ -1441,6 +1441,13 @@
     .modal-theme-blank {
       padding: 16px; border: 2px dashed var(--border); border-radius: 8px; background: var(--bg);
     }
+    .modal-theme-toggle {
+      display: block; width: 100%; margin-top: 8px; padding: 8px;
+      background: none; border: 1px solid var(--border); border-radius: 4px;
+      color: var(--accent); font-size: 0.82rem; cursor: pointer;
+      transition: background 0.15s;
+    }
+    .modal-theme-toggle:hover { background: var(--surface); }
 
     /* Related articles in modal */
     .modal-related-article {
@@ -5155,9 +5162,11 @@
       html += '<h4 class="modal-section-heading">未来予測テーマとの接続</h4>';
 
       if (matchedThemes.length > 0) {
-        matchedThemes.forEach(theme => {
-          const connector = _futureConnectorText(catKey, theme, article);
-          html += '<div class="modal-theme-item">' +
+        var THEME_FOLD = 3;
+        matchedThemes.forEach(function(theme, ti) {
+          var connector = _futureConnectorText(catKey, theme, article);
+          var hidden = (matchedThemes.length > THEME_FOLD && ti >= THEME_FOLD) ? ' style="display:none" data-theme-extra' : '';
+          html += '<div class="modal-theme-item"' + hidden + '>' +
             '<div class="modal-theme-header">' +
               '<span class="modal-theme-no">' + theme.no + '</span>' +
               '<span class="modal-theme-name">' + escapeHtml(theme.name) + '</span>' +
@@ -5166,6 +5175,9 @@
             '<div class="modal-theme-desc">' + escapeHtml(connector) + '</div>' +
           '</div>';
         });
+        if (matchedThemes.length > THEME_FOLD) {
+          html += '<button class="modal-theme-toggle" onclick="this.style.display=\'none\';document.querySelectorAll(\'[data-theme-extra]\').forEach(function(el){el.style.display=\'\'})">他' + (matchedThemes.length - THEME_FOLD) + '件のテーマを表示</button>';
+        }
       }
 
       // No matching theme — show as new theme candidate (blank spot on the future map)
@@ -5303,10 +5315,11 @@
       const idx = bookmarks.findIndex(b => b.id === id);
       if (idx >= 0) { bookmarks.splice(idx, 1); if (btn) btn.classList.remove('bookmarked'); }
       else { bookmarks.push({ id, title, url, addedAt: new Date().toISOString() }); if (btn) btn.classList.add('bookmarked'); }
+      var added = idx < 0;
       if (btn && btn.id === 'modalBookmarkBtn') {
-        var isNowBm = btn.classList.contains('bookmarked');
-        btn.innerHTML = '<span style="font-size:1.1em">&#9734;</span> ' + (isNowBm ? 'ブックマーク済み' : 'ブックマークに追加');
+        btn.innerHTML = '<span style="font-size:1.1em">&#9734;</span> ' + (added ? 'ブックマーク済み' : 'ブックマークに追加');
       }
+      showToast(added ? 'ブックマークに追加しました' : 'ブックマークを解除しました', 'info');
       localStorage.setItem('fin_bookmarks', JSON.stringify(bookmarks));
       updateBookmarkUI();
     };
@@ -5662,7 +5675,7 @@
         '</div>' +
         '<p class="fs-body-sm" style="color:var(--text-secondary);margin-bottom:20px;line-height:1.6">この記事をもとにCLA（因果階層分析）の視点から深層分析レポートを生成します。生成には30秒〜1分程度かかります。</p>' +
         '<div style="display:flex;gap:10px;justify-content:flex-end">' +
-          '<button class="btn-secondary" onclick="closeArticleModal()">キャンセル</button>' +
+          '<button class="btn-secondary" onclick="openArticleModal(\'' + escapeAttr(catKey) + '\',' + index + ')">戻る</button>' +
           '<button class="btn-primary" onclick="closeArticleModal();generateNewsReport(\'' + escapeAttr(catKey) + '\',' + index + ')">レポートを生成する</button>' +
         '</div></div>';
       modal.classList.add('visible');
