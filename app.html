@@ -3652,15 +3652,11 @@
             const bmId = 'news-' + catKey + '-' + origIdx;
             const isBm = bookmarks.some(b => b.id === bmId);
             gridHtml += '<div class="pestle-article"><div class="pestle-article-row">' +
-              '<div class="pestle-article-content" onclick="window.open(\'' + escapeAttr(safeUrl(a.url)) + '\',\'_blank\')">' +
+              '<div class="pestle-article-content" onclick="openArticleModal(\'' + escapeAttr(catKey) + '\',' + origIdx + ')">' +
               '<div class="pestle-article-meta"><span class="pestle-article-source">' + escapeHtml(a.source || '') + '</span>' +
               '<span class="pestle-article-time">' + escapeHtml(a.published_date || '') + '</span></div>' +
               '<div class="pestle-article-title">' + escapeHtml(a.title) + '</div>' +
               (ja ? '<div class="pestle-article-trans">' + escapeHtml(ja) + '</div>' : '') +
-              '</div>' +
-              '<div class="pestle-article-actions">' +
-                '<button class="pestle-article-action-btn ' + (isBm ? 'bookmarked' : '') + '" onclick="event.stopPropagation();toggleBookmark(\'' + bmId + '\',\'' + escapeAttr(a.title || '') + '\',\'' + escapeAttr(safeUrl(a.url)) + '\',this)"><span class="action-label">ブックマーク</span><span class="action-icon">&#9734;</span></button>' +
-                '<button class="pestle-article-action-btn pestle-article-action-report" onclick="event.stopPropagation();confirmAndGenerateReport(\'' + escapeAttr(catKey) + '\',' + origIdx + ')"><span class="action-label">レポート生成</span><span class="action-icon">&#9998;</span></button>' +
               '</div>' +
             '</div></div>';
           });
@@ -3701,15 +3697,11 @@
         const bmId = 'news-' + catKey + '-' + origIdx;
         const isBm = bookmarks.some(b => b.id === bmId);
         return '<div class="pestle-article"><div class="pestle-article-row">' +
-          '<div class="pestle-article-content" onclick="window.open(\'' + escapeAttr(safeUrl(a.url)) + '\',\'_blank\')">' +
+          '<div class="pestle-article-content" onclick="openArticleModal(\'' + escapeAttr(catKey) + '\',' + origIdx + ')">' +
           '<div class="pestle-article-meta"><span class="pestle-article-source">' + escapeHtml(a.source || '') + '</span>' +
           '<span class="pestle-article-time">' + escapeHtml(a.published_date || '') + '</span></div>' +
           '<div class="pestle-article-title">' + escapeHtml(a.title) + '</div>' +
           (ja ? '<div class="pestle-article-trans">' + escapeHtml(ja) + '</div>' : '') +
-          '</div>' +
-          '<div class="pestle-article-actions">' +
-            '<button class="pestle-article-action-btn ' + (isBm ? 'bookmarked' : '') + '" onclick="event.stopPropagation();toggleBookmark(\'' + bmId + '\',\'' + escapeAttr(a.title || '') + '\',\'' + escapeAttr(safeUrl(a.url)) + '\',this)">ブックマーク</button>' +
-            '<button class="pestle-article-action-btn pestle-article-action-report" onclick="event.stopPropagation();confirmAndGenerateReport(\'' + escapeAttr(catKey) + '\',' + origIdx + ')">レポート生成</button>' +
           '</div>' +
         '</div></div>';
       }).join('');
@@ -4791,24 +4783,102 @@
       const titleJa = trans?.title_translated || '';
       const summaryJa = trans?.summary_translated || '';
       const articleId = 'pestle-' + catKey + '-' + index;
+      const catLabel = PESTLE_CATS[catKey]?.labelJa || catKey;
+      const catColor = PESTLE_CATS[catKey]?.color || 'var(--accent)';
+
+      // Bookmark state
+      const bmId = 'news-' + catKey + '-' + index;
+      const isBm = bookmarks.some(b => b.id === bmId);
+
+      // Find related weak signals (matching PESTLE category)
+      const weakSignals = aiData?.weak_signals || [];
+      const relatedSignals = weakSignals.filter(ws =>
+        (ws.pestle_categories || []).some(c => c.toLowerCase() === catKey.toLowerCase())
+      ).slice(0, 5);
+
+      // Find other articles in same category for context
+      const sameCategory = (data.pestle[catKey]?.articles || [])
+        .filter((a, i) => i !== index)
+        .slice(0, 3);
+      const sameCatTrans = (aiData?.translations || {})[catKey] || [];
 
       const content = document.getElementById('articleModalContent');
-      content.innerHTML = '<div class="modal-title">' + escapeHtml(article.title) + '</div>' +
-        (titleJa ? '<div class="modal-trans">' + escapeHtml(titleJa) + '</div>' : '') +
-        '<div class="modal-meta">' + escapeHtml(article.source || '') + ' | ' + escapeHtml(article.published_date || '') +
-          (article.relevance_score ? ' | 関連度: ' + Number(article.relevance_score).toFixed(1) : '') +
-          (article.tier ? ' | Tier ' + article.tier : '') + '</div>' +
-        '<div class="modal-summary">' +
-          (summaryJa ? '<p class="modal-summary-main">' + escapeHtml(summaryJa) + '</p>' : '') +
-          (article.summary ? '<p>' + escapeHtml(article.summary) + '</p>' : '') +
-        '</div>' +
-        (article.url ? '<a class="modal-link" href="' + escapeHtml(article.url) + '" target="_blank">元記事を読む &rarr;</a>' : '') +
-        '<div style="margin:16px 0"><button class="btn-primary" style="width:100%" onclick="generateNewsReport(\'' + escapeAttr(catKey) + '\',' + index + ')">この記事からレポートを生成</button>' +
-        '<div id="newsReportResult-' + catKey + '-' + index + '"></div></div>' +
-        '<div class="comment-section"><h4 class="comment-heading">コメント</h4>' +
-          '<div class="comment-input-row"><input type="text" class="comment-input" placeholder="この記事にコメント..." id="modalCommentInput">' +
-          '<button class="btn-primary" onclick="submitArticleComment(\'' + escapeAttr(articleId) + '\')">投稿</button></div>' +
-          '<div class="comment-list" id="modalCommentList">読み込み中...</div></div>';
+      let html = '';
+
+      // Category badge
+      html += '<div style="margin-bottom:12px"><span style="display:inline-block;padding:3px 10px;border-radius:4px;font-size:0.78rem;font-weight:600;background:' + catColor + ';color:#fff">' + escapeHtml(catLabel) + '</span></div>';
+
+      // Title
+      html += '<div class="modal-title">' + escapeHtml(article.title) + '</div>';
+      if (titleJa) html += '<div class="modal-trans">' + escapeHtml(titleJa) + '</div>';
+
+      // Metadata
+      html += '<div class="modal-meta">' + escapeHtml(article.source || '') + ' | ' + escapeHtml(article.published_date || '') +
+        (article.relevance_score ? ' | 関連度: ' + Number(article.relevance_score).toFixed(1) : '') +
+        (article.tier ? ' | Tier ' + article.tier : '') + '</div>';
+
+      // Summary section
+      html += '<div class="modal-summary" style="margin:20px 0">';
+      if (summaryJa) html += '<p class="modal-summary-main" style="font-size:0.95rem;line-height:1.8;color:var(--text)">' + escapeHtml(summaryJa) + '</p>';
+      if (article.summary) html += '<p style="font-size:0.88rem;line-height:1.7;color:var(--text-secondary)">' + escapeHtml(article.summary) + '</p>';
+      html += '</div>';
+
+      // Action buttons row
+      html += '<div style="display:flex;gap:10px;margin:20px 0;flex-wrap:wrap">';
+      if (article.url) {
+        html += '<a class="btn-primary" href="' + escapeHtml(article.url) + '" target="_blank" style="text-decoration:none;display:inline-flex;align-items:center;gap:6px">元記事を読む <span style="font-size:0.8em">&rarr;</span></a>';
+      }
+      html += '<button class="btn-secondary ' + (isBm ? 'bookmarked' : '') + '" id="modalBookmarkBtn" onclick="toggleBookmark(\'' + bmId + '\',\'' + escapeAttr(article.title || '') + '\',\'' + escapeAttr(safeUrl(article.url)) + '\',this)" style="display:inline-flex;align-items:center;gap:6px">' +
+        '<span style="font-size:1.1em">&#9734;</span> ' + (isBm ? 'ブックマーク済み' : 'ブックマークに追加') + '</button>';
+      html += '<button class="btn-secondary" onclick="confirmAndGenerateReport(\'' + escapeAttr(catKey) + '\',' + index + ')" style="display:inline-flex;align-items:center;gap:6px"><span style="font-size:1.1em">&#9998;</span> レポートを生成</button>';
+      html += '</div>';
+
+      // Related signals section
+      if (relatedSignals.length > 0) {
+        html += '<div style="margin:24px 0;padding:20px;background:var(--card-bg);border:1px solid var(--border);border-radius:8px">';
+        html += '<h4 style="font-size:0.88rem;font-weight:700;margin-bottom:12px;color:var(--text)">関連シグナル</h4>';
+        relatedSignals.forEach(ws => {
+          const impactColor = (ws.potential_impact || '').toLowerCase() === 'high' ? '#e74c3c' :
+                              (ws.potential_impact || '').toLowerCase() === 'medium' ? '#f39c12' : '#95a5a6';
+          html += '<div style="padding:10px 0;border-bottom:1px solid var(--border)">' +
+            '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">' +
+              '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:' + impactColor + '"></span>' +
+              '<span style="font-size:0.84rem;font-weight:600;color:var(--text)">' + escapeHtml(ws.signal || '') + '</span>' +
+              (ws.potential_impact ? '<span style="font-size:0.72rem;padding:2px 6px;border-radius:3px;background:' + impactColor + '20;color:' + impactColor + '">' + escapeHtml(ws.potential_impact) + '</span>' : '') +
+            '</div>' +
+            '<div style="font-size:0.82rem;line-height:1.6;color:var(--text-secondary)">' + escapeHtml(ws.description || '') + '</div>' +
+          '</div>';
+        });
+        html += '</div>';
+      }
+
+      // Same category articles
+      if (sameCategory.length > 0) {
+        html += '<div style="margin:24px 0">';
+        html += '<h4 style="font-size:0.88rem;font-weight:700;margin-bottom:12px;color:var(--text)">同カテゴリの記事</h4>';
+        sameCategory.forEach(a => {
+          const aIdx = (data.pestle[catKey]?.articles || []).indexOf(a);
+          const aTr = sameCatTrans.find(t => t.index === aIdx);
+          const aJa = aTr?.title_translated || '';
+          html += '<div style="padding:8px 0;border-bottom:1px solid var(--border);cursor:pointer" onclick="openArticleModal(\'' + escapeAttr(catKey) + '\',' + aIdx + ')">' +
+            '<div style="font-size:0.82rem;color:var(--text-muted)">' + escapeHtml(a.source || '') + ' | ' + escapeHtml(a.published_date || '') + '</div>' +
+            '<div style="font-size:0.86rem;font-weight:500;color:var(--text);line-height:1.5">' + escapeHtml(a.title) + '</div>' +
+            (aJa ? '<div style="font-size:0.82rem;color:var(--text-secondary);line-height:1.5">' + escapeHtml(aJa) + '</div>' : '') +
+          '</div>';
+        });
+        html += '</div>';
+      }
+
+      // Report result container
+      html += '<div id="newsReportResult-' + catKey + '-' + index + '"></div>';
+
+      // Comments
+      html += '<div class="comment-section" style="margin-top:24px"><h4 class="comment-heading">コメント</h4>' +
+        '<div class="comment-input-row"><input type="text" class="comment-input" placeholder="この記事にコメント..." id="modalCommentInput">' +
+        '<button class="btn-primary" onclick="submitArticleComment(\'' + escapeAttr(articleId) + '\')">投稿</button></div>' +
+        '<div class="comment-list" id="modalCommentList">読み込み中...</div></div>';
+
+      content.innerHTML = html;
 
       window._modalReturnFocus = document.activeElement;
       document.getElementById('articleModal').classList.add('visible');
