@@ -69,7 +69,7 @@
       --accent-light: #1A1A1A;
       --text: #E0E0E0;
       --text-secondary: #AAAAAA;
-      --text-muted: #777777;
+      --text-muted: #8A8A8A;
       --border: #333333;
       --border-light: #2A2A2A;
       --highlight: #FF4444;
@@ -1381,7 +1381,7 @@
     .modal-title { font-weight: 700; font-size: 1.05rem; line-height: 1.45; margin-bottom: 8px; padding-right: 2rem; }
     .modal-trans { font-size: 0.92rem; color: var(--accent-soft); margin-bottom: 8px; }
     .modal-meta { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 16px; }
-    .modal-summary { font-size: 0.88rem; line-height: 1.7; margin-bottom: 16px; }
+    .modal-summary { font-size: 0.9rem; line-height: 1.9; margin-bottom: 16px; }
     .modal-summary p { margin-bottom: 8px; }
     .modal-summary p:last-child { margin-bottom: 0; }
     .modal-summary-main { font-weight: 500; color: var(--text); }
@@ -1394,11 +1394,14 @@
 
     /* Article detail modal: action buttons */
     .modal-actions {
-      display: flex; gap: 10px; margin: 20px 0; flex-wrap: wrap;
+      display: flex; gap: 10px; margin: 24px 0; flex-wrap: wrap;
     }
     .modal-action-btn {
       display: inline-flex; align-items: center; gap: 6px;
       text-decoration: none; white-space: nowrap;
+    }
+    .modal-action-btn-primary {
+      font-size: 0.92rem; padding: 12px 28px; font-weight: 600;
     }
 
     /* Article detail modal: section cards */
@@ -1431,8 +1434,9 @@
     }
     .modal-theme-name { font-size: 0.86rem; font-weight: 600; color: var(--text); }
     .modal-theme-map { font-size: 0.72rem; color: var(--text-muted); white-space: nowrap; }
+    .modal-theme-map::before { content: '/ '; }
     .modal-theme-desc {
-      font-size: 0.84rem; line-height: 1.7; color: var(--text-secondary); padding-left: 32px;
+      font-size: 0.84rem; line-height: 1.9; color: var(--text-secondary); padding-left: 32px;
     }
     .modal-theme-blank {
       padding: 16px; border: 2px dashed var(--border); border-radius: 8px; background: var(--bg);
@@ -1442,6 +1446,10 @@
     .modal-related-article {
       padding: 10px 12px; border-bottom: 1px solid var(--border); cursor: pointer;
       border-radius: 4px; transition: background 0.15s, padding-left 0.15s;
+      outline: none;
+    }
+    .modal-related-article:focus-visible {
+      box-shadow: 0 0 0 2px var(--accent);
     }
     .modal-related-article:hover {
       background: var(--surface); padding-left: 16px;
@@ -5109,7 +5117,7 @@
       // Action buttons row
       html += '<div class="modal-actions">';
       if (article.url) {
-        html += '<a class="btn-primary modal-action-btn" href="' + escapeAttr(safeUrl(article.url)) + '" target="_blank" rel="noopener noreferrer" style="font-size:0.92rem;padding:12px 28px">元記事を読む <span style="font-size:0.8em" aria-hidden="true">&nearr;</span></a>';
+        html += '<a class="btn-primary modal-action-btn modal-action-btn-primary" href="' + escapeAttr(safeUrl(article.url)) + '" target="_blank" rel="noopener noreferrer">元記事を読む <span aria-hidden="true">&nearr;</span><span class="visually-hidden">（外部サイトへ移動）</span></a>';
       }
       html += '<button class="btn-secondary modal-action-btn ' + (isBm ? 'bookmarked' : '') + '" id="modalBookmarkBtn" onclick="toggleBookmark(\'' + bmId + '\',\'' + escapeAttr(article.title || '') + '\',\'' + escapeAttr(safeUrl(article.url)) + '\',this)">' +
         '<span style="font-size:1.1em">&#9734;</span> ' + (isBm ? 'ブックマーク済み' : 'ブックマークに追加') + '</button>';
@@ -5207,6 +5215,10 @@
         '<div class="comment-list" id="modalCommentList">読み込み中...</div></div>';
 
       content.innerHTML = html;
+
+      // Scroll to top when navigating between articles in modal
+      var modalBoxEl = document.getElementById('modalBox');
+      if (modalBoxEl) modalBoxEl.scrollTop = 0;
 
       // Push history state so browser back closes modal (replace if already in modal to avoid stacking)
       const alreadyInModal = document.getElementById('articleModal').classList.contains('visible');
