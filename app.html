@@ -2732,7 +2732,7 @@
           <li><a href="#section-papers" class="nav-link" data-nav="section-papers">学術研究</a></li>
           <li><a href="#section-cla" class="nav-link" data-nav="section-cla">因果階層分析</a></li>
           <li><a href="#section-foresight" class="nav-link" data-nav="section-foresight">未来洞察</a></li>
-          <li><a href="#section-themes" class="nav-link" data-nav="section-themes">テーマ</a></li>
+          <li><a href="#section-themes" class="nav-link" data-nav="section-themes">メガトレンド</a></li>
           <li><a href="#section-bookmarks" class="nav-link" data-nav="section-bookmarks" id="navBookmarks">ブックマーク <span class="nav-badge" id="bookmarkCount">0</span></a></li>
           <li><a href="#section-guide" class="nav-link" data-nav="section-guide">使い方</a></li>
         </ul>
@@ -2905,14 +2905,14 @@
     <!-- THEMES (Futurology 18 Categories) -->
     <section class="app-section section-hidden" id="section-themes">
       <div class="section-header">
-        <h2 class="section-title">テーマ別キュレーション</h2>
+        <h2 class="section-title">メガトレンド</h2>
         <span class="section-subtitle">未来学18テーマ &times; 最新ニュース</span>
       </div>
       <p style="font-size:0.84rem;color:var(--text-secondary);line-height:1.7;max-width:720px;margin-bottom:20px">
         ミラツクが約30冊の未来予測関連書籍から抽出した18の大項目で、今日のニュースを分類しています。個別のニュースを「未来の文脈」の中に位置づけることで、断片的な情報が未来洞察へと変わります。
       </p>
       <div id="themesContent">
-        <div class="loading-indicator"><div class="loading-spinner"></div><div>テーマを読み込み中...</div></div>
+        <div class="loading-indicator"><div class="loading-spinner"></div><div>メガトレンドを読み込み中...</div></div>
       </div>
     </section>
 
@@ -2935,7 +2935,7 @@
           <div class="guide-item"><strong>学術研究</strong> ― 分野別に自動収集された最新の学術論文。新規性スコア付き。</div>
           <div class="guide-item"><strong>因果階層分析</strong> ― 36年分のCLA時系列データと四半期分析。リタニー・システム・世界観・神話の4層構造で社会変化を読み解きます。</div>
           <div class="guide-item"><strong>未来洞察</strong> ― 蓄積データをもとにAIが未来洞察の視点で回答。過去の洞察履歴も閲覧可能。</div>
-          <div class="guide-item"><strong>テーマ</strong> ― 未来予測書籍から抽出した18の大テーマで今日のニュースを分類。断片的な情報を未来の文脈に位置づけます。</div>
+          <div class="guide-item"><strong>メガトレンド</strong> ― 未来予測書籍から抽出した18の大テーマで今日のニュースを分類。断片的な情報を未来の文脈に位置づけます。</div>
           <div class="guide-item"><strong>ブックマーク</strong> ― 気になる記事・シグナル・論文を保存。アーカイブ機能付き。</div>
         </div>
         <div class="guide-section">
@@ -5019,6 +5019,32 @@
         html += '</div>';
       }
 
+      // Future themes connection
+      const articleText = ((article.title || '') + ' ' + (article.summary || '') + ' ' + (titleJa || '') + ' ' + (summaryJa || '')).toLowerCase();
+      const matchedThemes = FUTUROLOGY_THEMES.map(theme => {
+        const kwLower = theme.keywords.map(k => k.toLowerCase());
+        const hits = kwLower.filter(kw => articleText.includes(kw));
+        return hits.length > 0 ? { ...theme, hits } : null;
+      }).filter(Boolean).sort((a, b) => b.hits.length - a.hits.length);
+
+      if (matchedThemes.length > 0) {
+        html += '<div style="margin:24px 0;padding:20px;background:var(--card-bg);border:1px solid var(--border);border-radius:8px">';
+        html += '<h4 style="font-size:0.88rem;font-weight:700;margin-bottom:14px;color:var(--text)">未来予測テーマとの接続</h4>';
+        matchedThemes.forEach(theme => {
+          // Generate a contextual connection sentence based on PESTLE category and theme
+          const connector = _futureConnectorText(catKey, theme, article);
+          html += '<div style="padding:12px 0;border-bottom:1px solid var(--border)">' +
+            '<div style="display:flex;align-items:baseline;gap:8px;margin-bottom:6px">' +
+              '<span style="display:inline-block;min-width:24px;height:24px;line-height:24px;text-align:center;border-radius:50%;background:var(--accent);color:#fff;font-size:0.72rem;font-weight:700">' + theme.no + '</span>' +
+              '<span style="font-size:0.86rem;font-weight:600;color:var(--text)">' + escapeHtml(theme.name) + '</span>' +
+              '<span style="font-size:0.72rem;color:var(--text-muted);white-space:nowrap">' + escapeHtml(theme.map) + '</span>' +
+            '</div>' +
+            '<div style="font-size:0.84rem;line-height:1.7;color:var(--text-secondary);padding-left:32px">' + escapeHtml(connector) + '</div>' +
+          '</div>';
+        });
+        html += '</div>';
+      }
+
       // Same category articles
       if (sameCategory.length > 0) {
         html += '<div style="margin:24px 0">';
@@ -5173,6 +5199,44 @@
     });
 
     // ==============================================================
+    // FUTURE THEME CONNECTOR (contextual connection text for modal)
+    // ==============================================================
+    function _futureConnectorText(catKey, theme, article) {
+      var catContext = {
+        political: '政策・制度面から',
+        economic: '経済・市場の動向として',
+        social: '社会・文化的な変化として',
+        technological: '技術革新の観点から',
+        legal: '法規制の変化を通じて',
+        environmental: '環境・資源の観点から'
+      };
+      var catPhrase = catContext[catKey] || '';
+      var matchCount = theme.hits.length;
+      var strength = matchCount >= 3 ? '強く' : matchCount >= 2 ? '' : 'ゆるやかに';
+      var desc = {
+        1:  'イノベーションの分散や都市型経済圏の変化に関わる動きとして読むことで、断片的なニュースが未来の文脈の中に位置づけられます。',
+        2:  '人間の身体能力をテクノロジーで拡張する流れの中に位置づけることができます。',
+        3:  'テクノロジーが倫理的課題を生み出す構造として捉えると、未来社会のリスクが見えてきます。',
+        4:  '資源の効率的な管理・制御に向けた変化として、持続可能な未来への道筋と接続します。',
+        5:  'デジタル世界と現実の境界が曖昧になる流れの中で、新たな生活様式の萌芽として読めます。',
+        6:  'ロボットや自動化による社会構造の変化として、労働と生活の未来像と接続します。',
+        7:  '人類の活動領域が宇宙へ拡がる動きとして、文明のフロンティアの変化を示唆しています。',
+        8:  '気候変動と人類の生存環境への影響として、適応と変革の未来を考えるきっかけになります。',
+        9:  '経済的価値とは異なる新たな価値基準の模索として、ポスト資本主義の萌芽と接続します。',
+        10: '社会的活動・市民参加が日常化する流れとして、市民社会の未来像に接続します。',
+        11: '格差の拡大や新たな対立構造の出現として、社会の分断と統合の未来を考えるヒントです。',
+        12: '健康・長寿に関する科学技術の進展として、人生100年時代の未来像と接続します。',
+        13: '人間とロボットの関係が近づく変化として、共生社会の未来を示唆しています。',
+        14: '高度な技術が一般の人々にも使えるようになる流れとして、創造の民主化の未来と接続します。',
+        15: '多様性を前提とした社会の発展モデルとして、包摂的な未来社会への道筋を示しています。',
+        16: '脳科学・人工知能による知性の解明と再現の流れとして、意識と知性の未来と接続します。',
+        17: '国家の閉鎖性や社会の停滞に関わる動きとして、制度疲労と変革の未来を考えるきっかけです。',
+        18: '住まい方・働き方・暮らしの前提が変わる流れとして、日常生活の未来像と接続します。'
+      };
+      return 'この記事は、' + catPhrase + '「' + theme.name + '」と' + strength + '接続しています。' + (desc[theme.no] || '');
+    }
+
+    // ==============================================================
     // THEME CURATION (Futurology 18 Categories)
     // ==============================================================
     const FUTUROLOGY_THEMES = [
@@ -5289,7 +5353,7 @@
       if (grid) grid.style.display = 'none';
       if (!detail) return;
 
-      let html = `<button class="theme-back-btn" onclick="hideThemeDetail()">&larr; テーマ一覧に戻る</button>`;
+      let html = `<button class="theme-back-btn" onclick="hideThemeDetail()">&larr; メガトレンド一覧に戻る</button>`;
       html += `<div class="theme-detail-header">
         <div class="theme-detail-title">${t.no}. ${escapeHtml(t.name)}</div>
         <div class="theme-detail-desc">マップテーマ: ${escapeHtml(t.map)}</div>
@@ -5315,7 +5379,7 @@
         });
         html += '</div>';
       } else {
-        html += '<p style="color:var(--text-muted);font-size:0.84rem;margin-top:16px">今日のニュースにこのテーマに関連する記事は見つかりませんでした。</p>';
+        html += '<p style="color:var(--text-muted);font-size:0.84rem;margin-top:16px">今日のニュースにこのメガトレンドに関連する記事は見つかりませんでした。</p>';
       }
 
       detail.innerHTML = html;
