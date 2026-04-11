@@ -5567,7 +5567,39 @@
       var catCla = aiData?.cla?.[catKey] || {};
       var reportTitle = titleJa || article.title || '';
 
-      var question = '以下のニュース記事について、CLA（因果階層分析）の神話層との関連を踏まえた深層分析レポートを日本語で生成してください。\n\n' +
+      // Collect related weak signals for prompt context
+      var rptWeakSignals = aiData?.weak_signals || [];
+      var rptRelatedSigs = rptWeakSignals.filter(function(ws) {
+        return (ws.pestle_categories || []).some(function(c) { return c.toLowerCase() === catKey.toLowerCase(); });
+      }).slice(0, 5);
+      var rptSigCtx = '';
+      if (rptRelatedSigs.length > 0) {
+        rptSigCtx = '\n\n## 関連する弱いシグナル';
+        rptRelatedSigs.forEach(function(ws, i) {
+          rptSigCtx += '\n' + (i + 1) + '. ' + (ws.signal || '') + '（影響度: ' + (ws.potential_impact || 'N/A') + '）';
+          if (ws.description) rptSigCtx += '\n   ' + ws.description;
+          if (ws.time_horizon) rptSigCtx += '\n   時間軸: ' + ws.time_horizon;
+        });
+      }
+
+      // Match against 18 futurology themes for prompt context
+      var rptArtText = ((article.title || '') + ' ' + (article.summary || '') + ' ' + (titleJa || '') + ' ' + (summaryJa || '')).toLowerCase();
+      var rptThemeMatches = FUTUROLOGY_THEMES.map(function(theme) {
+        var kwLower = theme.keywords.map(function(k) { return k.toLowerCase(); });
+        var hits = kwLower.filter(function(kw) { return rptArtText.includes(kw); });
+        return hits.length > 0 ? { no: theme.no, name: theme.name, map: theme.map, score: hits.length } : null;
+      }).filter(Boolean).sort(function(a, b) { return b.score - a.score; });
+
+      var rptThemeCtx = '\n\n## メガトレンド（未来予測18テーマ）との関連';
+      if (rptThemeMatches.length > 0) {
+        rptThemeMatches.forEach(function(t) {
+          rptThemeCtx += '\n- テーマ' + t.no + '「' + t.name + '」（マップ: ' + t.map + '、マッチ度: ' + t.score + '）';
+        });
+      } else {
+        rptThemeCtx += '\n- 既存18テーマに直接該当なし（空白地帯の可能性）。この記事がどのような新テーマを示唆するか分析してください。';
+      }
+
+      var question = '以下のニュース記事について、CLA（因果階層分析）・弱いシグナル・メガトレンド（未来予測18テーマ）の3つの視点から統合的な深層分析レポートを日本語で生成してください。\n\n' +
         '## 記事情報\nタイトル: ' + (article.title || '') +
         (titleJa ? '\n日本語タイトル: ' + titleJa : '') +
         '\n出典: ' + (article.source || '') + ' (' + (article.published_date || '') + ')' +
@@ -5577,14 +5609,24 @@
         '\n\n## CLA分析コンテキスト（' + catKey + '分野）' +
         (catCla.myth_metaphor ? '\n神話・メタファー: ' + catCla.myth_metaphor : '') +
         (catCla.emerging_narrative ? '\n浮上するナラティブ: ' + catCla.emerging_narrative : '') +
-        '\n\n## レポート要件\n' +
-        '1. 500字程度の要約\n' +
-        '2. この記事が示す社会構造の変化と神話層への影響\n' +
-        '3. 歴史的経緯（時系列で簡潔に）\n' +
-        '4. 未来へのシグナル分析\n' +
-        '5. 今後ウォッチすべきポイント\n' +
-        '6. 関連する学術的知見（2つ）\n' +
-        '読者は経営者・コンサルタント。知的かつ実用的な洞察を散文形式で提供してください。';
+        rptSigCtx +
+        rptThemeCtx +
+        '\n\n## レポート構成（3本柱で均等に扱うこと）\n' +
+        '以下の構成で、各セクションを散文形式（地の文）で記述してください。箇条書きのみは不可。\n\n' +
+        '### 1. エグゼクティブサマリー（500字程度）\n' +
+        '記事の要点と、3つの分析視点（CLA・シグナル・メガトレンド）から見た意義を統合的に述べる。\n\n' +
+        '### 2. メガトレンドとの接続\n' +
+        '上記の未来予測18テーマとの関連を具体的に論じる。この記事がどのメガトレンドの文脈に位置づけられるか、なぜそのテーマと接続するのかを説明。18テーマに該当しない場合は「空白地帯」としてどのような新テーマの萌芽を示唆するか考察。複数テーマにまたがる場合はテーマ間の相互作用にも言及。\n\n' +
+        '### 3. シグナル分析\n' +
+        '関連する弱いシグナルとの関係を分析。この記事が示す変化の兆しは何か、シグナルの強度（強い/弱い）と時間軸（短期・中期・長期）を評価。複数のシグナルが収束している場合はその意味を解釈。\n\n' +
+        '### 4. CLA深層分析\n' +
+        '因果階層分析（リタニー→システム→世界観→神話）の4層で記事を読み解く。特に世界観と神話層の変化に注目。\n\n' +
+        '### 5. 歴史的経緯と構造変化\n' +
+        'この動きの歴史的背景を簡潔に整理し、現在の構造的転換点を論じる。\n\n' +
+        '### 6. 今後のウォッチポイント（3つ）\n' +
+        '経営者・コンサルタントが注視すべきポイント。具体的なアクション示唆を含む。\n\n' +
+        '### 7. 関連する学術的知見（2つ）\n' +
+        '読者は経営者・コンサルタント。知的かつ実用的な洞察を提供してください。';
 
       var WORKER_BASE = 'https://future-insight-proxy.nishimura-69a.workers.dev';
 
