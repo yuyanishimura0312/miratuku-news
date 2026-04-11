@@ -1651,8 +1651,8 @@
       .md-body h3 { font-size: 0.95rem !important; }
 
       /* Nav container must allow horizontal scroll-through */
-      .site-nav .container { overflow-x: visible; padding: 0; }
-      .site-nav { padding: 0 16px; }
+      .site-nav .container { overflow-x: auto; -webkit-overflow-scrolling: touch; padding: 0; }
+      .site-nav { padding: 0 16px; overflow: hidden; }
       .nav-list { width: max-content; min-width: 100%; }
 
       /* --- Header: compact, warm accent bar --- */
@@ -1725,8 +1725,9 @@
 
       /* --- Cards: soft rounded, warm shadows --- */
       .pestle-grid { grid-template-columns: 1fr; gap: 14px; }
+      .pestle-card { overflow: hidden; max-width: 100%; }
       .pestle-card-header { padding: 10px 14px 6px; }
-      .pestle-articles { padding: 0 14px 10px; }
+      .pestle-articles { padding: 0 14px 10px; overflow: hidden; }
       .pestle-article { padding: 8px 0; }
       .pestle-article-title { font-size: 0.82rem; }
 
@@ -1734,7 +1735,10 @@
       .report-summary {
         padding: 14px 16px;
         border-radius: var(--radius);
+        flex-wrap: wrap;
       }
+      .report-label { font-size: 0.84rem !important; flex: 1; min-width: 0; }
+      .report-count { margin-left: 0; font-size: 0.72rem; }
       .report-body { padding: 0 16px 16px; }
       .myth-grid { grid-template-columns: 1fr; }
       .report-myth-section { grid-template-columns: 1fr; }
@@ -1764,12 +1768,14 @@
       .ws-card-details-toggle { color: var(--accent); }
 
       /* --- Home sidebar signals: horizontal cards --- */
-      .home-news-sidebar { order: -1; }
+      .home-news-sidebar { order: -1; max-width: 100%; overflow: hidden; }
       .home-sidebar-card {
         padding: 14px;
         border-radius: 0;
         background: var(--surface);
         border-color: var(--border);
+        max-width: 100%;
+        overflow: hidden;
       }
       .home-sidebar-title {
         color: var(--text);
@@ -1969,7 +1975,11 @@
 
       /* --- CLA --- */
       .cla-period-btn { padding: 5px 10px; font-size: 0.68rem; border-radius: 16px; }
-      #claDownloadBar > div:first-child { min-width: 0 !important; }
+      #claDownloadBar {
+        flex-direction: column !important;
+        align-items: stretch !important;
+      }
+      #claDownloadBar > div:first-child { min-width: 0 !important; flex: unset !important; }
       .cla-download-btn { min-height: 44px; }
 
       /* --- Papers --- */
@@ -1984,6 +1994,9 @@
         border-radius: 0;
         background: var(--surface);
         border-color: var(--border);
+        max-width: 100%;
+        overflow: hidden;
+        box-sizing: border-box;
       }
       .insight-form { flex-direction: column; }
       .insight-input {
@@ -1998,6 +2011,22 @@
         min-height: 100px;
         width: 100%;
         box-sizing: border-box;
+      }
+      .insight-result {
+        max-width: 100%;
+        overflow: hidden;
+      }
+      .insight-answer {
+        max-width: 100%;
+        overflow-x: auto;
+        word-break: break-word;
+        box-sizing: border-box;
+      }
+      .insight-answer h1, .insight-answer h2, .insight-answer h3,
+      .insight-answer h4, .insight-answer p, .insight-answer li,
+      .insight-answer ul, .insight-answer ol {
+        max-width: 100%;
+        overflow-wrap: break-word;
       }
 
       /* --- Modal: friendly rounded sheet --- */
@@ -2046,7 +2075,7 @@
 
       /* Home layout: full width on mobile */
       .home-news-layout { grid-template-columns: 1fr; gap: 16px; }
-      .home-news-main { gap: 1.5rem; }
+      .home-news-main { gap: 1.5rem; min-width: 0; max-width: 100%; overflow: hidden; }
 
       /* Modal width fix */
       .modal-box { width: 100%; max-width: 100%; padding: 20px 16px 36px; }
