@@ -1535,6 +1535,92 @@
     }
     .guide-item strong { color: var(--text); }
 
+    /* Methodology guide */
+    .method-details { margin-bottom: 8px; border: 1px solid var(--border-light); border-radius: 0; }
+    .method-summary {
+      padding: 12px 16px; cursor: pointer; font-size: 0.88rem; font-weight: 600;
+      color: var(--text); background: var(--card-bg); list-style: none;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .method-summary::before { content: '\25B6'; font-size: 0.6rem; transition: transform 0.2s; color: var(--text-muted); }
+    .method-details[open] .method-summary::before { transform: rotate(90deg); }
+    .method-summary:hover { background: var(--hover); }
+    .method-body {
+      padding: 16px; font-size: 0.84rem; line-height: 1.8; color: var(--text-secondary);
+      border-top: 1px solid var(--border-light);
+    }
+    .method-body p { margin: 0 0 12px 0; }
+    .method-body p:last-child { margin-bottom: 0; }
+    .method-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 10px; margin: 12px 0;
+    }
+    .method-card {
+      padding: 12px; font-size: 0.82rem; line-height: 1.6;
+      border-left: 3px solid var(--border); background: var(--bg);
+    }
+    .method-card strong { color: var(--text); display: block; margin-bottom: 4px; }
+    .cla-layers-guide { margin: 16px 0; }
+    .cla-layer-item {
+      display: flex; gap: 12px; padding: 10px 12px;
+      margin-left: calc(var(--depth, 1) * 8px);
+      border-left: 3px solid color-mix(in srgb, var(--accent) calc(var(--depth) * 16%), var(--border-light));
+      margin-bottom: 4px;
+    }
+    .cla-layer-label { font-weight: 700; font-size: 0.82rem; color: var(--text); min-width: 200px; white-space: nowrap; }
+    .cla-layer-desc { font-size: 0.82rem; color: var(--text-secondary); }
+    .method-workflow { margin: 12px 0; }
+    .workflow-step {
+      display: flex; gap: 12px; align-items: flex-start; padding: 10px 0;
+      border-bottom: 1px solid var(--border-light);
+    }
+    .workflow-step:last-child { border-bottom: none; }
+    .workflow-num {
+      min-width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 0.8rem; color: var(--bg);
+      background: var(--accent); border-radius: 50%; flex-shrink: 0;
+    }
+    .workflow-step strong { color: var(--text); }
+    @media (max-width: 600px) {
+      .cla-layer-item { flex-direction: column; gap: 2px; margin-left: calc(var(--depth, 1) * 4px); }
+      .cla-layer-label { min-width: unset; white-space: normal; }
+      .method-grid { grid-template-columns: 1fr; }
+    }
+
+    /* Theme curation */
+    .theme-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+    .theme-card {
+      background: var(--card-bg); border: 1px solid var(--border-light); padding: 16px;
+      cursor: pointer; transition: border-color 0.15s;
+    }
+    .theme-card:hover { border-color: var(--accent); }
+    .theme-card-title { font-size: 0.92rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+    .theme-card-meta { font-size: 0.76rem; color: var(--text-muted); margin-bottom: 8px; }
+    .theme-card-keywords { display: flex; flex-wrap: wrap; gap: 4px; }
+    .theme-keyword {
+      font-size: 0.7rem; padding: 2px 8px; background: var(--bg);
+      border: 1px solid var(--border-light); color: var(--text-muted);
+    }
+    .theme-detail-header { margin-bottom: 16px; }
+    .theme-detail-title { font-size: 1.1rem; font-weight: 700; color: var(--text); }
+    .theme-detail-desc { font-size: 0.84rem; color: var(--text-secondary); margin-top: 6px; line-height: 1.7; }
+    .theme-sub-items { margin: 12px 0; }
+    .theme-sub-item {
+      padding: 8px 0; border-bottom: 1px solid var(--border-light);
+      font-size: 0.84rem; color: var(--text-secondary);
+    }
+    .theme-sub-item strong { color: var(--text); }
+    .theme-matched-news { margin-top: 16px; }
+    .theme-back-btn {
+      background: none; border: 1px solid var(--border); color: var(--text-muted);
+      padding: 6px 14px; font-size: 0.82rem; cursor: pointer; margin-bottom: 12px;
+    }
+    .theme-back-btn:hover { border-color: var(--text); color: var(--text); }
+    .theme-match-count {
+      font-size: 0.76rem; color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent);
+      padding: 2px 8px; font-weight: 600;
+    }
+
     /* ================================================================
        REGION FLOATING BUTTON (home only)
        ================================================================ */
@@ -2646,6 +2732,7 @@
           <li><a href="#section-papers" class="nav-link" data-nav="section-papers">学術研究</a></li>
           <li><a href="#section-cla" class="nav-link" data-nav="section-cla">因果階層分析</a></li>
           <li><a href="#section-foresight" class="nav-link" data-nav="section-foresight">未来洞察</a></li>
+          <li><a href="#section-themes" class="nav-link" data-nav="section-themes">テーマ</a></li>
           <li><a href="#section-bookmarks" class="nav-link" data-nav="section-bookmarks" id="navBookmarks">ブックマーク <span class="nav-badge" id="bookmarkCount">0</span></a></li>
           <li><a href="#section-guide" class="nav-link" data-nav="section-guide">使い方</a></li>
         </ul>
@@ -2815,6 +2902,20 @@
     </section>
 
     <!-- GUIDE -->
+    <!-- THEMES (Futurology 18 Categories) -->
+    <section class="app-section section-hidden" id="section-themes">
+      <div class="section-header">
+        <h2 class="section-title">テーマ別キュレーション</h2>
+        <span class="section-subtitle">未来学18テーマ &times; 最新ニュース</span>
+      </div>
+      <p style="font-size:0.84rem;color:var(--text-secondary);line-height:1.7;max-width:720px;margin-bottom:20px">
+        ミラツクが約30冊の未来予測関連書籍から抽出した18の大項目で、今日のニュースを分類しています。個別のニュースを「未来の文脈」の中に位置づけることで、断片的な情報が未来洞察へと変わります。
+      </p>
+      <div id="themesContent">
+        <div class="loading-indicator"><div class="loading-spinner"></div><div>テーマを読み込み中...</div></div>
+      </div>
+    </section>
+
     <section class="app-section section-hidden" id="section-guide">
       <div class="section-header">
         <h2 class="section-title">使い方ガイド</h2>
@@ -2834,6 +2935,7 @@
           <div class="guide-item"><strong>学術研究</strong> ― 分野別に自動収集された最新の学術論文。新規性スコア付き。</div>
           <div class="guide-item"><strong>因果階層分析</strong> ― 36年分のCLA時系列データと四半期分析。リタニー・システム・世界観・神話の4層構造で社会変化を読み解きます。</div>
           <div class="guide-item"><strong>未来洞察</strong> ― 蓄積データをもとにAIが未来洞察の視点で回答。過去の洞察履歴も閲覧可能。</div>
+          <div class="guide-item"><strong>テーマ</strong> ― 未来予測書籍から抽出した18の大テーマで今日のニュースを分類。断片的な情報を未来の文脈に位置づけます。</div>
           <div class="guide-item"><strong>ブックマーク</strong> ― 気になる記事・シグナル・論文を保存。アーカイブ機能付き。</div>
         </div>
         <div class="guide-section">
@@ -2843,6 +2945,71 @@
           <div class="guide-item"><strong>日本/グローバル切替</strong> ― ホーム画面右下のフローティングボタンで切り替え。ニュース・レポートの表示言語圏が変わります。</div>
           <div class="guide-item"><strong>ダークモード</strong> ― ヘッダー右上の月マークで切り替え。</div>
         </div>
+        <div class="guide-section">
+          <h3 class="guide-heading">方法論ガイド</h3>
+          <p class="guide-text" style="margin-bottom:16px">Insight News で使われている分析フレームワークの解説です。各手法の背景と「なぜこの分析が重要か」を理解することで、ニュースの読み方が変わります。</p>
+
+          <details class="method-details">
+            <summary class="method-summary">PESTLE分析とは</summary>
+            <div class="method-body">
+              <p>PESTLE分析は、社会の変化を6つの領域から体系的に捉えるフレームワークです。</p>
+              <div class="method-grid">
+                <div class="method-card" style="border-left:3px solid var(--P)"><strong>Political（政治）</strong><br>政策・規制・外交・選挙・ガバナンス。制度的な枠組みの変化を追跡します。</div>
+                <div class="method-card" style="border-left:3px solid var(--E)"><strong>Economic（経済）</strong><br>市場動向・産業構造・雇用・金融政策。経済的インセンティブの変化を捉えます。</div>
+                <div class="method-card" style="border-left:3px solid var(--S)"><strong>Social（社会）</strong><br>人口動態・価値観・ライフスタイル・教育。人々の暮らしと意識の変化を見ます。</div>
+                <div class="method-card" style="border-left:3px solid var(--T)"><strong>Technological（技術）</strong><br>新技術・研究開発・デジタル化・インフラ。技術が社会を変える力の方向を読みます。</div>
+                <div class="method-card" style="border-left:3px solid var(--L)"><strong>Legal（法律）</strong><br>法改正・判例・コンプライアンス・知的財産。ルールの変化がもたらす影響を分析します。</div>
+                <div class="method-card" style="border-left:3px solid var(--En)"><strong>Environmental（環境）</strong><br>気候変動・資源・生態系・エネルギー政策。地球環境と人間活動の関係性の変化を追います。</div>
+              </div>
+              <p>単一のカテゴリだけでなく、カテゴリ間の相互作用に注目すること（例：技術革新が法規制を促し、社会の価値観を変える）が、未来洞察の鍵です。</p>
+            </div>
+          </details>
+
+          <details class="method-details">
+            <summary class="method-summary">因果階層分析（CLA）とは</summary>
+            <div class="method-body">
+              <p>CLA（Causal Layered Analysis）は、未来学者ソハイル・イナヤトゥラが開発した深層分析手法です。表面的な事象の裏にある構造的原因、さらにその背後にある世界観や神話を掘り下げることで、「なぜこの未来が生まれるのか」を理解します。</p>
+              <div class="cla-layers-guide">
+                <div class="cla-layer-item" style="--depth:1"><div class="cla-layer-label">Layer 1: リタニー（表層事象）</div><div class="cla-layer-desc">メディアで報じられるニュースそのもの。「何が起きているか」。量的データ、見出し、トレンド。</div></div>
+                <div class="cla-layer-item" style="--depth:2"><div class="cla-layer-label">Layer 2: 社会的原因</div><div class="cla-layer-desc">事象を生み出している社会システムや制度。経済構造、政策、技術インフラなど。「なぜ起きているか」。</div></div>
+                <div class="cla-layer-item" style="--depth:3"><div class="cla-layer-label">Layer 3: ディスコース（世界観）</div><div class="cla-layer-desc">その社会が「当たり前」と見なしている前提や価値観。何が正当とされ、何が問われないか。</div></div>
+                <div class="cla-layer-item" style="--depth:4"><div class="cla-layer-label">Layer 4: 神話・メタファー</div><div class="cla-layer-desc">集合的無意識に根ざす物語や象徴。人々が「感じている」世界の形。言語化されにくいが、社会の方向性を深く規定する。</div></div>
+                <div class="cla-layer-item" style="--depth:5"><div class="cla-layer-label">Layer 5: 核心的緊張</div><div class="cla-layer-desc">各層の間に存在する矛盾や葛藤。旧い世界観と新しい現実のせめぎ合い。変化の原動力。</div></div>
+                <div class="cla-layer-item" style="--depth:6"><div class="cla-layer-label">Layer 6: 新たな物語</div><div class="cla-layer-desc">緊張から生まれつつある新しい神話やメタファー。「次の時代」の萌芽。</div></div>
+              </div>
+              <p>Insight News では、毎日のPESTLEニュースに対してAIがCLA分析を適用し、表面的な情報の「深層」を自動抽出しています。36年分（1990-2026）のCLAアーカイブでは、日本社会の神話・メタファーがどのように変遷してきたかを時系列で追うことができます。</p>
+            </div>
+          </details>
+
+          <details class="method-details">
+            <summary class="method-summary">弱いシグナル（Weak Signals）とは</summary>
+            <div class="method-body">
+              <p>弱いシグナルとは、未来学者エリナ・ヒルトゥネンが体系化した概念で、「大きな変化の初期兆候だが、まだ主流メディアや一般的な認識では注目されていない情報」のことです。</p>
+              <p>ミラツクの人類学的アプローチでは、これを「まだ言語化されていない変化の兆し」と捉えます。フィールドワークで現場の声を拾うのと同様に、AIがPESTLEニュースと学術論文を横断分析し、通常の報道では見落とされる「変化の種」を検出します。</p>
+              <div class="method-grid" style="grid-template-columns:repeat(auto-fill,minmax(200px,1fr))">
+                <div class="method-card"><strong>影響度（Impact）</strong><br><span class="ws-badge ws-badge-high" style="font-size:0.7rem">High</span> 社会全体に影響<br><span class="ws-badge ws-badge-medium" style="font-size:0.7rem">Medium</span> 特定分野に影響<br><span class="ws-badge ws-badge-low" style="font-size:0.7rem">Low</span> 限定的だが注視</div>
+                <div class="method-card"><strong>タイムホライズン</strong><br>シグナルが顕在化するまでの推定時間軸。短期（1-2年）、中期（3-5年）、長期（5年以上）。</div>
+                <div class="method-card"><strong>カウンタートレンド</strong><br>シグナルに対する反作用。変化には必ず抵抗や逆方向の動きが伴うため、両面を見ることが重要です。</div>
+              </div>
+            </div>
+          </details>
+
+          <details class="method-details">
+            <summary class="method-summary">未来洞察の実践ガイド</summary>
+            <div class="method-body">
+              <p>Insight News を使った未来洞察の実践的なワークフローです。</p>
+              <div class="method-workflow">
+                <div class="workflow-step"><div class="workflow-num">1</div><div><strong>スキャニング</strong><br>ホーム画面でPESTLEニュースを概観。日本/グローバルを切り替えて視野を広げる。気になる記事をブックマーク。</div></div>
+                <div class="workflow-step"><div class="workflow-num">2</div><div><strong>シグナル確認</strong><br>シグナルタブで変化の兆しを確認。特にカテゴリを横断するシグナル（例：技術×社会）に注目。</div></div>
+                <div class="workflow-step"><div class="workflow-num">3</div><div><strong>深層分析</strong><br>因果階層分析タブでCLAの6層を読み、表面事象の裏にある構造を理解する。過去のCLAと比較して変化の方向を読む。</div></div>
+                <div class="workflow-step"><div class="workflow-num">4</div><div><strong>問いを立てる</strong><br>未来洞察タブで「この変化が続くと5年後にどうなるか」「この技術が社会に普及したとき何が起きるか」等の問いを投げる。</div></div>
+                <div class="workflow-step"><div class="workflow-num">5</div><div><strong>洞察を蓄積</strong><br>ブックマークしたシグナルと洞察を定期的に振り返り、パターンを見出す。レポート生成で分析を言語化する。</div></div>
+              </div>
+              <p>重要なのは、一つの正解を求めるのではなく、「複数の可能性」を探ることです。ミラツクの未来学は「すでにある未来の可能性を実現する」という信念に基づいています。予測ではなく、現在の中に複数の未来の兆しを見出し、望ましいものを選び取る実践です。</p>
+            </div>
+          </details>
+        </div>
+
         <div class="guide-section">
           <h3 class="guide-heading">メディアソース</h3>
           <p class="guide-text" style="margin-bottom:12px">以下のメディアからニュースを自動収集しています。各メディアの信頼性に基づきTier分類されています。</p>
@@ -5006,9 +5173,167 @@
     });
 
     // ==============================================================
+    // THEME CURATION (Futurology 18 Categories)
+    // ==============================================================
+    const FUTUROLOGY_THEMES = [
+      { no: 1,  name: 'イノベーションの分散と都市国家の誕生', map: '生態系化する社会',
+        keywords: ['イノベーション', '都市国家', 'スタートアップ', 'オープンイノベーション', '分散', '都市化', 'グローバル市民', 'スマートシティ', 'innovation', 'startup', 'decentrali'] },
+      { no: 2,  name: 'テクノロジーを用いた理想的身体機能の拡張', map: '技術と身体',
+        keywords: ['身体拡張', '義肢', 'ウェアラブル', 'サイボーグ', '脳機械インターフェース', 'BCI', 'バイオハック', 'exoskeleton', 'prosthetic', 'augment', 'biohack'] },
+      { no: 3,  name: 'テクノロジーの非人間的活用', map: '技術と倫理',
+        keywords: ['監視', 'サイバー攻撃', '自律兵器', 'ドローン兵器', 'ディープフェイク', 'AI倫理', 'サイバーセキュリティ', 'surveillance', 'cyber weapon', 'deepfake', 'autonomous weapon'] },
+      { no: 4,  name: '資源のスマートコントロール', map: '資源と制御',
+        keywords: ['スマートグリッド', '資源管理', 'エネルギー効率', 'IoT', 'スマート農業', '水資源', 'リサイクル', 'smart grid', 'resource', 'precision agriculture', 'circular economy'] },
+      { no: 5,  name: 'デジタルワールドと現実世界の融合', map: 'デジタルと現実',
+        keywords: ['メタバース', 'AR', 'VR', 'XR', 'デジタルツイン', '仮想現実', '拡張現実', 'NFT', 'metaverse', 'digital twin', 'mixed reality', 'virtual'] },
+      { no: 6,  name: 'ロボットによる自動化する社会', map: '自動化社会',
+        keywords: ['ロボット', '自動化', '自動運転', 'RPA', 'ファクトリーオートメーション', '無人', 'AGV', 'robot', 'automat', 'autonomous', 'driverless', 'unmanned'] },
+      { no: 7,  name: '宇宙に進出する人類', map: '宇宙開発',
+        keywords: ['宇宙', '火星', '月面', '衛星', 'ロケット', 'SpaceX', 'NASA', 'JAXA', '宇宙旅行', 'space', 'mars', 'lunar', 'satellite', 'orbit'] },
+      { no: 8,  name: '気候変動と生存圏の縮小', map: '気候と生存',
+        keywords: ['気候変動', '温暖化', '海面上昇', '異常気象', '気候難民', 'カーボン', '脱炭素', 'CO2', 'climate', 'warming', 'emission', 'carbon', 'extreme weather', 'flood', 'drought'] },
+      { no: 9,  name: '経済以外の新たな価値', map: '価値の多様化',
+        keywords: ['ウェルビーイング', '幸福度', 'GDP以外', '社会関係資本', 'ソーシャルキャピタル', 'コモンズ', '共有経済', 'well-being', 'wellbeing', 'happiness index', 'commons', 'sharing economy', 'degrowth'] },
+      { no: 10, name: '社会的な活動の当たり前化', map: '市民社会',
+        keywords: ['市民活動', 'ソーシャルビジネス', '社会起業', 'NGO', 'NPO', 'ボランティア', 'civic tech', 'social enterprise', 'philanthrop', 'social impact', 'CSR', 'ESG'] },
+      { no: 11, name: '拡大する格差と新たな紛争', map: '格差と紛争',
+        keywords: ['格差', '不平等', '貧困', '紛争', '難民', 'テロ', '分断', '移民', 'inequality', 'poverty', 'conflict', 'refugee', 'polariz', 'migration'] },
+      { no: 12, name: '進展する身体的健康と長寿社会', map: '健康と長寿',
+        keywords: ['長寿', 'アンチエイジング', '再生医療', 'ゲノム', '遺伝子治療', '健康寿命', 'バイオテクノロジー', 'longevity', 'aging', 'genome', 'gene therapy', 'regenerative', 'biotech', 'CRISPR'] },
+      { no: 13, name: '人とロボットの接近', map: '人機共生',
+        keywords: ['コミュニケーションロボット', '介護ロボット', 'ソーシャルロボット', 'ヒューマノイド', '人機', 'AI アシスタント', 'companion robot', 'humanoid', 'social robot', 'cobot', 'human-robot'] },
+      { no: 14, name: '高度な専門技術の一般化', map: '技術の民主化',
+        keywords: ['民主化', 'ノーコード', 'ローコード', '3Dプリンタ', 'オープンソース', 'DIY', 'maker', '市民科学', 'democratiz', 'no-code', 'low-code', '3D print', 'open source', 'citizen science'] },
+      { no: 15, name: '多様性と共にある発展の実現', map: '包摂的発展',
+        keywords: ['多様性', 'ダイバーシティ', 'インクルージョン', 'ジェンダー', 'LGBTQ', 'アクセシビリティ', '共生', 'diversity', 'inclusion', 'gender', 'equity', 'accessibility', 'multicultural'] },
+      { no: 16, name: '脳の解明と再現', map: '脳科学',
+        keywords: ['脳科学', '神経科学', 'ニューロ', '人工知能', 'AGI', 'ブレイン', '意識', '認知科学', 'neuroscience', 'brain', 'neural', 'AGI', 'consciousness', 'cognitive'] },
+      { no: 17, name: '閉じる国家と停滞する社会', map: '国家と停滞',
+        keywords: ['保護主義', '孤立主義', '少子化', '人口減少', '高齢化', '停滞', 'ポピュリズム', '権威主義', 'protectionism', 'isolationism', 'demographic decline', 'aging society', 'populism', 'authoritarian'] },
+      { no: 18, name: '暮らしの基盤自体の多様化', map: '暮らしの変容',
+        keywords: ['リモートワーク', '多拠点', 'ノマド', '教育改革', 'ベーシックインカム', 'ライフスタイル', 'ワーケーション', '暮らし方', 'remote work', 'nomad', 'basic income', 'lifestyle', 'co-living', 'edtech'] }
+    ];
+
+    let _themesRendered = false;
+
+    function matchNewsToThemes(articles) {
+      // Build match results: theme -> matched articles
+      const results = FUTUROLOGY_THEMES.map(theme => {
+        const matched = [];
+        const kwLower = theme.keywords.map(k => k.toLowerCase());
+        (articles || []).forEach(art => {
+          const text = ((art.title || '') + ' ' + (art.summary || '')).toLowerCase();
+          const hits = kwLower.filter(kw => text.includes(kw));
+          if (hits.length > 0) {
+            matched.push({ ...art, _matchScore: hits.length, _matchedKeywords: hits });
+          }
+        });
+        matched.sort((a, b) => b._matchScore - a._matchScore);
+        return { ...theme, matched };
+      });
+      return results;
+    }
+
+    function renderThemes() {
+      if (_themesRendered) return;
+      const container = document.getElementById('themesContent');
+      if (!container) return;
+
+      // Collect all articles across PESTLE categories and regions
+      const allArticles = [];
+      const latestRaw = typeof dataCache !== 'undefined' ? dataCache['latest.json'] : null;
+      if (latestRaw) {
+        ['japan', 'global'].forEach(region => {
+          const regionData = latestRaw[region] || latestRaw;
+          const pestle = regionData?.pestle || regionData;
+          if (pestle && typeof pestle === 'object') {
+            Object.keys(pestle).forEach(catKey => {
+              const cat = pestle[catKey];
+              (cat.articles || []).forEach(art => {
+                if (art && art.title) {
+                  if (!art.pestle_category && !art.category) art.pestle_category = catKey;
+                  allArticles.push(art);
+                }
+              });
+            });
+          }
+        });
+      }
+
+      const themed = matchNewsToThemes(allArticles);
+
+      // Grid view
+      let html = '<div class="theme-grid" id="themeGrid">';
+      themed.forEach((t, idx) => {
+        const count = t.matched.length;
+        html += `<div class="theme-card" onclick="showThemeDetail(${idx})">
+          <div class="theme-card-title">${t.no}. ${escapeHtml(t.name)}</div>
+          <div class="theme-card-meta">${escapeHtml(t.map)} ${count > 0 ? `<span class="theme-match-count">${count}件の関連ニュース</span>` : ''}</div>
+          <div class="theme-card-keywords">${t.keywords.slice(0, 6).map(k => `<span class="theme-keyword">${escapeHtml(k)}</span>`).join('')}</div>
+        </div>`;
+      });
+      html += '</div>';
+      html += '<div id="themeDetail" style="display:none"></div>';
+      container.innerHTML = html;
+      _themesRendered = true;
+      // Store for detail view
+      window._themedData = themed;
+    }
+
+    window.showThemeDetail = function(idx) {
+      const themed = window._themedData;
+      if (!themed || !themed[idx]) return;
+      const t = themed[idx];
+      const grid = document.getElementById('themeGrid');
+      const detail = document.getElementById('themeDetail');
+      if (grid) grid.style.display = 'none';
+      if (!detail) return;
+
+      let html = `<button class="theme-back-btn" onclick="hideThemeDetail()">&larr; テーマ一覧に戻る</button>`;
+      html += `<div class="theme-detail-header">
+        <div class="theme-detail-title">${t.no}. ${escapeHtml(t.name)}</div>
+        <div class="theme-detail-desc">マップテーマ: ${escapeHtml(t.map)}</div>
+      </div>`;
+
+      // Show matched news
+      if (t.matched.length > 0) {
+        html += `<h3 class="guide-heading" style="margin-top:16px">関連ニュース（${t.matched.length}件）</h3>`;
+        html += '<div class="theme-matched-news">';
+        t.matched.slice(0, 30).forEach(art => {
+          const catKey = art.pestle_category || art.category || '';
+          const catInfo = PESTLE_CATS[catKey] || {};
+          html += `<div class="news-item" style="padding:10px 0;border-bottom:1px solid var(--border-light)">
+            <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px">
+              ${catInfo.labelJa ? `<span class="pestle-badge" style="background:${catInfo.color};color:#fff;padding:1px 6px;font-size:0.7rem">${catInfo.labelJa}</span>` : ''}
+              <span style="font-size:0.76rem;color:var(--text-muted)">${escapeHtml(art.source || '')}</span>
+              <span class="theme-match-count">${art._matchScore}キーワード一致</span>
+            </div>
+            <div style="font-size:0.88rem;font-weight:600;color:var(--text);margin-bottom:4px;cursor:pointer" onclick="openArticleInModal(this)" data-url="${escapeHtml(art.url || '')}" data-title="${escapeHtml(art.title || '')}">${escapeHtml(art.title || '')}</div>
+            <div style="font-size:0.82rem;color:var(--text-secondary);line-height:1.6">${escapeHtml((art.summary || '').slice(0, 200))}${(art.summary || '').length > 200 ? '...' : ''}</div>
+            <div style="margin-top:4px;display:flex;flex-wrap:wrap;gap:3px">${(art._matchedKeywords || []).map(k => `<span class="theme-keyword" style="background:color-mix(in srgb, var(--accent) 10%, transparent);border-color:var(--accent)">${escapeHtml(k)}</span>`).join('')}</div>
+          </div>`;
+        });
+        html += '</div>';
+      } else {
+        html += '<p style="color:var(--text-muted);font-size:0.84rem;margin-top:16px">今日のニュースにこのテーマに関連する記事は見つかりませんでした。</p>';
+      }
+
+      detail.innerHTML = html;
+      detail.style.display = 'block';
+      window.scrollTo(0, 0);
+    };
+
+    window.hideThemeDetail = function() {
+      const grid = document.getElementById('themeGrid');
+      const detail = document.getElementById('themeDetail');
+      if (grid) grid.style.display = '';
+      if (detail) detail.style.display = 'none';
+    };
+
+    // ==============================================================
     // SECTION ROUTING
     // ==============================================================
-    const VALID_SECTIONS = ['section-home', 'section-signals', 'section-reports', 'section-user-reports', 'section-papers', 'section-cla', 'section-foresight', 'section-foresight-history', 'section-media', 'section-bookmarks', 'section-guide'];
+    const VALID_SECTIONS = ['section-home', 'section-signals', 'section-reports', 'section-user-reports', 'section-papers', 'section-cla', 'section-foresight', 'section-foresight-history', 'section-media', 'section-themes', 'section-bookmarks', 'section-guide'];
     const DEFAULT_SECTION = 'section-home';
 
     window.showSection = function(sectionId) {
@@ -5021,6 +5346,7 @@
       // Load foresight history when navigating to foresight or history section
       if (sectionId === 'section-foresight' || sectionId === 'section-foresight-history') loadForesightHistory();
       if (sectionId === 'section-user-reports') loadUserReports();
+      if (sectionId === 'section-themes') renderThemes();
       // Show/hide region toggle floating button (only on home)
       const regionFloat = document.getElementById('regionFloating');
       if (regionFloat) regionFloat.style.display = (sectionId === 'section-home') ? '' : 'none';
