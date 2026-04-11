@@ -1389,6 +1389,58 @@
       margin-bottom: 16px;
     }
 
+    /* Article detail modal: action buttons */
+    .modal-actions {
+      display: flex; gap: 10px; margin: 20px 0; flex-wrap: wrap;
+    }
+    .modal-action-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      text-decoration: none; white-space: nowrap;
+    }
+
+    /* Article detail modal: section cards */
+    .modal-section-card {
+      margin: 24px 0; padding: 20px;
+      background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px;
+    }
+    .modal-section-plain { margin: 24px 0; }
+    .modal-section-heading {
+      font-size: 0.88rem; font-weight: 700; margin-bottom: 12px; color: var(--text);
+    }
+
+    /* Signal items in modal */
+    .modal-signal-item { padding: 10px 0; border-bottom: 1px solid var(--border); }
+    .modal-signal-header { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; flex-wrap: wrap; }
+    .modal-signal-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .modal-signal-name { font-size: 0.84rem; font-weight: 600; color: var(--text); }
+    .modal-signal-badge { font-size: 0.72rem; padding: 2px 6px; border-radius: 3px; }
+    .modal-signal-desc { font-size: 0.82rem; line-height: 1.6; color: var(--text-secondary); }
+
+    /* Theme items in modal */
+    .modal-theme-item { padding: 12px 0; border-bottom: 1px solid var(--border); }
+    .modal-theme-header { display: flex; align-items: baseline; gap: 8px; margin-bottom: 6px; flex-wrap: wrap; }
+    .modal-theme-no {
+      display: inline-block; min-width: 24px; height: 24px; line-height: 24px;
+      text-align: center; border-radius: 50%; background: var(--accent); color: #fff;
+      font-size: 0.72rem; font-weight: 700; flex-shrink: 0;
+    }
+    .modal-theme-name { font-size: 0.86rem; font-weight: 600; color: var(--text); }
+    .modal-theme-map { font-size: 0.72rem; color: var(--text-muted); white-space: nowrap; }
+    .modal-theme-desc {
+      font-size: 0.84rem; line-height: 1.7; color: var(--text-secondary); padding-left: 32px;
+    }
+    .modal-theme-blank {
+      padding: 16px; border: 2px dashed var(--border); border-radius: 8px; background: var(--bg);
+    }
+
+    /* Related articles in modal */
+    .modal-related-article {
+      padding: 8px 0; border-bottom: 1px solid var(--border); cursor: pointer;
+    }
+    .modal-related-meta { font-size: 0.82rem; color: var(--text-muted); }
+    .modal-related-title { font-size: 0.86rem; font-weight: 500; color: var(--text); line-height: 1.5; }
+    .modal-related-trans { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5; }
+
     /* Comments */
     .comment-section { border-top: 1px solid var(--border); padding-top: 16px; margin-top: 16px; }
     .comment-heading { font-weight: 600; font-size: 0.88rem; margin-bottom: 10px; }
@@ -2271,6 +2323,30 @@
       .paper-title { font-size: 0.84rem; }
       .paper-title-row { flex-direction: column; gap: 4px; }
       .paper-item { padding-left: 10px; }
+
+      /* Article detail modal: mobile layout */
+      .modal-actions {
+        flex-direction: column; gap: 8px;
+      }
+      .modal-action-btn {
+        width: 100%; justify-content: center;
+        padding: 10px 16px; font-size: 0.84rem;
+      }
+      .modal-section-card { padding: 14px; margin: 16px 0; }
+      .modal-section-plain { margin: 16px 0; }
+      .modal-section-heading { font-size: 0.84rem; }
+      .modal-signal-name { font-size: 0.8rem; }
+      .modal-signal-desc { font-size: 0.78rem; }
+      .modal-theme-header { gap: 6px; }
+      .modal-theme-name { font-size: 0.82rem; }
+      .modal-theme-map { font-size: 0.68rem; }
+      .modal-theme-desc { font-size: 0.8rem; padding-left: 0; margin-top: 4px; }
+      .modal-theme-blank { padding: 12px; }
+      .modal-theme-blank .modal-theme-desc { padding-left: 0; }
+      .modal-related-meta { font-size: 0.78rem; }
+      .modal-related-title { font-size: 0.82rem; }
+      .modal-related-trans { font-size: 0.78rem; }
+      .modal-summary p { font-size: 0.84rem !important; }
     }
 
     @media (max-width: 375px) {
@@ -5010,29 +5086,29 @@
       html += '</div>';
 
       // Action buttons row
-      html += '<div style="display:flex;gap:10px;margin:20px 0;flex-wrap:wrap">';
+      html += '<div class="modal-actions">';
       if (article.url) {
-        html += '<a class="btn-primary" href="' + escapeHtml(article.url) + '" target="_blank" style="text-decoration:none;display:inline-flex;align-items:center;gap:6px">元記事を読む <span style="font-size:0.8em">&rarr;</span></a>';
+        html += '<a class="btn-primary modal-action-btn" href="' + escapeHtml(article.url) + '" target="_blank">元記事を読む <span style="font-size:0.8em">&rarr;</span></a>';
       }
-      html += '<button class="btn-secondary ' + (isBm ? 'bookmarked' : '') + '" id="modalBookmarkBtn" onclick="toggleBookmark(\'' + bmId + '\',\'' + escapeAttr(article.title || '') + '\',\'' + escapeAttr(safeUrl(article.url)) + '\',this)" style="display:inline-flex;align-items:center;gap:6px">' +
+      html += '<button class="btn-secondary modal-action-btn ' + (isBm ? 'bookmarked' : '') + '" id="modalBookmarkBtn" onclick="toggleBookmark(\'' + bmId + '\',\'' + escapeAttr(article.title || '') + '\',\'' + escapeAttr(safeUrl(article.url)) + '\',this)">' +
         '<span style="font-size:1.1em">&#9734;</span> ' + (isBm ? 'ブックマーク済み' : 'ブックマークに追加') + '</button>';
-      html += '<button class="btn-secondary" onclick="confirmAndGenerateReport(\'' + escapeAttr(catKey) + '\',' + index + ')" style="display:inline-flex;align-items:center;gap:6px"><span style="font-size:1.1em">&#9998;</span> レポートを生成</button>';
+      html += '<button class="btn-secondary modal-action-btn" onclick="confirmAndGenerateReport(\'' + escapeAttr(catKey) + '\',' + index + ')"><span style="font-size:1.1em">&#9998;</span> レポートを生成</button>';
       html += '</div>';
 
       // Related signals section
       if (relatedSignals.length > 0) {
-        html += '<div style="margin:24px 0;padding:20px;background:var(--card-bg);border:1px solid var(--border);border-radius:8px">';
-        html += '<h4 style="font-size:0.88rem;font-weight:700;margin-bottom:12px;color:var(--text)">関連シグナル</h4>';
+        html += '<div class="modal-section-card">';
+        html += '<h4 class="modal-section-heading">関連シグナル</h4>';
         relatedSignals.forEach(ws => {
           const impactColor = (ws.potential_impact || '').toLowerCase() === 'high' ? '#e74c3c' :
                               (ws.potential_impact || '').toLowerCase() === 'medium' ? '#f39c12' : '#95a5a6';
-          html += '<div style="padding:10px 0;border-bottom:1px solid var(--border)">' +
-            '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">' +
-              '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:' + impactColor + '"></span>' +
-              '<span style="font-size:0.84rem;font-weight:600;color:var(--text)">' + escapeHtml(ws.signal || '') + '</span>' +
-              (ws.potential_impact ? '<span style="font-size:0.72rem;padding:2px 6px;border-radius:3px;background:' + impactColor + '20;color:' + impactColor + '">' + escapeHtml(ws.potential_impact) + '</span>' : '') +
+          html += '<div class="modal-signal-item">' +
+            '<div class="modal-signal-header">' +
+              '<span class="modal-signal-dot" style="background:' + impactColor + '"></span>' +
+              '<span class="modal-signal-name">' + escapeHtml(ws.signal || '') + '</span>' +
+              (ws.potential_impact ? '<span class="modal-signal-badge" style="background:' + impactColor + '20;color:' + impactColor + '">' + escapeHtml(ws.potential_impact) + '</span>' : '') +
             '</div>' +
-            '<div style="font-size:0.82rem;line-height:1.6;color:var(--text-secondary)">' + escapeHtml(ws.description || '') + '</div>' +
+            '<div class="modal-signal-desc">' + escapeHtml(ws.description || '') + '</div>' +
           '</div>';
         });
         html += '</div>';
@@ -5046,19 +5122,19 @@
         return hits.length > 0 ? { ...theme, hits } : null;
       }).filter(Boolean).sort((a, b) => b.hits.length - a.hits.length);
 
-      html += '<div style="margin:24px 0;padding:20px;background:var(--card-bg);border:1px solid var(--border);border-radius:8px">';
-      html += '<h4 style="font-size:0.88rem;font-weight:700;margin-bottom:14px;color:var(--text)">未来予測テーマとの接続</h4>';
+      html += '<div class="modal-section-card">';
+      html += '<h4 class="modal-section-heading">未来予測テーマとの接続</h4>';
 
       if (matchedThemes.length > 0) {
         matchedThemes.forEach(theme => {
           const connector = _futureConnectorText(catKey, theme, article);
-          html += '<div style="padding:12px 0;border-bottom:1px solid var(--border)">' +
-            '<div style="display:flex;align-items:baseline;gap:8px;margin-bottom:6px">' +
-              '<span style="display:inline-block;min-width:24px;height:24px;line-height:24px;text-align:center;border-radius:50%;background:var(--accent);color:#fff;font-size:0.72rem;font-weight:700">' + theme.no + '</span>' +
-              '<span style="font-size:0.86rem;font-weight:600;color:var(--text)">' + escapeHtml(theme.name) + '</span>' +
-              '<span style="font-size:0.72rem;color:var(--text-muted);white-space:nowrap">' + escapeHtml(theme.map) + '</span>' +
+          html += '<div class="modal-theme-item">' +
+            '<div class="modal-theme-header">' +
+              '<span class="modal-theme-no">' + theme.no + '</span>' +
+              '<span class="modal-theme-name">' + escapeHtml(theme.name) + '</span>' +
+              '<span class="modal-theme-map">' + escapeHtml(theme.map) + '</span>' +
             '</div>' +
-            '<div style="font-size:0.84rem;line-height:1.7;color:var(--text-secondary);padding-left:32px">' + escapeHtml(connector) + '</div>' +
+            '<div class="modal-theme-desc">' + escapeHtml(connector) + '</div>' +
           '</div>';
         });
       }
@@ -5067,12 +5143,12 @@
       if (matchedThemes.length === 0) {
         var catContext2 = { political:'政策・制度', economic:'経済・市場', social:'社会・文化', technological:'技術・イノベーション', legal:'法・規制', environmental:'環境・資源' };
         var catLabel2 = catContext2[catKey] || catLabel;
-        html += '<div style="padding:16px;border:2px dashed var(--border);border-radius:8px;background:var(--bg)">' +
-          '<div style="display:flex;align-items:baseline;gap:8px;margin-bottom:8px">' +
-            '<span style="display:inline-block;min-width:24px;height:24px;line-height:24px;text-align:center;border-radius:50%;background:var(--text-muted);color:#fff;font-size:0.72rem;font-weight:700">?</span>' +
-            '<span style="font-size:0.86rem;font-weight:600;color:var(--accent)">新規テーマ候補（空白地帯）</span>' +
+        html += '<div class="modal-theme-blank">' +
+          '<div class="modal-theme-header">' +
+            '<span class="modal-theme-no" style="background:var(--text-muted)">?</span>' +
+            '<span class="modal-theme-name" style="color:var(--accent)">新規テーマ候補（空白地帯）</span>' +
           '</div>' +
-          '<div style="font-size:0.84rem;line-height:1.8;color:var(--text-secondary);padding-left:32px">' +
+          '<div class="modal-theme-desc">' +
             'この記事は、既存の18の未来予測テーマのいずれにも直接的に該当しません。' +
             '「' + escapeHtml(catLabel2) + '」領域における新たな変化の兆しとして、既存のテーマでは捉えきれない未来の動きを示唆している可能性があります。' +
             '18テーマの「空白地帯」に位置するこうした記事は、次の未来予測テーマを生み出す種になり得ます。' +
@@ -5085,16 +5161,16 @@
 
       // Same category articles
       if (sameCategory.length > 0) {
-        html += '<div style="margin:24px 0">';
-        html += '<h4 style="font-size:0.88rem;font-weight:700;margin-bottom:12px;color:var(--text)">同カテゴリの記事</h4>';
+        html += '<div class="modal-section-plain">';
+        html += '<h4 class="modal-section-heading">同カテゴリの記事</h4>';
         sameCategory.forEach(a => {
           const aIdx = (data.pestle[catKey]?.articles || []).indexOf(a);
           const aTr = sameCatTrans.find(t => t.index === aIdx);
           const aJa = aTr?.title_translated || '';
-          html += '<div style="padding:8px 0;border-bottom:1px solid var(--border);cursor:pointer" onclick="openArticleModal(\'' + escapeAttr(catKey) + '\',' + aIdx + ')">' +
-            '<div style="font-size:0.82rem;color:var(--text-muted)">' + escapeHtml(a.source || '') + ' | ' + escapeHtml(a.published_date || '') + '</div>' +
-            '<div style="font-size:0.86rem;font-weight:500;color:var(--text);line-height:1.5">' + escapeHtml(a.title) + '</div>' +
-            (aJa ? '<div style="font-size:0.82rem;color:var(--text-secondary);line-height:1.5">' + escapeHtml(aJa) + '</div>' : '') +
+          html += '<div class="modal-related-article" onclick="openArticleModal(\'' + escapeAttr(catKey) + '\',' + aIdx + ')">' +
+            '<div class="modal-related-meta">' + escapeHtml(a.source || '') + ' | ' + escapeHtml(a.published_date || '') + '</div>' +
+            '<div class="modal-related-title">' + escapeHtml(a.title) + '</div>' +
+            (aJa ? '<div class="modal-related-trans">' + escapeHtml(aJa) + '</div>' : '') +
           '</div>';
         });
         html += '</div>';
