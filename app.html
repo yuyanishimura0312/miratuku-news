@@ -1361,6 +1361,20 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     }
     .modal-close:hover { background: var(--surface); color: var(--accent); }
+    .modal-back-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 5;
+      padding: 8px 0; margin-bottom: 8px;
+      background: var(--card-bg);
+    }
+    .modal-back-bar .modal-close { position: static; float: none; }
+    .modal-back-btn {
+      background: none; border: 1px solid var(--border); color: var(--text-muted);
+      padding: 6px 14px; font-size: 0.82rem; cursor: pointer;
+      display: flex; align-items: center; gap: 4px;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .modal-back-btn:hover { color: var(--text); border-color: var(--text); }
     .modal-title { font-weight: 700; font-size: 1.05rem; line-height: 1.45; margin-bottom: 8px; padding-right: 2rem; }
     .modal-trans { font-size: 0.92rem; color: var(--accent-soft); margin-bottom: 8px; }
     .modal-meta { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 16px; }
@@ -3027,7 +3041,10 @@
     <div class="modal-progress-bar"><div class="modal-progress-fill" id="modalProgressFill"></div></div>
     <div class="modal-box" id="modalBox">
       <div class="modal-reader-col">
-        <button class="modal-close" onclick="closeArticleModal()" aria-label="閉じる">&times;</button>
+        <div class="modal-back-bar">
+          <button class="modal-back-btn" onclick="closeArticleModal()" aria-label="記事を閉じて戻る">&larr; 戻る</button>
+          <button class="modal-close" onclick="closeArticleModal()" aria-label="閉じる">&times;</button>
+        </div>
         <div id="articleModalContent"></div>
       </div>
     </div>
@@ -3743,9 +3760,11 @@
       '</div>';
 
       content.innerHTML = modalHtml;
+      const wasVisible = document.getElementById('articleModal').classList.contains('visible');
       window._modalReturnFocus = document.activeElement;
       document.getElementById('articleModal').classList.add('visible');
       document.body.style.overflow = 'hidden';
+      if (!wasVisible) history.pushState({ modal: true }, '', location.href);
 
       // Reading progress bar
       var modalBox = document.getElementById('modalBox');
@@ -5092,19 +5111,30 @@
 
       content.innerHTML = html;
 
+      // Push history state so browser back closes modal (replace if already in modal to avoid stacking)
+      const alreadyInModal = document.getElementById('articleModal').classList.contains('visible');
       window._modalReturnFocus = document.activeElement;
       document.getElementById('articleModal').classList.add('visible');
       document.body.style.overflow = 'hidden';
       loadArticleComments(articleId);
-      setTimeout(() => { const btn = document.querySelector('#articleModal .modal-close'); if (btn) btn.focus(); }, 100);
+      setTimeout(() => { const btn = document.querySelector('.modal-back-btn'); if (btn) btn.focus(); }, 100);
+      if (alreadyInModal) {
+        history.replaceState({ modal: true }, '', location.href);
+      } else {
+        history.pushState({ modal: true }, '', location.href);
+      }
     };
 
-    window.closeArticleModal = function() {
-      document.getElementById('articleModal').classList.remove('visible');
+    window.closeArticleModal = function(fromPopstate) {
+      const modal = document.getElementById('articleModal');
+      if (!modal.classList.contains('visible')) return;
+      modal.classList.remove('visible');
       document.body.style.overflow = '';
       var pf = document.getElementById('modalProgressFill'); if (pf) pf.style.width = '0%';
       var mb = document.getElementById('modalBox'); if (mb) mb.scrollTop = 0;
       if (window._modalReturnFocus) { window._modalReturnFocus.focus(); window._modalReturnFocus = null; }
+      // Pop the modal history entry (unless we're already handling popstate)
+      if (!fromPopstate) history.back();
     };
 
     document.getElementById('articleModal').addEventListener('click', function(e) { if (e.target === this) closeArticleModal(); });
@@ -5417,13 +5447,16 @@
       detail.innerHTML = html;
       detail.style.display = 'block';
       window.scrollTo(0, 0);
+      // Push history so browser back returns to grid
+      history.pushState({ themeDetail: idx }, '', location.href);
     };
 
-    window.hideThemeDetail = function() {
+    window.hideThemeDetail = function(fromPopstate) {
       const grid = document.getElementById('themeGrid');
       const detail = document.getElementById('themeDetail');
       if (grid) grid.style.display = '';
       if (detail) detail.style.display = 'none';
+      if (!fromPopstate) history.back();
     };
 
     // ==============================================================
@@ -5463,7 +5496,23 @@
       });
     });
 
-    window.addEventListener('popstate', initSectionFromHash);
+    window.addEventListener('popstate', function(e) {
+      // Handle modal back
+      if (e.state?.modal) return; // Navigating to modal state, ignore
+      const modal = document.getElementById('articleModal');
+      if (modal && modal.classList.contains('visible')) {
+        closeArticleModal(true);
+        return;
+      }
+      // Handle megatrend detail back
+      if (e.state?.themeDetail !== undefined) return;
+      const themeDetail = document.getElementById('themeDetail');
+      if (themeDetail && themeDetail.style.display !== 'none' && themeDetail.innerHTML) {
+        hideThemeDetail(true);
+        return;
+      }
+      initSectionFromHash();
+    });
     initSectionFromHash();
 
     // ==============================================================
