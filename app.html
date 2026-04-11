@@ -2731,8 +2731,8 @@
           <li><a href="#section-user-reports" class="nav-link" data-nav="section-user-reports">読者レポート</a></li>
           <li><a href="#section-papers" class="nav-link" data-nav="section-papers">学術研究</a></li>
           <li><a href="#section-cla" class="nav-link" data-nav="section-cla">因果階層分析</a></li>
-          <li><a href="#section-foresight" class="nav-link" data-nav="section-foresight">未来洞察</a></li>
           <li><a href="#section-themes" class="nav-link" data-nav="section-themes">メガトレンド</a></li>
+          <li><a href="#section-foresight" class="nav-link" data-nav="section-foresight">未来洞察</a></li>
           <li><a href="#section-bookmarks" class="nav-link" data-nav="section-bookmarks" id="navBookmarks">ブックマーク <span class="nav-badge" id="bookmarkCount">0</span></a></li>
           <li><a href="#section-guide" class="nav-link" data-nav="section-guide">使い方</a></li>
         </ul>
@@ -5027,11 +5027,11 @@
         return hits.length > 0 ? { ...theme, hits } : null;
       }).filter(Boolean).sort((a, b) => b.hits.length - a.hits.length);
 
+      html += '<div style="margin:24px 0;padding:20px;background:var(--card-bg);border:1px solid var(--border);border-radius:8px">';
+      html += '<h4 style="font-size:0.88rem;font-weight:700;margin-bottom:14px;color:var(--text)">未来予測テーマとの接続</h4>';
+
       if (matchedThemes.length > 0) {
-        html += '<div style="margin:24px 0;padding:20px;background:var(--card-bg);border:1px solid var(--border);border-radius:8px">';
-        html += '<h4 style="font-size:0.88rem;font-weight:700;margin-bottom:14px;color:var(--text)">未来予測テーマとの接続</h4>';
         matchedThemes.forEach(theme => {
-          // Generate a contextual connection sentence based on PESTLE category and theme
           const connector = _futureConnectorText(catKey, theme, article);
           html += '<div style="padding:12px 0;border-bottom:1px solid var(--border)">' +
             '<div style="display:flex;align-items:baseline;gap:8px;margin-bottom:6px">' +
@@ -5042,8 +5042,27 @@
             '<div style="font-size:0.84rem;line-height:1.7;color:var(--text-secondary);padding-left:32px">' + escapeHtml(connector) + '</div>' +
           '</div>';
         });
-        html += '</div>';
       }
+
+      // No matching theme — show as new theme candidate (blank spot on the future map)
+      if (matchedThemes.length === 0) {
+        var catContext2 = { political:'政策・制度', economic:'経済・市場', social:'社会・文化', technological:'技術・イノベーション', legal:'法・規制', environmental:'環境・資源' };
+        var catLabel2 = catContext2[catKey] || catLabel;
+        html += '<div style="padding:16px;border:2px dashed var(--border);border-radius:8px;background:var(--bg)">' +
+          '<div style="display:flex;align-items:baseline;gap:8px;margin-bottom:8px">' +
+            '<span style="display:inline-block;min-width:24px;height:24px;line-height:24px;text-align:center;border-radius:50%;background:var(--text-muted);color:#fff;font-size:0.72rem;font-weight:700">?</span>' +
+            '<span style="font-size:0.86rem;font-weight:600;color:var(--accent)">新規テーマ候補（空白地帯）</span>' +
+          '</div>' +
+          '<div style="font-size:0.84rem;line-height:1.8;color:var(--text-secondary);padding-left:32px">' +
+            'この記事は、既存の18の未来予測テーマのいずれにも直接的に該当しません。' +
+            '「' + escapeHtml(catLabel2) + '」領域における新たな変化の兆しとして、既存のテーマでは捉えきれない未来の動きを示唆している可能性があります。' +
+            '18テーマの「空白地帯」に位置するこうした記事は、次の未来予測テーマを生み出す種になり得ます。' +
+            'どのような新しいテーマが必要か、この記事をきっかけに考えてみてください。' +
+          '</div>' +
+        '</div>';
+      }
+
+      html += '</div>';
 
       // Same category articles
       if (sameCategory.length > 0) {
