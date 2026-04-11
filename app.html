@@ -5240,7 +5240,10 @@
       if (!fromPopstate) history.back();
     };
 
-    document.getElementById('articleModal').addEventListener('click', function(e) { if (e.target === this) closeArticleModal(); });
+    document.getElementById('articleModal').addEventListener('click', function(e) {
+      // Close when clicking outside the modal-box (the dark overlay area)
+      if (e.target === this || !document.getElementById('modalBox').contains(e.target)) closeArticleModal();
+    });
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape') closeArticleModal();
       const modal = document.getElementById('articleModal');
