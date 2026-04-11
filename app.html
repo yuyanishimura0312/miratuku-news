@@ -990,6 +990,8 @@
       border-color: var(--accent-soft);
       color: var(--text);
     }
+    .action-icon { display: none; }
+    .action-label { display: inline; }
     .pestle-article-action-btn.bookmarked {
       background: var(--accent-light);
       border-color: var(--accent-soft);
@@ -1511,6 +1513,49 @@
     .text-muted { color: var(--text-muted); font-size: 0.82rem; }
 
     /* ================================================================
+       GUIDE SECTION
+       ================================================================ */
+    .guide-content { max-width: 720px; }
+    .guide-section { margin-bottom: 2rem; }
+    .guide-heading {
+      font-family: var(--font-serif);
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--border);
+    }
+    .guide-text { font-size: 0.84rem; line-height: 1.75; color: var(--text-secondary); }
+    .guide-item {
+      font-size: 0.84rem;
+      line-height: 1.7;
+      color: var(--text-secondary);
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border-light);
+    }
+    .guide-item strong { color: var(--text); }
+
+    /* ================================================================
+       REGION FLOATING BUTTON (home only)
+       ================================================================ */
+    .region-floating {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 150;
+      display: flex;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+      border-radius: 0;
+      overflow: hidden;
+    }
+    .region-floating .region-btn {
+      padding: 10px 18px;
+      font-size: 0.78rem;
+    }
+
+    /* ================================================================
        FONT-SIZE UTILITY CLASSES — used by JS-generated content
        Replaces inline style="font-size:..." for mobile control
        ================================================================ */
@@ -1668,14 +1713,14 @@
       .header-right { gap: 6px; width: 100%; justify-content: flex-end; flex-wrap: wrap; overflow: hidden; }
       .auth-area { flex-shrink: 1; min-width: 0; }
       .user-name { max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-      .region-toggle { border-radius: 0; border-color: var(--border); }
-      .region-btn {
-        padding: 5px 12px; font-size: 0.72rem;
+      .region-floating {
+        bottom: 16px;
+        right: 16px;
         border-radius: 0;
       }
-      .region-btn.active {
-        background: #121212;
-        box-shadow: none;
+      .region-floating .region-btn {
+        padding: 8px 14px;
+        font-size: 0.72rem;
       }
       .theme-toggle { padding: 5px 8px; font-size: 0.75rem; border-radius: 0; }
       .auth-area { font-size: 0.72rem; }
@@ -1852,14 +1897,17 @@
         align-items: center;
       }
       .pestle-article-action-btn {
-        padding: 10px 12px;
-        font-size: 0.72rem;
+        padding: 8px 10px;
+        font-size: 0.82rem;
         min-height: 36px;
-        min-width: 64px;
+        min-width: 36px;
         display: flex;
         align-items: center;
         justify-content: center;
       }
+      .action-icon { display: inline; }
+      .action-label { display: none; }
+      .pestle-article-action-btn.bookmarked .action-icon { color: var(--accent-warm); }
       .pestle-article-actions {
         flex-direction: row;
         gap: 6px;
@@ -2060,7 +2108,7 @@
 
       /* --- Others --- */
       .skeleton-grid { grid-template-columns: 1fr; }
-      .toast-container { left: 0.75rem; right: 0.75rem; bottom: 0.75rem; }
+      .toast-container { left: 0.75rem; right: 0.75rem; bottom: 4rem; }
       .toast {
         border-radius: 0;
         box-shadow: var(--shadow-md);
@@ -2581,10 +2629,6 @@
           <span class="header-date" id="headerDate"></span>
         </div>
         <div class="header-right">
-          <div class="region-toggle">
-            <button class="region-btn active" data-region="japan">日本</button>
-            <button class="region-btn" data-region="global">グローバル</button>
-          </div>
           <button class="theme-toggle" id="themeToggle" title="ダークモード切替" aria-label="ダークモード切替">&#9789;</button>
           <div class="auth-area" id="authArea">
             <span>読み込み中...</span>
@@ -2596,15 +2640,14 @@
       <div class="container">
         <ul class="nav-list">
           <li><a href="#section-home" class="nav-link active" data-nav="section-home">ホーム</a></li>
-          <li><a href="#section-cla" class="nav-link" data-nav="section-cla">因果階層分析</a></li>
           <li><a href="#section-signals" class="nav-link" data-nav="section-signals">シグナル</a></li>
-          <li><a href="#section-papers" class="nav-link" data-nav="section-papers">学術研究</a></li>
-          <li><a href="#section-foresight" class="nav-link" data-nav="section-foresight">未来洞察</a></li>
-          <li><a href="#section-foresight-history" class="nav-link" data-nav="section-foresight-history">洞察履歴</a></li>
-          <li><a href="#section-media" class="nav-link" data-nav="section-media">メディア</a></li>
-          <li><a href="#section-reports" class="nav-link" data-nav="section-reports">レポート一覧</a></li>
+          <li><a href="#section-reports" class="nav-link" data-nav="section-reports">レポート</a></li>
           <li><a href="#section-user-reports" class="nav-link" data-nav="section-user-reports">読者レポート</a></li>
+          <li><a href="#section-papers" class="nav-link" data-nav="section-papers">学術研究</a></li>
+          <li><a href="#section-cla" class="nav-link" data-nav="section-cla">因果階層分析</a></li>
+          <li><a href="#section-foresight" class="nav-link" data-nav="section-foresight">未来洞察</a></li>
           <li><a href="#section-bookmarks" class="nav-link" data-nav="section-bookmarks" id="navBookmarks">ブックマーク <span class="nav-badge" id="bookmarkCount">0</span></a></li>
+          <li><a href="#section-guide" class="nav-link" data-nav="section-guide">使い方</a></li>
         </ul>
       </div>
     </nav>
@@ -2717,19 +2760,17 @@
         </form>
         <div id="foresightAnswer"></div>
       </div>
-      <a class="more-link" href="#section-foresight-history" onclick="event.preventDefault();showSection('section-foresight-history');history.pushState(null,'','app.html#section-foresight-history')">過去の洞察履歴を見る &rarr;</a>
+      <div style="margin-top:2rem">
+        <h3 class="section-title">洞察履歴</h3>
+        <p class="section-subtitle" style="margin-bottom:12px">過去の未来洞察の問いかけと応答</p>
+        <div id="foresightHistoryContent">
+          <div class="loading-indicator"><div class="loading-spinner"></div><div>読み込み中...</div></div>
+        </div>
+      </div>
     </section>
 
-    <!-- FORESIGHT HISTORY -->
-    <section class="app-section section-hidden" id="section-foresight-history">
-      <div class="section-header">
-        <h2 class="section-title">洞察履歴</h2>
-        <span class="section-subtitle">過去の未来洞察の問いかけと応答</span>
-      </div>
-      <div id="foresightHistoryContent">
-        <div class="loading-indicator"><div class="loading-spinner"></div><div>読み込み中...</div></div>
-      </div>
-    </section>
+    <!-- FORESIGHT HISTORY (hidden, kept for backward compat) -->
+    <section class="app-section section-hidden" id="section-foresight-history" style="display:none"></section>
 
     <!-- MEDIA -->
     <section class="app-section section-hidden" id="section-media">
@@ -2773,6 +2814,45 @@
       <div id="bookmarksContent"></div>
     </section>
 
+    <!-- GUIDE -->
+    <section class="app-section section-hidden" id="section-guide">
+      <div class="section-header">
+        <h2 class="section-title">使い方ガイド</h2>
+        <span class="section-subtitle">Insight News の使い方</span>
+      </div>
+      <div class="guide-content">
+        <div class="guide-section">
+          <h3 class="guide-heading">Insight News とは</h3>
+          <p class="guide-text">Insight News は、ミラツク・インテリジェンス・パイプラインが自動収集したPESTLE（政治・経済・社会・技術・法律・環境）ニュース、因果階層分析（CLA）、弱いシグナル検出、学術論文追跡を統合した未来洞察プラットフォームです。</p>
+        </div>
+        <div class="guide-section">
+          <h3 class="guide-heading">各セクションの説明</h3>
+          <div class="guide-item"><strong>ホーム</strong> ― 最新ニュース、シグナル、学術論文、未来洞察を一覧表示。日本/グローバルの切り替えで表示データを変更できます。</div>
+          <div class="guide-item"><strong>シグナル</strong> ― PESTLEニュースと学術論文から自動検出された「変化の兆し（弱いシグナル）」。影響度とタイムホライズン付き。</div>
+          <div class="guide-item"><strong>レポート</strong> ― AI が毎日生成する月次分析レポートのアーカイブ。日本/グローバル両方の視点を収録。</div>
+          <div class="guide-item"><strong>読者レポート</strong> ― ニュース記事をもとに読者が生成した深層分析レポート。CLA の視点から解析されます。</div>
+          <div class="guide-item"><strong>学術研究</strong> ― 分野別に自動収集された最新の学術論文。新規性スコア付き。</div>
+          <div class="guide-item"><strong>因果階層分析</strong> ― 36年分のCLA時系列データと四半期分析。リタニー・システム・世界観・神話の4層構造で社会変化を読み解きます。</div>
+          <div class="guide-item"><strong>未来洞察</strong> ― 蓄積データをもとにAIが未来洞察の視点で回答。過去の洞察履歴も閲覧可能。</div>
+          <div class="guide-item"><strong>ブックマーク</strong> ― 気になる記事・シグナル・論文を保存。アーカイブ機能付き。</div>
+        </div>
+        <div class="guide-section">
+          <h3 class="guide-heading">機能の使い方</h3>
+          <div class="guide-item"><strong>ブックマーク</strong> ― 各記事・シグナルの星アイコンをタップして保存。ブックマークタブで一覧管理。</div>
+          <div class="guide-item"><strong>レポート生成</strong> ― ニュース記事のレポート生成ボタンから、CLA視点の深層分析を自動生成。生成はバックグラウンドで進行し、完了時に通知されます。</div>
+          <div class="guide-item"><strong>日本/グローバル切替</strong> ― ホーム画面右下のフローティングボタンで切り替え。ニュース・レポートの表示言語圏が変わります。</div>
+          <div class="guide-item"><strong>ダークモード</strong> ― ヘッダー右上の月マークで切り替え。</div>
+        </div>
+        <div class="guide-section">
+          <h3 class="guide-heading">メディアソース</h3>
+          <p class="guide-text" style="margin-bottom:12px">以下のメディアからニュースを自動収集しています。各メディアの信頼性に基づきTier分類されています。</p>
+          <div id="guideMediaContent">
+            <div class="loading-indicator"><div class="loading-spinner"></div><div>メディアソースを読み込み中...</div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
   </main>
 
   <!-- ARTICLE MODAL -->
@@ -2784,6 +2864,12 @@
         <div id="articleModalContent"></div>
       </div>
     </div>
+  </div>
+
+  <!-- REGION FLOATING (home only) -->
+  <div class="region-floating" id="regionFloating">
+    <button class="region-btn active" data-region="japan">日本</button>
+    <button class="region-btn" data-region="global">グローバル</button>
   </div>
 
   <!-- TOAST -->
@@ -2803,8 +2889,8 @@
           <div class="footer-heading">セクション</div>
           <ul class="footer-links">
             <li><a href="#section-home">ホーム</a></li>
-            <li><a href="#section-cla">因果階層分析</a></li>
             <li><a href="#section-signals">シグナル</a></li>
+            <li><a href="#section-reports">レポート</a></li>
             <li><a href="#section-papers">学術研究</a></li>
             <li><a href="#section-foresight">未来洞察</a></li>
           </ul>
@@ -2812,8 +2898,8 @@
         <div>
           <div class="footer-heading">その他</div>
           <ul class="footer-links">
-            <li><a href="#section-reports">レポート一覧</a></li>
-            <li><a href="#section-media">メディアソース</a></li>
+            <li><a href="#section-cla">因果階層分析</a></li>
+            <li><a href="#section-guide">使い方ガイド</a></li>
             <li><a href="#" onclick="auth.signOut();return false;">ログアウト</a></li>
           </ul>
         </div>
@@ -3573,8 +3659,8 @@
               (ja ? '<div class="pestle-article-trans">' + escapeHtml(ja) + '</div>' : '') +
               '</div>' +
               '<div class="pestle-article-actions">' +
-                '<button class="pestle-article-action-btn ' + (isBm ? 'bookmarked' : '') + '" onclick="event.stopPropagation();toggleBookmark(\'' + bmId + '\',\'' + escapeAttr(a.title || '') + '\',\'' + escapeAttr(safeUrl(a.url)) + '\',this)">ブックマーク</button>' +
-                '<button class="pestle-article-action-btn pestle-article-action-report" onclick="event.stopPropagation();confirmAndGenerateReport(\'' + escapeAttr(catKey) + '\',' + origIdx + ')">レポート生成</button>' +
+                '<button class="pestle-article-action-btn ' + (isBm ? 'bookmarked' : '') + '" onclick="event.stopPropagation();toggleBookmark(\'' + bmId + '\',\'' + escapeAttr(a.title || '') + '\',\'' + escapeAttr(safeUrl(a.url)) + '\',this)"><span class="action-label">ブックマーク</span><span class="action-icon">&#9734;</span></button>' +
+                '<button class="pestle-article-action-btn pestle-article-action-report" onclick="event.stopPropagation();confirmAndGenerateReport(\'' + escapeAttr(catKey) + '\',' + origIdx + ')"><span class="action-label">レポート生成</span><span class="action-icon">&#9998;</span></button>' +
               '</div>' +
             '</div></div>';
           });
@@ -4450,6 +4536,8 @@
 
     function renderMediaSources(data) {
       const container = document.getElementById('mediaSourcesContent');
+      // Also render in guide section
+      const guideContainer = document.getElementById('guideMediaContent');
       if (!data) { container.innerHTML = '<p class="text-muted">メディアソースデータを取得できませんでした。</p>'; return; }
 
       // Store data for re-rendering after tier changes
@@ -4522,6 +4610,9 @@
             '<td class="media-count">' + (s.articles_count || 0) + '</td>' +
             '<td class="media-date">' + escapeHtml(s.last_fetched || '-') + '</td></tr>';
         }).join('') + '</tbody></table></div>';
+
+      // Copy media table to guide section
+      if (guideContainer) guideContainer.innerHTML = container.innerHTML;
     }
 
     // Shared helpers for PESTLE category display
@@ -4827,7 +4918,7 @@
         document.querySelectorAll('.region-btn').forEach(b => b.classList.remove('active'));
         this.classList.add('active');
         currentRegion = this.dataset.region;
-        renderHomeDashboard(dataCache['daily_report.json'], dataCache['latest.json'], dataCache['ai_analysis.json'], dataCache['daily_papers.json']);
+        renderHomeDashboard(dataCache['daily_report.json'], dataCache['latest.json'], dataCache['ai_analysis.json'], dataCache['daily_papers.json'], dataCache['insight_reports.json']);
         renderMediaSources(dataCache['media_sources.json']);
         renderReportsArchive(dataCache['daily_report.json']);
         loadCLAArchive();
@@ -4847,7 +4938,7 @@
     // ==============================================================
     // SECTION ROUTING
     // ==============================================================
-    const VALID_SECTIONS = ['section-home', 'section-cla', 'section-signals', 'section-papers', 'section-foresight', 'section-foresight-history', 'section-media', 'section-reports', 'section-user-reports', 'section-bookmarks'];
+    const VALID_SECTIONS = ['section-home', 'section-signals', 'section-reports', 'section-user-reports', 'section-papers', 'section-cla', 'section-foresight', 'section-foresight-history', 'section-media', 'section-bookmarks', 'section-guide'];
     const DEFAULT_SECTION = 'section-home';
 
     window.showSection = function(sectionId) {
@@ -4857,9 +4948,12 @@
       if (target) target.classList.remove('section-hidden');
       document.querySelectorAll('.nav-link[data-nav]').forEach(a => a.classList.toggle('active', a.dataset.nav === sectionId));
       window.scrollTo(0, 0);
-      // Load foresight history when navigating to the history section
-      if (sectionId === 'section-foresight-history') loadForesightHistory();
+      // Load foresight history when navigating to foresight or history section
+      if (sectionId === 'section-foresight' || sectionId === 'section-foresight-history') loadForesightHistory();
       if (sectionId === 'section-user-reports') loadUserReports();
+      // Show/hide region toggle floating button (only on home)
+      const regionFloat = document.getElementById('regionFloating');
+      if (regionFloat) regionFloat.style.display = (sectionId === 'section-home') ? '' : 'none';
     };
 
     function initSectionFromHash() {
@@ -4912,7 +5006,10 @@
       document.body.style.overflow = 'hidden';
     };
 
-    window.generateNewsReport = async function(catKey, index) {
+    // Store for completed background reports
+    window._pendingReports = [];
+
+    window.generateNewsReport = function(catKey, index) {
       var data = dataCache['latest.json'];
       var aiData = dataCache['ai_analysis.json'];
       if (!data) { showToast('ニュースデータがありません。', 'error'); return; }
@@ -4921,12 +5018,13 @@
       var user = auth.currentUser;
       if (!user) { showToast('レポートを生成するにはログインが必要です。', 'error'); return; }
 
-      showToast('レポートを生成中...しばらくお待ちください', 'info');
+      showToast('レポートをバックグラウンドで生成中...', 'info');
 
       var trans = aiData?.translations?.[catKey]?.find(function(t) { return t.index === index; });
       var titleJa = trans?.title_translated || '';
       var summaryJa = trans?.summary_translated || '';
       var catCla = aiData?.cla?.[catKey] || {};
+      var reportTitle = titleJa || article.title || '';
 
       var question = '以下のニュース記事について、CLA（因果階層分析）の神話層との関連を踏まえた深層分析レポートを日本語で生成してください。\n\n' +
         '## 記事情報\nタイトル: ' + (article.title || '') +
@@ -4948,60 +5046,85 @@
         '読者は経営者・コンサルタント。知的かつ実用的な洞察を散文形式で提供してください。';
 
       var WORKER_BASE = 'https://future-insight-proxy.nishimura-69a.workers.dev';
-      try {
-        var resp = await fetch(WORKER_BASE + '/api/foresight', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'X-User-Id': user.uid },
-          body: JSON.stringify({
-            question: question,
-            claContext: window.__claContext || '',
-            signalsContext: window.__signalsContext || '',
-            newsContext: window.__newsContext || ''
-          })
-        });
-        if (!resp.ok) { var err = await resp.json().catch(function() { return {}; }); throw new Error(err.error || 'HTTP ' + resp.status); }
-        var respData = await resp.json();
-        var generatedText = respData.answer || '';
-        var reportTitle = titleJa || article.title || '';
 
-        // Show in modal
-        var content = document.getElementById('articleModalContent');
-        var catInfo = PESTLE_CATS[catKey] || { labelJa: catKey, color: 'var(--accent)' };
-        content.innerHTML = '<div style="border-top:4px solid ' + catInfo.color + ';padding-top:16px">' +
-          '<span class="ir-hero-cat-badge" style="background:' + catInfo.color + '">' + escapeHtml(catInfo.labelJa) + '</span> ' +
-          '<span class="fs-label" style="font-weight:600;padding:2px 10px;border-radius:12px;background:var(--accent-light);color:var(--accent)">読者レポート</span>' +
-          '<h2 class="fs-h1" style="margin:12px 0 8px;line-height:1.4">' + escapeHtml(reportTitle) + '</h2>' +
-          '<div class="fs-meta" style="color:var(--text-muted);margin-bottom:16px">' +
-            escapeHtml(article.source || '') + ' / ' + escapeHtml(article.published_date || '') +
-            (article.url ? ' &mdash; <a href="' + escapeAttr(safeUrl(article.url)) + '" target="_blank" style="color:var(--accent)">元記事</a>' : '') +
-          '</div>' +
-          '<div class="md-body">' + renderMarkdown(generatedText) + '</div></div>';
-        document.getElementById('articleModal').classList.add('visible');
-        document.body.style.overflow = 'hidden';
-
-        // Save to Firestore
+      // Run in background - doesn't block page navigation
+      (async function() {
         try {
-          await db.collection('user_reports').add({
-            userId: user.uid,
-            userName: user.displayName || user.email || '',
-            sourceReportTitle: reportTitle,
-            sourceCategory: catKey,
-            sourceUrl: article.url || '',
-            generatedText: generatedText,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          var resp = await fetch(WORKER_BASE + '/api/foresight', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-User-Id': user.uid },
+            body: JSON.stringify({
+              question: question,
+              claContext: window.__claContext || '',
+              signalsContext: window.__signalsContext || '',
+              newsContext: window.__newsContext || ''
+            })
           });
-          showToast('レポートを保存しました。', 'success');
-          // Update sidebar
-          loadUserReportsSidebar();
-        } catch (saveErr) {
-          console.warn('User report save failed:', saveErr);
-          showToast('レポートの保存に失敗しました。', 'error');
+          if (!resp.ok) { var err = await resp.json().catch(function() { return {}; }); throw new Error(err.error || 'HTTP ' + resp.status); }
+          var respData = await resp.json();
+          var generatedText = respData.answer || '';
+
+          // Save to Firestore
+          try {
+            await db.collection('user_reports').add({
+              userId: user.uid,
+              userName: user.displayName || user.email || '',
+              sourceReportTitle: reportTitle,
+              sourceCategory: catKey,
+              sourceUrl: article.url || '',
+              generatedText: generatedText,
+              createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            loadUserReportsSidebar();
+          } catch (saveErr) {
+            console.warn('User report save failed:', saveErr);
+          }
+
+          // Store completed report for viewing
+          var catInfo = PESTLE_CATS[catKey] || { labelJa: catKey, color: 'var(--accent)' };
+          window._pendingReports.push({
+            title: reportTitle,
+            catKey: catKey,
+            catInfo: catInfo,
+            article: article,
+            generatedText: generatedText
+          });
+
+          // Show notification toast with "view" action
+          showReportCompleteToast(reportTitle);
+        } catch (err) {
+          console.error('News report generation error:', err);
+          showToast('レポートの生成に失敗しました: ' + (err.message || err), 'error');
         }
-      } catch (err) {
-        console.error('News report generation error:', err);
-        closeArticleModal();
-        showToast('レポートの生成に失敗しました: ' + (err.message || err), 'error');
-      }
+      })();
+    };
+
+    function showReportCompleteToast(title) {
+      var container = document.getElementById('toastContainer');
+      var toast = document.createElement('div');
+      toast.className = 'toast toast-success toast-report-complete';
+      toast.innerHTML = '<div style="margin-bottom:6px"><strong>レポート生成完了</strong></div>' +
+        '<div style="font-size:0.78rem;margin-bottom:8px">' + escapeHtml(title.substring(0, 60)) + '</div>' +
+        '<button class="btn-primary" style="font-size:0.72rem;padding:6px 14px" onclick="viewLatestReport();this.parentElement.remove()">レポートを見る</button>';
+      container.appendChild(toast);
+      setTimeout(function() { if (toast.parentElement) { toast.classList.add('toast-out'); setTimeout(function() { toast.remove(); }, 300); } }, 10000);
+    }
+
+    window.viewLatestReport = function() {
+      var report = window._pendingReports.pop();
+      if (!report) { showToast('表示するレポートがありません。', 'info'); return; }
+      var content = document.getElementById('articleModalContent');
+      content.innerHTML = '<div style="border-top:4px solid ' + report.catInfo.color + ';padding-top:16px">' +
+        '<span class="ir-hero-cat-badge" style="background:' + report.catInfo.color + '">' + escapeHtml(report.catInfo.labelJa) + '</span> ' +
+        '<span class="fs-label" style="font-weight:600;padding:2px 10px;border-radius:12px;background:var(--accent-light);color:var(--accent)">読者レポート</span>' +
+        '<h2 class="fs-h1" style="margin:12px 0 8px;line-height:1.4">' + escapeHtml(report.title) + '</h2>' +
+        '<div class="fs-meta" style="color:var(--text-muted);margin-bottom:16px">' +
+          escapeHtml(report.article.source || '') + ' / ' + escapeHtml(report.article.published_date || '') +
+          (report.article.url ? ' &mdash; <a href="' + escapeAttr(safeUrl(report.article.url)) + '" target="_blank" style="color:var(--accent)">元記事</a>' : '') +
+        '</div>' +
+        '<div class="md-body">' + renderMarkdown(report.generatedText) + '</div></div>';
+      document.getElementById('articleModal').classList.add('visible');
+      document.body.style.overflow = 'hidden';
     };
 
     // ==============================================================
