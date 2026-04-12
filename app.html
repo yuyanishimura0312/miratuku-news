@@ -5053,8 +5053,32 @@
             '<td class="media-date">' + escapeHtml(s.last_fetched || '-') + '</td></tr>';
         }).join('') + '</tbody></table></div>';
 
-      // Copy media table to guide section
-      if (guideContainer) guideContainer.innerHTML = container.innerHTML;
+      // Render ALL media (unfiltered) in guide section
+      if (guideContainer) {
+        const allArticles = sources.reduce((sum, s) => sum + (s.articles_count || 0), 0);
+        const allSorted = sources.slice().sort((a, b) => {
+          const tA = (getEffectiveTier(a) === '-' ? 99 : getEffectiveTier(a));
+          const tB = (getEffectiveTier(b) === '-' ? 99 : getEffectiveTier(b));
+          if (tA !== tB) return tA - tB;
+          return (b.articles_count || 0) - (a.articles_count || 0);
+        });
+        guideContainer.innerHTML = '<div class="media-meta">' + sources.length + 'メディアから合計 <strong>' + allArticles.toLocaleString() + '</strong> 件の記事を収集（国内' + sources.filter(s=>(s.language||'').toLowerCase()==='ja').length + ' + 海外' + sources.filter(s=>(s.language||'').toLowerCase()==='en').length + '）</div>' +
+          '<div class="media-table-wrap"><table class="media-table"><thead><tr>' +
+          '<th>メディア名</th><th>分野</th><th>Tier</th><th>言語</th><th>記事数</th><th>最終取得</th></tr></thead><tbody>' +
+          allSorted.map(s => {
+            const name = s.name_ja || s.name || s.title || '';
+            const cat = catToJa(s.categories || s.category || s.type || '');
+            const tier = getEffectiveTier(s);
+            const tierClass = tier === 1 ? '' : (tier === 2 ? 'tier-badge-2' : 'tier-badge-3');
+            const lang = (s.language || '').toLowerCase() === 'ja' ? '日本語' : '英語';
+            return '<tr><td class="media-name">' + escapeHtml(name) + '</td>' +
+              '<td>' + escapeHtml(cat) + '</td>' +
+              '<td>' + (tier !== '-' ? '<span class="tier-badge ' + tierClass + '">Tier ' + tier + '</span>' : '-') + '</td>' +
+              '<td>' + lang + '</td>' +
+              '<td class="media-count">' + (s.articles_count || 0) + '</td>' +
+              '<td class="media-date">' + escapeHtml(s.last_fetched || '-') + '</td></tr>';
+          }).join('') + '</tbody></table></div>';
+      }
     }
 
     // Shared helpers for PESTLE category display
