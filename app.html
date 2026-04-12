@@ -5328,13 +5328,14 @@
         html += '</div>';
       }
 
-      // Future themes connection
-      const articleText = ((article.title || '') + ' ' + (article.summary || '') + ' ' + (titleJa || '') + ' ' + (summaryJa || '')).toLowerCase();
+      // Future themes connection (using shared fuzzy matching)
+      const articleTitleText = ((article.title || '') + ' ' + (titleJa || '')).toLowerCase();
+      const articleText = (articleTitleText + ' ' + (article.summary || '') + ' ' + (summaryJa || '')).toLowerCase();
       const matchedThemes = FUTUROLOGY_THEMES.map(theme => {
         const kwLower = theme.keywords.map(k => k.toLowerCase());
-        const hits = kwLower.filter(kw => articleText.includes(kw));
-        return hits.length > 0 ? { ...theme, hits } : null;
-      }).filter(Boolean).sort((a, b) => b.hits.length - a.hits.length);
+        const { score, hits } = _themeMatchScore(articleText, articleTitleText, kwLower);
+        return score > 0 ? { ...theme, hits, score } : null;
+      }).filter(Boolean).sort((a, b) => b.score - a.score);
 
       html += '<div class="modal-section-card">';
       html += '<h4 class="modal-section-heading">未来予測テーマとの接続</h4>';
@@ -5603,55 +5604,88 @@
     // ==============================================================
     const FUTUROLOGY_THEMES = [
       { no: 1,  name: 'イノベーションの分散と都市国家の誕生', map: '生態系化する社会',
-        keywords: ['イノベーション', '都市国家', 'スタートアップ', 'オープンイノベーション', '分散', '都市化', 'グローバル市民', 'スマートシティ', 'innovation', 'startup', 'decentrali'] },
+        keywords: ['イノベーション', '都市国家', 'スタートアップ', 'オープンイノベーション', '分散', '都市化', 'グローバル市民', 'スマートシティ', 'innovation', 'startup', 'decentrali',
+          'エコシステム', 'クラスター', 'シリコンバレー', 'テックハブ', 'ベンチャー', '起業', '産業集積', 'DAO', 'Web3', '特区', 'hub', 'ecosystem', 'venture', 'technopol', 'cluster', 'incubat', 'accelerat'] },
       { no: 2,  name: 'テクノロジーを用いた理想的身体機能の拡張', map: '技術と身体',
-        keywords: ['身体拡張', '義肢', 'ウェアラブル', 'サイボーグ', '脳機械インターフェース', 'BCI', 'バイオハック', 'exoskeleton', 'prosthetic', 'augment', 'biohack'] },
+        keywords: ['身体拡張', '義肢', 'ウェアラブル', 'サイボーグ', '脳機械インターフェース', 'BCI', 'バイオハック', 'exoskeleton', 'prosthetic', 'augment', 'biohack',
+          'インプラント', 'パワードスーツ', '人工臓器', '生体工学', 'ニューラリンク', 'haptic', 'implant', 'neuroprosthe', 'wearable', 'bioelectron', 'sensory', 'cochlear', 'retinal'] },
       { no: 3,  name: 'テクノロジーの非人間的活用', map: '技術と倫理',
-        keywords: ['監視', 'サイバー攻撃', '自律兵器', 'ドローン兵器', 'ディープフェイク', 'AI倫理', 'サイバーセキュリティ', 'surveillance', 'cyber weapon', 'deepfake', 'autonomous weapon'] },
+        keywords: ['監視', 'サイバー攻撃', '自律兵器', 'ドローン兵器', 'ディープフェイク', 'AI倫理', 'サイバーセキュリティ', 'surveillance', 'cyber weapon', 'deepfake', 'autonomous weapon',
+          '顔認識', '情報操作', 'プロパガンダ', 'ランサムウェア', '偽情報', 'フェイクニュース', 'キラーロボット', 'スパイウェア', 'facial recognition', 'disinformation', 'misinformation', 'ransomware', 'spyware', 'lethal autonomous', 'weaponiz', 'malware', 'hack'] },
       { no: 4,  name: '資源のスマートコントロール', map: '資源と制御',
-        keywords: ['スマートグリッド', '資源管理', 'エネルギー効率', 'IoT', 'スマート農業', '水資源', 'リサイクル', 'smart grid', 'resource', 'precision agriculture', 'circular economy'] },
+        keywords: ['スマートグリッド', '資源管理', 'エネルギー効率', 'IoT', 'スマート農業', '水資源', 'リサイクル', 'smart grid', 'resource', 'precision agriculture', 'circular economy',
+          'エネルギー', '再生可能', '新エネルギー', '省エネ', '蓄電', 'バッテリー', '送電', '電力', '太陽光', '風力', '水素', 'レアメタル', '廃棄物', 'サプライチェーン', 'energy', 'renewable', 'solar', 'wind', 'hydrogen', 'battery', 'storage', 'grid', 'waste', 'recycl', 'sustain', 'efficien', 'conserv', 'water management', 'desalinat', 'rare earth', 'lithium', 'supply chain'] },
       { no: 5,  name: 'デジタルワールドと現実世界の融合', map: 'デジタルと現実',
-        keywords: ['メタバース', 'AR', 'VR', 'XR', 'デジタルツイン', '仮想現実', '拡張現実', 'NFT', 'metaverse', 'digital twin', 'mixed reality', 'virtual'] },
+        keywords: ['メタバース', 'AR', 'VR', 'XR', 'デジタルツイン', '仮想現実', '拡張現実', 'NFT', 'metaverse', 'digital twin', 'mixed reality', 'virtual',
+          'ホログラム', '没入', 'アバター', 'ブロックチェーン', 'デジタルアート', 'バーチャル空間', 'hologram', 'immersive', 'avatar', 'spatial computing', 'blockchain', 'token', 'web3', 'augmented'] },
       { no: 6,  name: 'ロボットによる自動化する社会', map: '自動化社会',
-        keywords: ['ロボット', '自動化', '自動運転', 'RPA', 'ファクトリーオートメーション', '無人', 'AGV', 'robot', 'automat', 'autonomous', 'driverless', 'unmanned'] },
+        keywords: ['ロボット', '自動化', '自動運転', 'RPA', 'ファクトリーオートメーション', '無人', 'AGV', 'robot', 'automat', 'autonomous', 'driverless', 'unmanned',
+          'ドローン', '配送ロボット', '無人店舗', '工場自動化', '物流自動化', 'ロボティクス', 'drone', 'warehouse', 'logistics automat', 'robotic', 'self-driving', 'lidar', 'autopilot'] },
       { no: 7,  name: '宇宙に進出する人類', map: '宇宙開発',
-        keywords: ['宇宙', '火星', '月面', '衛星', 'ロケット', 'SpaceX', 'NASA', 'JAXA', '宇宙旅行', 'space', 'mars', 'lunar', 'satellite', 'orbit'] },
+        keywords: ['宇宙', '火星', '月面', '衛星', 'ロケット', 'SpaceX', 'NASA', 'JAXA', '宇宙旅行', 'space', 'mars', 'lunar', 'satellite', 'orbit',
+          '宇宙ステーション', '小惑星', '宇宙資源', '軌道', 'スペースデブリ', '深宇宙', 'ISS', 'asteroid', 'space station', 'space debris', 'space mining', 'launch', 'rocket', 'cosmos', 'extraterrestr', 'interplanetary', 'Blue Origin', 'starship'] },
       { no: 8,  name: '気候変動と生存圏の縮小', map: '気候と生存',
-        keywords: ['気候変動', '温暖化', '海面上昇', '異常気象', '気候難民', 'カーボン', '脱炭素', 'CO2', 'climate', 'warming', 'emission', 'carbon', 'extreme weather', 'flood', 'drought'] },
+        keywords: ['気候変動', '温暖化', '海面上昇', '異常気象', '気候難民', 'カーボン', '脱炭素', 'CO2', 'climate', 'warming', 'emission', 'carbon', 'extreme weather', 'flood', 'drought',
+          '気候危機', '環境破壊', '生態系', '生物多様性', '森林破壊', '砂漠化', '熱波', '台風', 'ハリケーン', '山火事', '氷河', 'パリ協定', 'グリーン', 'net zero', 'biodiversity', 'deforestation', 'ecosystem', 'wildfire', 'hurricane', 'heatwave', 'glacier', 'sea level', 'methane', 'greenhouse', 'COP', 'adaptation', 'resilien'] },
       { no: 9,  name: '経済以外の新たな価値', map: '価値の多様化',
-        keywords: ['ウェルビーイング', '幸福度', 'GDP以外', '社会関係資本', 'ソーシャルキャピタル', 'コモンズ', '共有経済', 'well-being', 'wellbeing', 'happiness index', 'commons', 'sharing economy', 'degrowth'] },
+        keywords: ['ウェルビーイング', '幸福度', 'GDP以外', '社会関係資本', 'ソーシャルキャピタル', 'コモンズ', '共有経済', 'well-being', 'wellbeing', 'happiness index', 'commons', 'sharing economy', 'degrowth',
+          '脱成長', 'QOL', '生活の質', 'マインドフルネス', 'ケア経済', '贈与経済', '互助', '連帯経済', '幸福', 'purpose', 'quality of life', 'social capital', 'care economy', 'gift economy', 'cooperative', 'mutual aid', 'solidarity', 'mindful', 'post-growth', 'doughnut economics'] },
       { no: 10, name: '社会的な活動の当たり前化', map: '市民社会',
-        keywords: ['市民活動', 'ソーシャルビジネス', '社会起業', 'NGO', 'NPO', 'ボランティア', 'civic tech', 'social enterprise', 'philanthrop', 'social impact', 'CSR', 'ESG'] },
+        keywords: ['市民活動', 'ソーシャルビジネス', '社会起業', 'NGO', 'NPO', 'ボランティア', 'civic tech', 'social enterprise', 'philanthrop', 'social impact', 'CSR', 'ESG',
+          'ソーシャルイノベーション', '社会貢献', 'インパクト投資', 'コミュニティ', '草の根', '市民参加', 'クラウドファンディング', '社会的企業', 'social innovation', 'impact invest', 'community', 'grassroot', 'civil society', 'crowdfund', 'activism', 'participat', 'nonprofit', 'SDGs', 'B Corp'] },
       { no: 11, name: '拡大する格差と新たな紛争', map: '格差と紛争',
-        keywords: ['格差', '不平等', '貧困', '紛争', '難民', 'テロ', '分断', '移民', 'inequality', 'poverty', 'conflict', 'refugee', 'polariz', 'migration'] },
+        keywords: ['格差', '不平等', '貧困', '紛争', '難民', 'テロ', '分断', '移民', 'inequality', 'poverty', 'conflict', 'refugee', 'polariz', 'migration',
+          '所得格差', 'デジタルデバイド', '経済格差', '戦争', '内戦', '制裁', '地政学', 'ジェノサイド', '人権侵害', '強制移住', 'war', 'civil war', 'sanction', 'geopolitic', 'displacement', 'digital divide', 'wealth gap', 'terrorism', 'extremism', 'radicali', 'asylum', 'humanitarian'] },
       { no: 12, name: '進展する身体的健康と長寿社会', map: '健康と長寿',
-        keywords: ['長寿', 'アンチエイジング', '再生医療', 'ゲノム', '遺伝子治療', '健康寿命', 'バイオテクノロジー', 'longevity', 'aging', 'genome', 'gene therapy', 'regenerative', 'biotech', 'CRISPR'] },
+        keywords: ['長寿', 'アンチエイジング', '再生医療', 'ゲノム', '遺伝子治療', '健康寿命', 'バイオテクノロジー', 'longevity', 'aging', 'genome', 'gene therapy', 'regenerative', 'biotech', 'CRISPR',
+          '幹細胞', 'mRNA', 'ワクチン', '免疫療法', '個別化医療', 'プレシジョンメディシン', '遺伝子編集', 'テロメア', '老化', '寿命', 'エピジェネティクス', 'stem cell', 'vaccine', 'immunotherapy', 'precision medicine', 'personalized', 'telomere', 'anti-aging', 'lifespan', 'healthspan', 'epigenetic', 'gene editing', 'biopharm'] },
       { no: 13, name: '人とロボットの接近', map: '人機共生',
-        keywords: ['コミュニケーションロボット', '介護ロボット', 'ソーシャルロボット', 'ヒューマノイド', '人機', 'AI アシスタント', 'companion robot', 'humanoid', 'social robot', 'cobot', 'human-robot'] },
+        keywords: ['コミュニケーションロボット', '介護ロボット', 'ソーシャルロボット', 'ヒューマノイド', '人機', 'AI アシスタント', 'companion robot', 'humanoid', 'social robot', 'cobot', 'human-robot',
+          'チャットボット', '対話AI', '感情認識', 'ペットロボット', '接客ロボット', '協働ロボット', 'ChatGPT', 'LLM', '大規模言語', '生成AI', 'conversational AI', 'chatbot', 'emotional AI', 'affective computing', 'collaborative robot', 'service robot', 'AI assistant', 'generative AI', 'language model'] },
       { no: 14, name: '高度な専門技術の一般化', map: '技術の民主化',
-        keywords: ['民主化', 'ノーコード', 'ローコード', '3Dプリンタ', 'オープンソース', 'DIY', 'maker', '市民科学', 'democratiz', 'no-code', 'low-code', '3D print', 'open source', 'citizen science'] },
+        keywords: ['民主化', 'ノーコード', 'ローコード', '3Dプリンタ', 'オープンソース', 'DIY', 'maker', '市民科学', 'democratiz', 'no-code', 'low-code', '3D print', 'open source', 'citizen science',
+          'FabLab', 'ファブラボ', 'メイカー', 'Arduino', 'Raspberry Pi', 'バイオDIY', 'クリエイターエコノミー', 'フリーランス', 'GitHub', 'API', 'SaaS', 'creator economy', 'freelance', 'peer production', 'platform', 'accessible technolog'] },
       { no: 15, name: '多様性と共にある発展の実現', map: '包摂的発展',
-        keywords: ['多様性', 'ダイバーシティ', 'インクルージョン', 'ジェンダー', 'LGBTQ', 'アクセシビリティ', '共生', 'diversity', 'inclusion', 'gender', 'equity', 'accessibility', 'multicultural'] },
+        keywords: ['多様性', 'ダイバーシティ', 'インクルージョン', 'ジェンダー', 'LGBTQ', 'アクセシビリティ', '共生', 'diversity', 'inclusion', 'gender', 'equity', 'accessibility', 'multicultural',
+          'フェミニズム', '同性婚', '障害者', 'ユニバーサルデザイン', '先住民', '民族', '人種', '差別', 'DEI', '公正', 'feminism', 'marriage equality', 'disability', 'universal design', 'indigenous', 'racial', 'ethnic', 'anti-discrimination', 'representat', 'intersectional'] },
       { no: 16, name: '脳の解明と再現', map: '脳科学',
-        keywords: ['脳科学', '神経科学', 'ニューロ', '人工知能', 'AGI', 'ブレイン', '意識', '認知科学', 'neuroscience', 'brain', 'neural', 'AGI', 'consciousness', 'cognitive'] },
+        keywords: ['脳科学', '神経科学', 'ニューロ', '人工知能', 'AGI', 'ブレイン', '意識', '認知科学', 'neuroscience', 'brain', 'neural', 'AGI', 'consciousness', 'cognitive',
+          '深層学習', 'ディープラーニング', 'ニューラルネットワーク', '機械学習', 'トランスフォーマー', 'シナプス', '脳波', '脳イメージング', 'AI', 'deep learning', 'machine learning', 'neural network', 'transformer', 'synapse', 'fMRI', 'brain-computer', 'neuromorphic', 'artificial general', 'superintelligen'] },
       { no: 17, name: '閉じる国家と停滞する社会', map: '国家と停滞',
-        keywords: ['保護主義', '孤立主義', '少子化', '人口減少', '高齢化', '停滞', 'ポピュリズム', '権威主義', 'protectionism', 'isolationism', 'demographic decline', 'aging society', 'populism', 'authoritarian'] },
+        keywords: ['保護主義', '孤立主義', '少子化', '人口減少', '高齢化', '停滞', 'ポピュリズム', '権威主義', 'protectionism', 'isolationism', 'demographic decline', 'aging society', 'populism', 'authoritarian',
+          '出生率', '人口危機', 'ナショナリズム', '排外', '関税', 'デカップリング', '国境', '規制強化', 'birth rate', 'fertility', 'nationalism', 'xenophob', 'tariff', 'decoupling', 'border', 'stagnation', 'recession', 'autocra', 'illiberal', 'sovereignty', 'deglobaliz'] },
       { no: 18, name: '暮らしの基盤自体の多様化', map: '暮らしの変容',
-        keywords: ['リモートワーク', '多拠点', 'ノマド', '教育改革', 'ベーシックインカム', 'ライフスタイル', 'ワーケーション', '暮らし方', 'remote work', 'nomad', 'basic income', 'lifestyle', 'co-living', 'edtech'] }
+        keywords: ['リモートワーク', '多拠点', 'ノマド', '教育改革', 'ベーシックインカム', 'ライフスタイル', 'ワーケーション', '暮らし方', 'remote work', 'nomad', 'basic income', 'lifestyle', 'co-living', 'edtech',
+          'テレワーク', 'フレックス', '副業', 'ギグエコノミー', '地方移住', '関係人口', 'シェアハウス', '食の多様化', '代替肉', 'オンライン教育', 'MOOC', 'gig economy', 'hybrid work', 'coworking', 'digital nomad', 'alternative protein', 'plant-based', 'home school', 'lifelong learning', 'work-life', 'four-day work', 'universal basic'] }
     ];
 
     let _themesRendered = false;
 
+    // Shared fuzzy matching: checks title (weight 2) and summary (weight 1)
+    function _themeMatchScore(text, titleText, kwLower) {
+      let score = 0;
+      const hits = [];
+      kwLower.forEach(kw => {
+        const inTitle = titleText.includes(kw);
+        const inBody = !inTitle && text.includes(kw);
+        if (inTitle) { score += 2; hits.push(kw); }
+        else if (inBody) { score += 1; hits.push(kw); }
+      });
+      return { score, hits };
+    }
+
     function matchNewsToThemes(articles) {
       // Build match results: theme -> matched articles (search both original and Japanese text)
+      // Title matches are weighted higher than summary-only matches
       const results = FUTUROLOGY_THEMES.map(theme => {
         const matched = [];
         const kwLower = theme.keywords.map(k => k.toLowerCase());
         (articles || []).forEach(art => {
-          const text = ((art.title || '') + ' ' + (art.summary || '') + ' ' + (art._titleJa || '') + ' ' + (art._summaryJa || '')).toLowerCase();
-          const hits = kwLower.filter(kw => text.includes(kw));
-          if (hits.length > 0) {
-            matched.push({ ...art, _matchScore: hits.length, _matchedKeywords: hits });
+          const titleText = ((art.title || '') + ' ' + (art._titleJa || '')).toLowerCase();
+          const text = (titleText + ' ' + (art.summary || '') + ' ' + (art._summaryJa || '')).toLowerCase();
+          const { score, hits } = _themeMatchScore(text, titleText, kwLower);
+          if (score > 0) {
+            matched.push({ ...art, _matchScore: score, _matchedKeywords: hits });
           }
         });
         matched.sort((a, b) => b._matchScore - a._matchScore);
@@ -5895,12 +5929,13 @@
         });
       }
 
-      // Match against 18 futurology themes for prompt context
-      var rptArtText = ((article.title || '') + ' ' + (article.summary || '') + ' ' + (titleJa || '') + ' ' + (summaryJa || '')).toLowerCase();
+      // Match against 18 futurology themes for prompt context (using shared fuzzy matching)
+      var rptTitleText = ((article.title || '') + ' ' + (titleJa || '')).toLowerCase();
+      var rptArtText = (rptTitleText + ' ' + (article.summary || '') + ' ' + (summaryJa || '')).toLowerCase();
       var rptThemeMatches = FUTUROLOGY_THEMES.map(function(theme) {
         var kwLower = theme.keywords.map(function(k) { return k.toLowerCase(); });
-        var hits = kwLower.filter(function(kw) { return rptArtText.includes(kw); });
-        return hits.length > 0 ? { no: theme.no, name: theme.name, map: theme.map, score: hits.length } : null;
+        var result = _themeMatchScore(rptArtText, rptTitleText, kwLower);
+        return result.score > 0 ? { no: theme.no, name: theme.name, map: theme.map, score: result.score } : null;
       }).filter(Boolean).sort(function(a, b) { return b.score - a.score; });
 
       var rptThemeCtx = '\n\n## メガトレンド（未来予測18テーマ）との関連';
