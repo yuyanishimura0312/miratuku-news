@@ -3048,7 +3048,7 @@
       <div class="guide-content">
         <div class="guide-section">
           <h3 class="guide-heading">Insight News とは</h3>
-          <p class="guide-text">Insight News は、ミラツク・インテリジェンス・パイプラインが自動収集したPESTLE（政治・経済・社会・技術・法律・環境）ニュース、因果階層分析（CLA）、弱いシグナル検出、学術論文追跡を統合した未来洞察プラットフォームです。</p>
+          <p class="guide-text">Insight News は、ミラツク・インテリジェンス・パイプラインが毎日3つのデータストリーム（PESTLEニュース2,000件、学術論文1,000件、歴史的PESTLE記事~1,200件）を自動収集し、因果階層分析（CLA）、弱いシグナル検出、シナリオ生成を行う未来洞察プラットフォームです。124のRSSフィード（国内57、海外67）と学術API、さらに1900年から現在まで126年分・16万件超の歴史データベースを基盤に、「異分野の交差点から未来を見る」というミラツクの理念を実装しています。</p>
         </div>
         <div class="guide-section">
           <h3 class="guide-heading">各セクションの説明</h3>
@@ -3057,7 +3057,7 @@
           <div class="guide-item"><strong>レポート</strong> ― AI が毎日生成する月次分析レポートのアーカイブ。日本/グローバル両方の視点を収録。</div>
           <div class="guide-item"><strong>読者レポート</strong> ― ニュース記事をもとに読者が生成した深層分析レポート。CLA の視点から解析されます。</div>
           <div class="guide-item"><strong>学術研究</strong> ― 分野別に自動収集された最新の学術論文。新規性スコア付き。</div>
-          <div class="guide-item"><strong>因果階層分析</strong> ― 36年分のCLA時系列データと四半期分析。リタニー・システム・世界観・神話の4層構造で社会変化を読み解きます。</div>
+          <div class="guide-item"><strong>因果階層分析</strong> ― 126年分（1900-2025）のCLA時系列データと四半期分析。リタニー・システム・世界観・神話の4層構造で社会変化を読み解きます。</div>
           <div class="guide-item"><strong>未来洞察</strong> ― 蓄積データをもとにAIが未来洞察の視点で回答。過去の洞察履歴も閲覧可能。</div>
           <div class="guide-item"><strong>メガトレンド</strong> ― 未来予測書籍から抽出した18の大テーマで今日のニュースを分類。断片的な情報を未来の文脈に位置づけます。</div>
           <div class="guide-item"><strong>ブックマーク</strong> ― 気になる記事・シグナル・論文を保存。アーカイブ機能付き。</div>
@@ -3101,7 +3101,7 @@
                 <div class="cla-layer-item" style="--depth:5"><div class="cla-layer-label">Layer 5: 核心的緊張</div><div class="cla-layer-desc">各層の間に存在する矛盾や葛藤。旧い世界観と新しい現実のせめぎ合い。変化の原動力。</div></div>
                 <div class="cla-layer-item" style="--depth:6"><div class="cla-layer-label">Layer 6: 新たな物語</div><div class="cla-layer-desc">緊張から生まれつつある新しい神話やメタファー。「次の時代」の萌芽。</div></div>
               </div>
-              <p>Insight News では、毎日のPESTLEニュースに対してAIがCLA分析を適用し、表面的な情報の「深層」を自動抽出しています。36年分（1990-2026）のCLAアーカイブでは、日本社会の神話・メタファーがどのように変遷してきたかを時系列で追うことができます。</p>
+              <p>Insight News では、毎日のPESTLEニュースに対してAIがCLA分析を適用し、表面的な情報の「深層」を自動抽出しています。126年分（1900-2025）のCLAアーカイブでは、20世紀初頭から現代に至る社会の神話・メタファーがどのように変遷してきたかを時系列で追うことができます。</p>
             </div>
           </details>
 
@@ -3135,8 +3135,44 @@
         </div>
 
         <div class="guide-section">
+          <h3 class="guide-heading">データパイプライン</h3>
+          <p class="guide-text" style="margin-bottom:16px">Insight News は毎日3つのデータストリームを自動収集・分析しています。</p>
+          <div class="method-grid" style="grid-template-columns:1fr">
+            <div class="method-card" style="border-left:3px solid var(--accent)">
+              <strong>Stream 1: PESTLEニュース（2,000件/日）</strong><br>
+              124のRSSフィード（国内57、海外67）とGDELT APIから取得。6カテゴリ各334件に自動分類。フォーサイト機関（NOEMA, Aeon, Nautilus等）、非西洋圏メディア（The Conversation Africa, Global Voices, The Diplomat等）、国内官公庁15省庁のフィードを含む。Tier 2-3（深層レイヤー）ソースにはスコアブーストを適用し、弱いシグナルが表層ニュースに埋もれないよう設計。
+            </div>
+            <div class="method-card" style="border-left:3px solid var(--S)">
+              <strong>Stream 2: 学術論文（1,000件/日）</strong><br>
+              OpenAlex APIから5分野（人文学・社会科学・自然科学・工学・芸術）の最新論文を各200件取得。人類学・哲学・政治学・環境科学を含む幅広い学際的カバレッジ。AIによる新規性評価・日本語翻訳付き。
+            </div>
+            <div class="method-card" style="border-left:3px solid var(--T)">
+              <strong>Stream 3: 歴史的PESTLEデータ（~1,200件/日）</strong><br>
+              1900年から現在まで126年分・166,481件の歴史的PESTLE記事をデータベースに蓄積。1950年以降は各年1,200件、それ以前は600件。Claude APIで歴史的に重要な出来事を6カテゴリで生成し、CLA時系列分析の基盤データとして活用。
+            </div>
+          </div>
+
+          <p class="guide-text" style="margin-top:16px;margin-bottom:8px"><strong>AI分析パイプライン（日次自動実行）</strong></p>
+          <div class="method-workflow">
+            <div class="workflow-step"><div class="workflow-num">1</div><div><strong>収集</strong><br>3ストリームからデータ取得・PESTLE分類・DB格納</div></div>
+            <div class="workflow-step"><div class="workflow-num">2</div><div><strong>CLA分析</strong><br>6カテゴリの因果階層分析（4層+緊張+新物語）を生成</div></div>
+            <div class="workflow-step"><div class="workflow-num">3</div><div><strong>シグナル検出</strong><br>8つの視点から約100個の弱いシグナルを抽出</div></div>
+            <div class="workflow-step"><div class="workflow-num">4</div><div><strong>アラート・シナリオ</strong><br>異常検出アラート生成、週次で未来シナリオ更新</div></div>
+            <div class="workflow-step"><div class="workflow-num">5</div><div><strong>デプロイ</strong><br>GitHub Pagesに自動デプロイ、Firestoreに状態報告</div></div>
+          </div>
+
+          <p class="guide-text" style="margin-top:16px;margin-bottom:8px"><strong>CLA深層レイヤー対応ソース</strong></p>
+          <p class="guide-text">ホワイトペーパーのコンセプト「異分野の交差点から未来を見る」に基づき、表層ニュースだけでなくCLAの深層レイヤー（世界観・神話）に対応する情報源を体系的に配置しています。</p>
+          <div class="method-grid" style="grid-template-columns:repeat(auto-fill,minmax(200px,1fr));margin-top:8px">
+            <div class="method-card"><strong>Tier 1: 表層（リタニー）</strong><br>BBC, Reuters, NHK, 日経など主要メディア99フィード。事実報道と速報。</div>
+            <div class="method-card"><strong>Tier 2: 構造（社会原因）</strong><br>NOEMA, Aeon, Boston Review, Palladiumなど21フィード。社会構造・制度を分析する知性誌。</div>
+            <div class="method-card"><strong>Tier 3: 深層（世界観・神話）</strong><br>The Marginalian, Cascade Institute, Earth4Allなど4フィード。文明論・パラダイム転換。</div>
+          </div>
+        </div>
+
+        <div class="guide-section">
           <h3 class="guide-heading">メディアソース</h3>
-          <p class="guide-text" style="margin-bottom:12px">以下のメディアからニュースを自動収集しています。各メディアの信頼性に基づきTier分類されています。</p>
+          <p class="guide-text" style="margin-bottom:12px">以下の124メディアからニュースを自動収集しています。各メディアの信頼性に基づきTier分類されています。</p>
           <div id="guideMediaContent">
             <div class="loading-indicator"><div class="loading-spinner"></div><div>メディアソースを読み込み中...</div></div>
           </div>
