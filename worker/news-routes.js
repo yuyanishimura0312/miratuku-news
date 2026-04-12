@@ -8,6 +8,28 @@
 //   POST /api/foresight         - Ask a foresight question with context
 //   POST /api/foresight-builder - Build insight from bookmarked articles
 
+// Allowed origins for CORS — restrict to known deploy URLs only
+const ALLOWED_ORIGINS = [
+  'https://yuyanishimura0312.github.io',
+  'https://future-insight-proxy.nishimura-69a.workers.dev',
+  'https://future-insight-proxy.yuyanishimura0312.workers.dev',
+];
+
+// Validate the request Origin header and return restricted CORS headers.
+// Returns null if the origin is not allowed (caller should return 403).
+function getCorsHeaders(request) {
+  const origin = request.headers.get('Origin') || '';
+  if (!ALLOWED_ORIGINS.includes(origin)) {
+    return null;
+  }
+  return {
+    'Access-Control-Allow-Origin': origin,
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, X-User-Id',
+    'Access-Control-Max-Age': '86400',
+  };
+}
+
 // Stricter rate limit for foresight: 5 requests/min/user
 const foresightRateLimits = new Map();
 const FORESIGHT_RATE_WINDOW = 60 * 1000;
@@ -78,7 +100,16 @@ ${articleList}
 }
 
 // POST /api/foresight — Foresight question handler
-async function handleForesight(request, env, corsHeaders) {
+async function handleForesight(request, env, _corsHeaders) {
+  // Use origin-restricted CORS headers instead of the permissive ones from caller
+  const corsHeaders = getCorsHeaders(request);
+  if (!corsHeaders) {
+    return new Response(JSON.stringify({ error: 'Origin not allowed' }), {
+      status: 403,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
   if (request.method !== 'POST') {
     return new Response(JSON.stringify({ error: 'POST required' }), {
       status: 405,
@@ -173,7 +204,15 @@ async function handleForesight(request, env, corsHeaders) {
 }
 
 // POST /api/foresight-builder — Build insight from bookmarks
-async function handleForesightBuilder(request, env, corsHeaders) {
+async function handleForesightBuilder(request, env, _corsHeaders) {
+  const corsHeaders = getCorsHeaders(request);
+  if (!corsHeaders) {
+    return new Response(JSON.stringify({ error: 'Origin not allowed' }), {
+      status: 403,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
   if (request.method !== 'POST') {
     return new Response(JSON.stringify({ error: 'POST required' }), {
       status: 405,
@@ -266,7 +305,15 @@ async function handleForesightBuilder(request, env, corsHeaders) {
 }
 
 // POST /api/regenerate-report — Regenerate an insight report with structured JSON output
-async function handleRegenerateReport(request, env, corsHeaders) {
+async function handleRegenerateReport(request, env, _corsHeaders) {
+  const corsHeaders = getCorsHeaders(request);
+  if (!corsHeaders) {
+    return new Response(JSON.stringify({ error: 'Origin not allowed' }), {
+      status: 403,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
   if (request.method !== 'POST') {
     return new Response(JSON.stringify({ error: 'POST required' }), {
       status: 405,
@@ -405,6 +452,8 @@ export {
   handleForesightBuilder,
   handleRegenerateReport,
   cleanupForesightRateLimits,
+  getCorsHeaders,
+  ALLOWED_ORIGINS,
 };
 
 // Integration example for main worker/index.js:
