@@ -1927,6 +1927,15 @@
         background: linear-gradient(90deg, transparent, var(--bg));
         pointer-events: none;
       }
+      @keyframes nav-scroll-hint {
+        0% { transform: translateX(0); }
+        40% { transform: translateX(-20px); }
+        70% { transform: translateX(0); }
+        100% { transform: translateX(0); }
+      }
+      .site-nav.scroll-hint .nav-list {
+        animation: nav-scroll-hint 1.2s ease-in-out 1;
+      }
       .nav-list { padding-right: 2.5rem; gap: 6px; padding-top: 6px; padding-bottom: 10px; }
       .nav-link {
         padding: 7px 14px;
@@ -3640,6 +3649,15 @@
               (d.articles || []).slice(0, 3).forEach(a => topNews.push('[' + cat + '] ' + (a.title || '')));
             });
             window.__newsContext = topNews.join('\n').slice(0, 2000);
+          }
+
+          // Mobile nav scroll hint (first visit only)
+          if (!localStorage.getItem('nav_scroll_seen')) {
+            const nav = document.querySelector('.site-nav');
+            if (nav && nav.scrollWidth > nav.clientWidth) {
+              nav.classList.add('scroll-hint');
+              setTimeout(() => { nav.classList.remove('scroll-hint'); localStorage.setItem('nav_scroll_seen', '1'); }, 1500);
+            }
           }
         } catch (renderErr) {
           console.error('Render error:', renderErr);
