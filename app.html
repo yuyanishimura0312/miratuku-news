@@ -5026,7 +5026,7 @@
 
       const resetBtn = hasOverrides ? '<button class="tier-reset-btn" onclick="resetMediaTiers()">Tierリセット</button>' : '';
 
-      container.innerHTML = '<div class="media-meta">' + filtered.length + 'メディアから合計 <strong>' + totalArticles.toLocaleString() + '</strong> 件の記事を収集' + resetBtn + '</div>' +
+      container.innerHTML = '<div class="media-meta">' + filtered.length + ' RSSフィードから <strong>' + totalArticles.toLocaleString() + '</strong> 件の記事を収集' + (data.total_articles_all ? '（DB全体: ' + data.total_articles_all.toLocaleString() + ' 件）' : '') + resetBtn + '</div>' +
         '<div class="media-table-wrap"><table class="media-table"><thead><tr>' +
         '<th>メディア名</th><th>分野</th><th>Tier</th><th>記事数</th><th>最終取得</th></tr></thead><tbody>' +
         filtered.sort((a, b) => {
@@ -5056,13 +5056,15 @@
       // Render ALL media (unfiltered) in guide section
       if (guideContainer) {
         const allArticles = sources.reduce((sum, s) => sum + (s.articles_count || 0), 0);
+        const totalAll = data.total_articles_all || 0;
         const allSorted = sources.slice().sort((a, b) => {
           const tA = (getEffectiveTier(a) === '-' ? 99 : getEffectiveTier(a));
           const tB = (getEffectiveTier(b) === '-' ? 99 : getEffectiveTier(b));
           if (tA !== tB) return tA - tB;
           return (b.articles_count || 0) - (a.articles_count || 0);
         });
-        guideContainer.innerHTML = '<div class="media-meta">' + sources.length + 'メディアから合計 <strong>' + allArticles.toLocaleString() + '</strong> 件の記事を収集（国内' + sources.filter(s=>(s.language||'').toLowerCase()==='ja').length + ' + 海外' + sources.filter(s=>(s.language||'').toLowerCase()==='en').length + '）</div>' +
+        const dbNote = totalAll ? '<div class="media-meta" style="margin-top:4px;font-size:0.9em;opacity:0.8">データベース全体: <strong>' + totalAll.toLocaleString() + '</strong> 件（GDELT・歴史データ含む ' + (data.distinct_sources_all || 0).toLocaleString() + ' ソース）</div>' : '';
+        guideContainer.innerHTML = '<div class="media-meta">' + sources.length + ' RSSフィードから <strong>' + allArticles.toLocaleString() + '</strong> 件の記事を収集（国内' + sources.filter(s=>(s.language||'').toLowerCase()==='ja').length + ' + 海外' + sources.filter(s=>(s.language||'').toLowerCase()==='en').length + '）</div>' + dbNote +
           '<div class="media-table-wrap"><table class="media-table"><thead><tr>' +
           '<th>メディア名</th><th>分野</th><th>Tier</th><th>言語</th><th>記事数</th><th>最終取得</th></tr></thead><tbody>' +
           allSorted.map(s => {
