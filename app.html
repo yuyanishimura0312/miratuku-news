@@ -3048,7 +3048,7 @@
       <div class="guide-content">
         <div class="guide-section">
           <h3 class="guide-heading">Insight News とは</h3>
-          <p class="guide-text">Insight News は、ミラツク・インテリジェンス・パイプラインが毎日3つのデータストリーム（PESTLEニュース2,000件、学術論文1,000件、歴史的PESTLE記事~1,200件）を自動収集し、因果階層分析（CLA）、弱いシグナル検出、シナリオ生成を行う未来洞察プラットフォームです。124のRSSフィード（国内57、海外67）と学術API、さらに1900年から現在まで126年分・22万件超の歴史データベースを基盤に、「異分野の交差点から未来を見る」というミラツクの理念を実装しています。</p>
+          <p class="guide-text">Insight News は、ミラツク・インテリジェンス・パイプラインが毎日3つのデータストリーム（PESTLEニュース約2,000件、学術論文約1,000件、歴史的PESTLE記事約1,200件）を自動収集し、因果階層分析（CLA）、弱いシグナル検出、シナリオ生成を行う未来洞察プラットフォームです。<span id="guideOverviewStats">124のRSSフィード（国内57、海外67）と学術API、さらに1900年から現在まで126年分・22万件超の歴史データベース</span>を基盤に、「異分野の交差点から未来を見る」というミラツクの理念を実装しています。</p>
         </div>
         <div class="guide-section">
           <h3 class="guide-heading">各セクションの説明</h3>
@@ -3139,8 +3139,8 @@
           <p class="guide-text" style="margin-bottom:16px">Insight News は毎日3つのデータストリームを自動収集・分析しています。</p>
           <div class="method-grid" style="grid-template-columns:1fr">
             <div class="method-card" style="border-left:3px solid var(--accent)">
-              <strong>Stream 1: PESTLEニュース（2,000件/日）</strong><br>
-              124のRSSフィード（国内57、海外67）とGDELT APIから取得。6カテゴリ各334件に自動分類。フォーサイト機関（NOEMA, Aeon, Nautilus等）、非西洋圏メディア（The Conversation Africa, Global Voices, The Diplomat等）、国内官公庁15省庁のフィードを含む。Tier 2-3（深層レイヤー）ソースにはスコアブーストを適用し、弱いシグナルが表層ニュースに埋もれないよう設計。
+              <strong>Stream 1: PESTLEニュース（約2,000件/日）</strong><br>
+              <span id="guideStreamStats">124のRSSフィード（国内57、海外67）</span>とGDELT APIから取得。6カテゴリ各334件に自動分類。フォーサイト機関（NOEMA, Aeon, Nautilus等）、非西洋圏メディア（The Conversation Africa, Global Voices, The Diplomat等）、国内官公庁15省庁のフィードを含む。Tier 2-3（深層レイヤー）ソースにはスコアブーストを適用し、弱いシグナルが表層ニュースに埋もれないよう設計。
             </div>
             <div class="method-card" style="border-left:3px solid var(--S)">
               <strong>Stream 2: 学術論文（1,000件/日）</strong><br>
@@ -3288,7 +3288,7 @@
 
         <div class="guide-section">
           <h3 class="guide-heading">全メディアソース一覧</h3>
-          <p class="guide-text" style="margin-bottom:12px">以下の124メディアからニュースを自動収集しています。各メディアの信頼性に基づきTier分類されています。</p>
+          <p class="guide-text" style="margin-bottom:12px" id="guideMediaIntro">以下のメディアからニュースを自動収集しています。各メディアの信頼性に基づきTier分類されています。</p>
           <div id="guideMediaContent">
             <div class="loading-indicator"><div class="loading-spinner"></div><div>メディアソースを読み込み中...</div></div>
           </div>
@@ -3829,7 +3829,7 @@
         var mythLabel = r.myth_relation === 'strengthens' ? '強化' : '変革';
         var mythClass = r.myth_relation === 'strengthens' ? 'ir-myth-badge-strengthens' : 'ir-myth-badge-transforms';
         html += '<div class="ir-side-item' + (i === 0 ? ' active' : '') + '" onclick="switchHeroReport(' + i + ')" data-ir-index="' + i + '">' +
-          '<div class="ir-side-dot" style="background:' + catInfo.color + '"></div>' +
+          '<div class="ir-side-dot" style="background:' + catInfo.color + '" title="' + escapeHtml(catInfo.labelJa || '') + '" aria-label="' + escapeHtml(catInfo.labelJa || '') + '"></div>' +
           '<div class="ir-side-text">' +
             '<div class="ir-side-title">' + escapeHtml(r.report_title || '') + '</div>' +
             '<span class="ir-side-myth ' + mythClass + '">' + mythLabel + '</span>' +
@@ -3853,7 +3853,7 @@
             '<div class="ir-carousel-accent" style="background:' + catInfo.color + '"></div>' +
             '<div class="ir-carousel-body">' +
               '<div class="ir-carousel-header">' +
-                '<div class="ir-carousel-dot" style="background:' + catInfo.color + '"></div>' +
+                '<div class="ir-carousel-dot" style="background:' + catInfo.color + '" title="' + escapeHtml(catInfo.labelJa || '') + '"></div>' +
                 '<span class="ir-carousel-cat">' + escapeHtml(catInfo.labelJa || r.article?.pestle_category || '') + '</span>' +
               '</div>' +
               '<div class="ir-carousel-title">' + escapeHtml(r.report_title || '') + '</div>' +
@@ -4348,6 +4348,7 @@
     function renderCLAMetaReport(metaData) {
       const metaContainer = document.getElementById('claMetaContent');
       if (!metaContainer) return;
+      if (!metaData) { metaContainer.innerHTML = '<p class="text-muted">メタレポートデータがありません。</p>'; return; }
 
       const regions = [
         { key: 'japan', label: '日本メディアの視点' },
@@ -5082,6 +5083,23 @@
               '<td class="media-date">' + escapeHtml(s.last_fetched || '-') + '</td></tr>';
           }).join('') + '</tbody></table></div>';
       }
+
+      // Update hardcoded guide stats with live data
+      const totalAll = data.total_articles_all || 0;
+      const jaCount = sources.filter(s => (s.language || '').toLowerCase() === 'ja').length;
+      const enCount = sources.filter(s => (s.language || '').toLowerCase() === 'en').length;
+      const overviewEl = document.getElementById('guideOverviewStats');
+      if (overviewEl && totalAll) {
+        overviewEl.textContent = sources.length + 'のRSSフィード（国内' + jaCount + '、海外' + enCount + '）と学術API、さらに1900年から現在まで126年分・' + totalAll.toLocaleString() + '件超の歴史データベース';
+      }
+      const streamEl = document.getElementById('guideStreamStats');
+      if (streamEl) {
+        streamEl.textContent = sources.length + 'のRSSフィード（国内' + jaCount + '、海外' + enCount + '）';
+      }
+      const introEl = document.getElementById('guideMediaIntro');
+      if (introEl) {
+        introEl.textContent = '以下の' + sources.length + 'メディアからニュースを自動収集しています。各メディアの信頼性に基づきTier分類されています。';
+      }
     }
 
     // Shared helpers for PESTLE category display
@@ -5118,7 +5136,7 @@
           html += '<div class="ir-carousel-card" onclick="openInsightReport(' + i + ')" style="flex:none;width:auto">' +
             '<div class="ir-carousel-accent" style="background:' + color + '"></div>' +
             '<div class="ir-carousel-body">' +
-              '<div class="ir-carousel-header"><div class="ir-carousel-dot" style="background:' + color + '"></div>' +
+              '<div class="ir-carousel-header"><div class="ir-carousel-dot" style="background:' + color + '" title="' + escapeHtml(getPestleLabel(r.article?.pestle_category)) + '"></div>' +
               '<span class="ir-carousel-cat">' + escapeHtml(getPestleLabel(r.article?.pestle_category)) + '</span></div>' +
               '<div class="ir-carousel-title" style="-webkit-line-clamp:3">' + escapeHtml(r.report_title || '') + '</div>' +
               mythBadgeHtml(r.myth_relation, 'ir-carousel-myth') +
@@ -5224,7 +5242,7 @@
               inner += '<div class="ir-carousel-card" style="flex:none;width:auto;cursor:pointer" onclick="openArchivedInsightReport(\'' + dateKey + '\',' + i + ')">' +
                 '<div class="ir-carousel-accent" style="background:' + color + '"></div>' +
                 '<div class="ir-carousel-body">' +
-                  '<div class="ir-carousel-header"><div class="ir-carousel-dot" style="background:' + color + '"></div>' +
+                  '<div class="ir-carousel-header"><div class="ir-carousel-dot" style="background:' + color + '" title="' + escapeHtml(getPestleLabel(r.article?.pestle_category)) + '"></div>' +
                   '<span class="ir-carousel-cat">' + escapeHtml(getPestleLabel(r.article?.pestle_category)) + '</span></div>' +
                   '<div class="ir-carousel-title">' + escapeHtml(r.report_title || '') + '</div>' +
                   mythBadgeHtml(r.myth_relation, 'ir-carousel-myth') +
@@ -5609,7 +5627,8 @@
           'エコシステム', 'クラスター', 'シリコンバレー', 'テックハブ', 'ベンチャー', '起業', '産業集積', 'DAO', 'Web3', '特区', 'hub', 'ecosystem', 'venture', 'technopol', 'cluster', 'incubat', 'accelerat'] },
       { no: 2,  name: 'テクノロジーを用いた理想的身体機能の拡張', map: '技術と身体',
         keywords: ['身体拡張', '義肢', 'ウェアラブル', 'サイボーグ', '脳機械インターフェース', 'BCI', 'バイオハック', 'exoskeleton', 'prosthetic', 'augment', 'biohack',
-          'インプラント', 'パワードスーツ', '人工臓器', '生体工学', 'ニューラリンク', 'haptic', 'implant', 'neuroprosthe', 'wearable', 'bioelectron', 'sensory', 'cochlear', 'retinal'] },
+          'インプラント', 'パワードスーツ', '人工臓器', '生体工学', 'ニューラリンク', 'haptic', 'implant', 'neuroprosthe', 'wearable', 'bioelectron', 'sensory', 'cochlear', 'retinal',
+          'hearing aid', 'assistive', 'orthopedic', 'neuralink', 'human enhancement', 'body hack', 'smart glass', 'smart watch', 'health monitor', 'biosensor', 'brain implant', 'robotic limb', 'bionics', 'human augment'] },
       { no: 3,  name: 'テクノロジーの非人間的活用', map: '技術と倫理',
         keywords: ['監視', 'サイバー攻撃', '自律兵器', 'ドローン兵器', 'ディープフェイク', 'AI倫理', 'サイバーセキュリティ', 'surveillance', 'cyber weapon', 'deepfake', 'autonomous weapon',
           '顔認識', '情報操作', 'プロパガンダ', 'ランサムウェア', '偽情報', 'フェイクニュース', 'キラーロボット', 'スパイウェア', 'facial recognition', 'disinformation', 'misinformation', 'ransomware', 'spyware', 'lethal autonomous', 'weaponiz', 'malware', 'hack'] },
@@ -5617,8 +5636,9 @@
         keywords: ['スマートグリッド', '資源管理', 'エネルギー効率', 'IoT', 'スマート農業', '水資源', 'リサイクル', 'smart grid', 'resource', 'precision agriculture', 'circular economy',
           'エネルギー', '再生可能', '新エネルギー', '省エネ', '蓄電', 'バッテリー', '送電', '電力', '太陽光', '風力', '水素', 'レアメタル', '廃棄物', 'サプライチェーン', 'energy', 'renewable', 'solar', 'wind', 'hydrogen', 'battery', 'storage', 'grid', 'waste', 'recycl', 'sustain', 'efficien', 'conserv', 'water management', 'desalinat', 'rare earth', 'lithium', 'supply chain'] },
       { no: 5,  name: 'デジタルワールドと現実世界の融合', map: 'デジタルと現実',
-        keywords: ['メタバース', 'AR', 'VR', 'XR', 'デジタルツイン', '仮想現実', '拡張現実', 'NFT', 'metaverse', 'digital twin', 'mixed reality', 'virtual',
-          'ホログラム', '没入', 'アバター', 'ブロックチェーン', 'デジタルアート', 'バーチャル空間', 'hologram', 'immersive', 'avatar', 'spatial computing', 'blockchain', 'token', 'web3', 'augmented'] },
+        keywords: ['メタバース', 'VR ', 'XR ', 'デジタルツイン', '仮想現実', '拡張現実', 'NFT', 'metaverse', 'digital twin', 'mixed reality', 'virtual reality', 'virtual world',
+          'ホログラム', '没入', 'アバター', 'ブロックチェーン', 'デジタルアート', 'バーチャル空間', 'hologram', 'immersive', 'avatar', 'spatial computing', 'blockchain', 'web3',
+          'augmented reality', 'extended reality', '仮想空間', 'デジタル世界', 'crypto', 'decentralized app', 'smart contract', 'DAO '] },
       { no: 6,  name: 'ロボットによる自動化する社会', map: '自動化社会',
         keywords: ['ロボット', '自動化', '自動運転', 'RPA', 'ファクトリーオートメーション', '無人', 'AGV', 'robot', 'automat', 'autonomous', 'driverless', 'unmanned',
           'ドローン', '配送ロボット', '無人店舗', '工場自動化', '物流自動化', 'ロボティクス', 'drone', 'warehouse', 'logistics automat', 'robotic', 'self-driving', 'lidar', 'autopilot'] },
@@ -5650,25 +5670,34 @@
         keywords: ['多様性', 'ダイバーシティ', 'インクルージョン', 'ジェンダー', 'LGBTQ', 'アクセシビリティ', '共生', 'diversity', 'inclusion', 'gender', 'equity', 'accessibility', 'multicultural',
           'フェミニズム', '同性婚', '障害者', 'ユニバーサルデザイン', '先住民', '民族', '人種', '差別', 'DEI', '公正', 'feminism', 'marriage equality', 'disability', 'universal design', 'indigenous', 'racial', 'ethnic', 'anti-discrimination', 'representat', 'intersectional'] },
       { no: 16, name: '脳の解明と再現', map: '脳科学',
-        keywords: ['脳科学', '神経科学', 'ニューロ', '人工知能', 'AGI', 'ブレイン', '意識', '認知科学', 'neuroscience', 'brain', 'neural', 'AGI', 'consciousness', 'cognitive',
-          '深層学習', 'ディープラーニング', 'ニューラルネットワーク', '機械学習', 'トランスフォーマー', 'シナプス', '脳波', '脳イメージング', 'AI', 'deep learning', 'machine learning', 'neural network', 'transformer', 'synapse', 'fMRI', 'brain-computer', 'neuromorphic', 'artificial general', 'superintelligen'] },
+        keywords: ['脳科学', '神経科学', 'ニューロ', '人工知能', 'AGI ', 'ブレイン', '認知科学', 'neuroscience', 'brain', 'neural network', 'consciousness', 'cognitive science',
+          '深層学習', 'ディープラーニング', 'ニューラルネットワーク', '機械学習', 'シナプス', '脳波', '脳イメージング', 'deep learning', 'machine learning', 'artificial intelligence', 'transformer model', 'synapse', 'fMRI', 'brain-computer', 'neuromorphic', 'artificial general intelligence', 'superintelligen', 'large language model', 'GPT', 'neural net', 'generative AI', 'AI model', 'AI system'] },
       { no: 17, name: '閉じる国家と停滞する社会', map: '国家と停滞',
         keywords: ['保護主義', '孤立主義', '少子化', '人口減少', '高齢化', '停滞', 'ポピュリズム', '権威主義', 'protectionism', 'isolationism', 'demographic decline', 'aging society', 'populism', 'authoritarian',
           '出生率', '人口危機', 'ナショナリズム', '排外', '関税', 'デカップリング', '国境', '規制強化', 'birth rate', 'fertility', 'nationalism', 'xenophob', 'tariff', 'decoupling', 'border', 'stagnation', 'recession', 'autocra', 'illiberal', 'sovereignty', 'deglobaliz'] },
       { no: 18, name: '暮らしの基盤自体の多様化', map: '暮らしの変容',
         keywords: ['リモートワーク', '多拠点', 'ノマド', '教育改革', 'ベーシックインカム', 'ライフスタイル', 'ワーケーション', '暮らし方', 'remote work', 'nomad', 'basic income', 'lifestyle', 'co-living', 'edtech',
-          'テレワーク', 'フレックス', '副業', 'ギグエコノミー', '地方移住', '関係人口', 'シェアハウス', '食の多様化', '代替肉', 'オンライン教育', 'MOOC', 'gig economy', 'hybrid work', 'coworking', 'digital nomad', 'alternative protein', 'plant-based', 'home school', 'lifelong learning', 'work-life', 'four-day work', 'universal basic'] }
+          'テレワーク', 'フレックス', '副業', 'ギグエコノミー', '地方移住', '関係人口', 'シェアハウス', '食の多様化', '代替肉', 'オンライン教育', 'MOOC', 'gig economy', 'hybrid work', 'coworking', 'digital nomad', 'alternative protein', 'plant-based', 'home school', 'lifelong learning', 'work-life', 'four-day work', 'universal basic',
+          'housing', 'rent', 'mortgage', 'urban planning', 'suburba', 'commut', 'freelanc', 'side job', 'food delivery', 'sharing economy', 'subscription', 'work from home', 'flexible work', 'education reform', 'online learning', 'childcare', '保育', '住宅', '通勤', '働き方改革', 'ワークライフバランス', '在宅勤務', '非正規', 'フードデリバリー', 'サブスクリプション'] }
     ];
 
     let _themesRendered = false;
 
     // Shared fuzzy matching: checks title (weight 2) and summary (weight 1)
+    // Short English keywords (<=3 chars) use word-boundary matching to avoid false positives
+    function _kwMatch(text, kw) {
+      if (kw.length <= 3 && /^[a-z]+$/i.test(kw)) {
+        // Word boundary match for short English terms like "AI", "VR", "IoT"
+        return new RegExp('\\b' + kw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'i').test(text);
+      }
+      return text.includes(kw);
+    }
     function _themeMatchScore(text, titleText, kwLower) {
       let score = 0;
       const hits = [];
       kwLower.forEach(kw => {
-        const inTitle = titleText.includes(kw);
-        const inBody = !inTitle && text.includes(kw);
+        const inTitle = _kwMatch(titleText, kw);
+        const inBody = !inTitle && _kwMatch(text, kw);
         if (inTitle) { score += 2; hits.push(kw); }
         else if (inBody) { score += 1; hits.push(kw); }
       });
