@@ -3576,7 +3576,8 @@
       if (etag) headers['If-None-Match'] = etag;
       if (lastMod) headers['If-Modified-Since'] = lastMod;
 
-      fetch(DATA_BASE + '/' + filename + cacheBust(), { headers: headers })
+      // No cacheBust here — conditional requests need stable URLs for 304 responses
+      fetch(DATA_BASE + '/' + filename, { headers: headers })
         .then(res => {
           if (res.status === 304) {
             // Not modified — just refresh timestamp
@@ -3621,6 +3622,25 @@
           renderReportsArchive(dailyReport);
           renderThemes();
           updateBookmarkUI();
+
+          // Populate foresight context for AI chat quality
+          if (aiAnalysis?.cla) {
+            window.__claContext = Object.entries(aiAnalysis.cla)
+              .map(([cat, d]) => '[' + cat + '] ' + (d.litany || '') + ' ' + (d.key_tension || ''))
+              .join('\n').slice(0, 3000);
+          }
+          if (aiAnalysis?.weak_signals) {
+            window.__signalsContext = aiAnalysis.weak_signals.slice(0, 20)
+              .map(s => (s.signal || '') + ': ' + (s.description || ''))
+              .join('\n').slice(0, 2000);
+          }
+          if (latest?.pestle) {
+            const topNews = [];
+            Object.entries(latest.pestle).forEach(([cat, d]) => {
+              (d.articles || []).slice(0, 3).forEach(a => topNews.push('[' + cat + '] ' + (a.title || '')));
+            });
+            window.__newsContext = topNews.join('\n').slice(0, 2000);
+          }
         } catch (renderErr) {
           console.error('Render error:', renderErr);
           document.getElementById('homeDashboard').innerHTML = '<div class="error-message">データの表示中にエラーが発生しました。ページを再読み込みしてください。</div>';
@@ -4923,7 +4943,7 @@
       return '<div class="paper-item">' +
         (sourceName ? '<div class="paper-journal">' + escapeHtml(sourceName) + '</div>' : '') +
         '<div class="paper-title-row"><div class="paper-title"><a href="' + escapeAttr(safeUrl(paper.source_url || paper.doi || '#')) + '" target="_blank">' + escapeHtml(displayTitle) + '</a></div>' +
-        '<button class="bookmark-btn ' + (isBookmarked ? 'bookmarked' : '') + '" onclick="event.stopPropagation();toggleBookmark(\'' + bookmarkId + '\',\'' + escapeAttr(displayTitle) + '\',\'' + escapeAttr(paper.source_url || paper.doi || '') + '\',this)" title="ブックマーク">&#9734;</button></div>' +
+        '<button class="bookmark-btn ' + (isBookmarked ? 'bookmarked' : '') + '" onclick="event.stopPropagation();toggleBookmark(\'' + bookmarkId + '\',\'' + escapeAttr(displayTitle) + '\',\'' + escapeAttr(safeUrl(paper.source_url || paper.doi || '')) + '\',this)" title="ブックマーク">&#9734;</button></div>' +
         (!isJournalOnly && paper.title_ja ? '<div class="paper-title-ja">' + escapeHtml(paper.title_ja) + '</div>' : '') +
         (paper.authors ? '<div class="paper-authors">' + escapeHtml(paper.authors) + '</div>' : '') +
         '<div class="paper-meta-row">' +
@@ -5540,7 +5560,7 @@
       } else {
         filtered.forEach(b => {
           html += '<div class="bookmark-list-item"><div class="bookmark-info">' +
-            (b.url ? '<a href="' + escapeHtml(b.url) + '" target="_blank" class="bookmark-title">' + escapeHtml(b.title) + '</a>' : '<span class="bookmark-title">' + escapeHtml(b.title) + '</span>') +
+            (b.url ? '<a href="' + escapeHtml(safeUrl(b.url)) + '" target="_blank" class="bookmark-title">' + escapeHtml(b.title) + '</a>' : '<span class="bookmark-title">' + escapeHtml(b.title) + '</span>') +
             '<div class="bookmark-date">' + (b.addedAt ? new Date(b.addedAt).toLocaleDateString('ja-JP') : '') + '</div>' +
             '</div><div class="bookmark-actions">' +
             '<button class="bookmark-action-btn" onclick="toggleArchiveBookmark(\'' + escapeAttr(b.id) + '\')" title="' + (b.archived ? '復元' : 'アーカイブ') + '">' + (b.archived ? '&#8634;' : '&#9744;') + '</button>' +
@@ -5735,10 +5755,9 @@
       const aiTranslations = typeof dataCache !== 'undefined' ? (dataCache['ai_analysis.json']?.translations || {}) : {};
       // If data not loaded yet, skip and retry later
       if (!latestRaw) return;
-      if (latestRaw) {
-        ['japan', 'global'].forEach(region => {
-          const regionData = latestRaw[region] || latestRaw;
-          const pestle = regionData?.pestle || regionData;
+      // Use pestle directly (no japan/global split in latest.json)
+      {
+        const pestle = latestRaw?.pestle || latestRaw;
           if (pestle && typeof pestle === 'object') {
             Object.keys(pestle).forEach(catKey => {
               const cat = pestle[catKey];
@@ -5758,7 +5777,6 @@
               });
             });
           }
-        });
       }
 
       const themed = matchNewsToThemes(allArticles);
