@@ -3619,6 +3619,7 @@
           renderPapers(papers);
           renderMediaSources(mediaSources);
           renderReportsArchive(dailyReport);
+          renderThemes();
           updateBookmarkUI();
         } catch (renderErr) {
           console.error('Render error:', renderErr);
@@ -5703,6 +5704,8 @@
       const allArticles = [];
       const latestRaw = typeof dataCache !== 'undefined' ? dataCache['latest.json'] : null;
       const aiTranslations = typeof dataCache !== 'undefined' ? (dataCache['ai_analysis.json']?.translations || {}) : {};
+      // If data not loaded yet, skip and retry later
+      if (!latestRaw) return;
       if (latestRaw) {
         ['japan', 'global'].forEach(region => {
           const regionData = latestRaw[region] || latestRaw;
