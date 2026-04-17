@@ -5299,8 +5299,16 @@
           '</div>' +
           '<div class="sig-dash-row" style="margin-bottom:0"><div class="sig-dash-block" style="flex:1"><div class="sig-dash-label">PESTLE x Three Horizons Matrix</div><div class="sig-matrix-wrap">' + matrixHtml + '</div></div></div>' +
         '</div>' +
-        // Filter bar
+        // Filter bar — search + chips + sort + group + score range
         '<div class="sig-filterbar" id="sigFilterBar">' +
+          // Row 1: Search + Sort + Group
+          '<div style="display:flex;gap:10px;align-items:center;width:100%;padding-bottom:10px;border-bottom:1px solid var(--border-light);margin-bottom:10px;flex-wrap:wrap">' +
+            '<input type="search" id="sigSearchInput" placeholder="シグナルを検索..." style="flex:1;min-width:200px;max-width:360px;height:32px;padding:0 10px 0 30px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:0.8rem;font-family:var(--font);background-image:url(\'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2214%22 height=%2214%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23999%22 stroke-width=%222%22%3E%3Ccircle cx=%2211%22 cy=%2211%22 r=%228%22/%3E%3Cpath d=%22m21 21-4.35-4.35%22/%3E%3C/svg%3E\');background-repeat:no-repeat;background-position:8px center" />' +
+            '<select class="sig-sort-select" id="sigSortSelect"><option value="score_desc">Score (高い順)</option><option value="score_asc">Score (低い順)</option><option value="impact">Impact (High優先)</option><option value="horizon">Horizon (H3優先)</option></select>' +
+            '<select class="sig-sort-select" id="sigGroupSelect"><option value="none">グループなし</option><option value="type">タイプ別</option><option value="pestle">PESTLE別</option><option value="horizon">Horizon別</option></select>' +
+            '<div class="sig-filter-result" style="border-left:1px solid var(--border-light);padding-left:12px"><span id="sigFilterCount">' + weakSignals.length + '件</span>を表示</div>' +
+          '</div>' +
+          // Row 2: Filter chips
           '<div class="sig-filter-group"><span class="sig-filter-label">Type</span><div class="sig-filter-chips" id="filterType">' +
             '<button class="sig-chip sig-chip--active" data-val="all">All</button>' +
             Object.keys(signalTypeMap).map(function(k) { return '<button class="sig-chip" data-val="' + k + '">' + signalTypeMap[k].label + '</button>'; }).join('') +
@@ -5317,44 +5325,94 @@
             '<button class="sig-chip sig-chip--active" data-val="all">All</button>' +
             '<button class="sig-chip" data-val="H1">H1</button><button class="sig-chip" data-val="H2">H2</button><button class="sig-chip" data-val="H3">H3</button>' +
           '</div></div>' +
-          '<div class="sig-filter-group sig-filter-group--sort"><span class="sig-filter-label">Sort</span>' +
-            '<select class="sig-sort-select" id="sigSortSelect"><option value="score_desc">Score (高い順)</option><option value="score_asc">Score (低い順)</option><option value="impact">Impact (High優先)</option><option value="horizon">Horizon (H3優先)</option></select>' +
+          '<div class="sig-filter-group" style="border-right:none"><span class="sig-filter-label">Score Min</span>' +
+            '<input type="range" id="sigScoreRange" min="0" max="10" step="0.5" value="0" style="width:80px;accent-color:var(--accent)">' +
+            '<span id="sigScoreVal" style="font-size:0.72rem;font-weight:700;color:var(--accent);min-width:20px">ALL</span>' +
           '</div>' +
-          '<div class="sig-filter-result"><span id="sigFilterCount">' + weakSignals.length + '件</span>を表示</div>' +
         '</div>' +
         // Card grid
         '<div class="ws-grid" id="wsGrid">' + cardsHtml + '</div>';
 
-      // ===== Filter / Sort logic =====
-      var filterState = { type: 'all', impact: 'all', pestle: 'all', horizon: 'all' };
+      // ===== Filter / Sort / Group / Search logic =====
+      var filterState = { type: 'all', impact: 'all', pestle: 'all', horizon: 'all', minScore: 0, query: '', group: 'none' };
 
-      function applyFilter() {
-        var grid = document.getElementById('wsGrid');
-        var cards = grid ? grid.querySelectorAll('.ws-card') : [];
+      function getFilteredSorted() {
         var sortVal = (document.getElementById('sigSortSelect') || {}).value || 'score_desc';
+        var q = filterState.query.toLowerCase();
         var impactOrderMap = { high: 0, medium: 1, low: 2 };
         var hOrderMap = { H3: 0, H2: 1, H1: 2 };
-        var cardsArr = Array.from(cards);
-        cardsArr.sort(function(a, b) {
-          if (sortVal === 'score_desc') return parseFloat(b.dataset.score || 0) - parseFloat(a.dataset.score || 0);
-          if (sortVal === 'score_asc') return parseFloat(a.dataset.score || 0) - parseFloat(b.dataset.score || 0);
-          if (sortVal === 'impact') return (impactOrderMap[a.dataset.impact] || 99) - (impactOrderMap[b.dataset.impact] || 99);
-          if (sortVal === 'horizon') return (hOrderMap[a.dataset.horizon] || 99) - (hOrderMap[b.dataset.horizon] || 99);
+
+        // Filter
+        var filtered = weakSignals.filter(function(ws, i) {
+          if (filterState.type !== 'all' && ws.signal_type !== filterState.type) return false;
+          if (filterState.impact !== 'all' && (ws.potential_impact || '').toLowerCase() !== filterState.impact) return false;
+          if (filterState.pestle !== 'all' && (ws.pestle_categories || []).indexOf(filterState.pestle) < 0) return false;
+          if (filterState.horizon !== 'all' && ws.three_horizons !== filterState.horizon) return false;
+          if (filterState.minScore > 0 && (ws.composite_score || 0) < filterState.minScore) return false;
+          if (q && ((ws.signal || '') + ' ' + (ws.description || '')).toLowerCase().indexOf(q) < 0) return false;
+          return true;
+        });
+
+        // Sort
+        filtered.sort(function(a, b) {
+          if (sortVal === 'score_desc') return (b.composite_score || 0) - (a.composite_score || 0);
+          if (sortVal === 'score_asc') return (a.composite_score || 0) - (b.composite_score || 0);
+          if (sortVal === 'impact') return (impactOrderMap[(a.potential_impact||'').toLowerCase()] || 99) - (impactOrderMap[(b.potential_impact||'').toLowerCase()] || 99);
+          if (sortVal === 'horizon') return (hOrderMap[a.three_horizons] || 99) - (hOrderMap[b.three_horizons] || 99);
           return 0;
         });
-        if (grid) cardsArr.forEach(function(c) { grid.appendChild(c); });
-        var visible = 0;
-        cardsArr.forEach(function(card) {
-          var typeOk = filterState.type === 'all' || card.dataset.type === filterState.type;
-          var impactOk = filterState.impact === 'all' || card.dataset.impact === filterState.impact;
-          var pestleOk = filterState.pestle === 'all' || (card.dataset.pestle || '').split(',').indexOf(filterState.pestle) >= 0;
-          var horizonOk = filterState.horizon === 'all' || card.dataset.horizon === filterState.horizon;
-          var show = typeOk && impactOk && pestleOk && horizonOk;
-          card.classList.toggle('ws-card--hidden', !show);
-          if (show) visible++;
-        });
+
+        return filtered;
+      }
+
+      function rebuildGrid() {
+        var filtered = getFilteredSorted();
+        var grid = document.getElementById('wsGrid');
+        if (!grid) return;
+
+        var groupVal = (document.getElementById('sigGroupSelect') || {}).value || 'none';
+
+        if (filtered.length === 0) {
+          grid.innerHTML = '<div style="text-align:center;padding:60px 20px;color:var(--text-muted);grid-column:1/-1">' +
+            '<div style="font-size:0.95rem;font-weight:600;color:var(--text-secondary);margin-bottom:8px">条件に一致するシグナルがありません</div>' +
+            '<div style="font-size:0.82rem">フィルタを変更するか、条件を緩めてください。</div></div>';
+        } else if (groupVal === 'none') {
+          grid.innerHTML = filtered.map(function(ws) { return renderCard(ws, weakSignals.indexOf(ws)); }).join('');
+        } else {
+          // Group by attribute
+          var groups = {};
+          var groupLabels = {
+            type: function(ws) { return ws.signal_type || 'unknown'; },
+            pestle: function(ws) { return (ws.pestle_categories && ws.pestle_categories[0]) || 'Other'; },
+            horizon: function(ws) { return ws.three_horizons || 'N/A'; }
+          };
+          var getKey = groupLabels[groupVal] || groupLabels.type;
+          filtered.forEach(function(ws) {
+            var k = getKey(ws);
+            if (!groups[k]) groups[k] = [];
+            groups[k].push(ws);
+          });
+
+          var groupOrder;
+          if (groupVal === 'horizon') groupOrder = ['H3', 'H2', 'H1', 'N/A'];
+          else if (groupVal === 'type') groupOrder = ['paradigm_shift', 'wild_card', 'emerging_trend', 'counter_trend', 'weak_signal'];
+          else groupOrder = Object.keys(groups).sort();
+
+          var html = '';
+          groupOrder.forEach(function(k) {
+            if (!groups[k] || groups[k].length === 0) return;
+            var displayLabel = groupVal === 'type' ? (signalTypeMap[k] ? signalTypeMap[k].label : k) :
+                              groupVal === 'horizon' ? (horizonMap[k] || k) : k;
+            html += '<div style="grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;padding:6px 0 10px;border-bottom:2px solid var(--border);margin-top:24px">' +
+              '<span style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-secondary)">' + escapeHtml(displayLabel) + '</span>' +
+              '<span style="font-size:0.68rem;color:var(--text-muted);background:var(--surface);padding:2px 8px;border:1px solid var(--border-light)">' + groups[k].length + '件</span></div>';
+            groups[k].forEach(function(ws) { html += renderCard(ws, weakSignals.indexOf(ws)); });
+          });
+          grid.innerHTML = html;
+        }
+
         var countEl = document.getElementById('sigFilterCount');
-        if (countEl) countEl.textContent = visible + '件';
+        if (countEl) countEl.textContent = filtered.length + '件';
       }
 
       // Bind filter chips
@@ -5371,15 +5429,38 @@
             group.querySelectorAll('.sig-chip').forEach(function(b) { b.classList.remove('sig-chip--active'); });
             btn.classList.add('sig-chip--active');
             filterState[cfg.key] = btn.dataset.val;
-            applyFilter();
+            rebuildGrid();
           });
         });
       });
 
+      // Sort
       var sortSelect = document.getElementById('sigSortSelect');
-      if (sortSelect) sortSelect.addEventListener('change', applyFilter);
-      applyFilter();
-      return; // end of new renderSignals
+      if (sortSelect) sortSelect.addEventListener('change', rebuildGrid);
+
+      // Group
+      var groupSelect = document.getElementById('sigGroupSelect');
+      if (groupSelect) groupSelect.addEventListener('change', function() { filterState.group = groupSelect.value; rebuildGrid(); });
+
+      // Search (debounced)
+      var searchInput = document.getElementById('sigSearchInput');
+      var searchTimer;
+      if (searchInput) searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(function() { filterState.query = searchInput.value; rebuildGrid(); }, 200);
+      });
+
+      // Score range
+      var scoreRange = document.getElementById('sigScoreRange');
+      var scoreVal = document.getElementById('sigScoreVal');
+      if (scoreRange) scoreRange.addEventListener('input', function() {
+        filterState.minScore = parseFloat(scoreRange.value);
+        if (scoreVal) scoreVal.textContent = filterState.minScore > 0 ? filterState.minScore : 'ALL';
+        rebuildGrid();
+      });
+
+      rebuildGrid();
+      return; // end of renderSignals
     }
 
     function renderSignals_REMOVED() { /* removed — see renderSignals above */
