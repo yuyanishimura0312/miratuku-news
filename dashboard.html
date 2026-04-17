@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Collection Dashboard | Insight News</title>
+  <link rel="icon" href="https://esse-sense.com/favicon.ico">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&family=Noto+Serif+JP:wght@400;700;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="js/shared/firebase-config.js"></script>
+
+  <style>
+    :root {
+      --bg: #FFFFFF;
+      --card: #FFFFFF;
+      --card-hover: #F7F7F5;
+      --accent: #121212;
+      --accent-soft: #555555;
+      --accent-warm: #CC1400;
+      --text: #121212;
+      --text-secondary: #555555;
+      --text-muted: #6B6B6B;
+      --border: #D9D9D9;
+      --border-light: #EEEEEE;
+      --surface: #F7F7F5;
+      --surface2: #EEEEEE;
+      --P: #8B0000;
+      --E: #1A5276;
+      --S: #1E8449;
+      --T: #2C3E50;
+      --L: #6C3483;
+      --En: #0E6655;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+      --shadow-md: 0 2px 8px rgba(0,0,0,0.08);
+      --font: "Noto Sans JP", "Hiragino Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-serif: "Noto Serif JP", "Hiragino Mincho ProN", Georgia, serif;
+      --status-ok: #1E8449;
+      --status-warn: #D4AC0D;
+      --status-error: #CC1400;
+    }
+
+    [data-theme="dark"] {
+      --bg: #121212;
+      --card: #1A1A1A;
+      --card-hover: #222222;
+      --accent: #E0E0E0;
+      --accent-soft: #999999;
+      --accent-warm: #FF4444;
+      --text: #E0E0E0;
+      --text-secondary: #AAAAAA;
+      --text-muted: #8A8A8A;
+      --border: #333333;
+      --border-light: #2A2A2A;
+      --surface: #1A1A1A;
+      --surface2: #222222;
+      --P: #E06060;
+      --E: #5599CC;
+      --S: #55AA77;
+      --T: #7799BB;
+      --L: #AA77CC;
+      --En: #44AA88;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+      --shadow-md: 0 2px 8px rgba(0,0,0,0.4);
+      --status-ok: #55AA77;
+      --status-warn: #E6C84A;
+      --status-error: #FF4444;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+
+    body {
+      font-family: var(--font);
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.7;
+      letter-spacing: 0.02em;
+      font-feature-settings: "palt";
+      min-height: 100vh;
+    }
+
+    /* --- Header --- */
+    .header {
+      border-bottom: 2px solid var(--accent);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .header-left { display: flex; align-items: center; gap: 16px; }
+    .header-left h1 {
+      font-family: var(--font-serif);
+      font-size: 1.1rem;
+      font-weight: 900;
+      letter-spacing: 0.06em;
+    }
+    .header-left h1 a {
+      color: var(--text);
+      text-decoration: none;
+    }
+    .header-left .sep {
+      color: var(--text-muted);
+      font-weight: 300;
+    }
+    .header-left .page-label {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .header-right { display: flex; align-items: center; gap: 12px; }
+    .header-right .back-link {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      text-decoration: none;
+      border: 1px solid var(--border);
+      padding: 4px 12px;
+      transition: background 0.15s;
+    }
+    .header-right .back-link:hover { background: var(--surface); }
+    .theme-toggle {
+      background: none; border: 1px solid var(--border);
+      color: var(--text-secondary); cursor: pointer;
+      padding: 4px 10px; font-size: 0.8rem;
+      font-family: var(--font);
+    }
+    .theme-toggle:hover { background: var(--surface); }
+
+    /* --- Main --- */
+    .main { max-width: 1400px; margin: 0 auto; padding: 24px; }
+
+    /* --- Section Title --- */
+    .section-title {
+      font-family: var(--font-serif);
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin: 32px 0 16px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+      letter-spacing: 0.04em;
+    }
+    .section-title:first-of-type { margin-top: 8px; }
+
+    /* --- Status bar --- */
+    .status-bar {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 10px 16px;
+      background: var(--surface);
+      border-left: 3px solid var(--status-ok);
+      margin-bottom: 24px;
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+    }
+    .status-bar.warn { border-left-color: var(--status-warn); }
+    .status-bar.error { border-left-color: var(--status-error); }
+    .status-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--status-ok);
+      flex-shrink: 0;
+    }
+    .status-bar.warn .status-dot { background: var(--status-warn); }
+    .status-bar.error .status-dot { background: var(--status-error); }
+    .status-bar .refresh-btn {
+      margin-left: auto;
+      background: none; border: 1px solid var(--border);
+      color: var(--text-secondary); cursor: pointer;
+      padding: 2px 10px; font-size: 0.75rem;
+      font-family: var(--font);
+    }
+    .status-bar .refresh-btn:hover { background: var(--card); }
+
+    /* --- KPI Grid --- */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+    .kpi-card {
+      background: var(--card);
+      border: 1px solid var(--border-light);
+      padding: 16px 18px;
+      box-shadow: var(--shadow-sm);
+    }
+    .kpi-label {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 4px;
+    }
+    .kpi-value {
+      font-family: var(--font-serif);
+      font-size: 1.8rem;
+      font-weight: 900;
+      line-height: 1.2;
+    }
+    .kpi-sub {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+    .kpi-value .delta {
+      font-size: 0.75rem;
+      font-weight: 500;
+      margin-left: 6px;
+      font-family: var(--font);
+    }
+    .delta.up { color: var(--status-ok); }
+    .delta.down { color: var(--status-error); }
+
+    /* --- Charts layout --- */
+    .chart-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 28px;
+    }
+    .chart-box {
+      background: var(--card);
+      border: 1px solid var(--border-light);
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+    }
+    .chart-box h3 {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 14px;
+    }
+    .chart-box canvas { width: 100% !important; max-height: 280px; }
+
+    /* --- Heatmap --- */
+    .heatmap-container {
+      background: var(--card);
+      border: 1px solid var(--border-light);
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 28px;
+      overflow-x: auto;
+    }
+    .heatmap-container h3 {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 14px;
+    }
+    .heatmap-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.75rem;
+    }
+    .heatmap-table th {
+      padding: 6px 8px;
+      text-align: center;
+      font-weight: 500;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    .heatmap-table th:first-child { text-align: left; width: 100px; }
+    .heatmap-table td {
+      padding: 6px 8px;
+      text-align: center;
+      border-bottom: 1px solid var(--border-light);
+      font-weight: 500;
+      transition: transform 0.1s;
+    }
+    .heatmap-table td:first-child {
+      text-align: left;
+      font-weight: 700;
+      color: var(--text-secondary);
+    }
+    .heatmap-cell {
+      display: inline-block;
+      width: 100%;
+      padding: 4px 0;
+    }
+
+    /* --- Alert summary --- */
+    .alert-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+    .alert-card {
+      background: var(--card);
+      border: 1px solid var(--border-light);
+      padding: 14px 16px;
+      box-shadow: var(--shadow-sm);
+    }
+    .alert-card .alert-type {
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 6px;
+    }
+    .alert-card .alert-type.surge { color: var(--status-error); }
+    .alert-card .alert-type.emergence { color: var(--status-warn); }
+    .alert-card .alert-type.crossover { color: var(--E); }
+    .alert-card .alert-level {
+      display: inline-block;
+      font-size: 0.65rem;
+      padding: 1px 6px;
+      margin-left: 6px;
+      border: 1px solid;
+      font-weight: 500;
+    }
+    .alert-card .alert-level.high { color: var(--status-error); border-color: var(--status-error); }
+    .alert-card .alert-level.medium { color: var(--status-warn); border-color: var(--status-warn); }
+    .alert-card .alert-level.low { color: var(--text-muted); border-color: var(--border); }
+    .alert-card .alert-title-text {
+      font-size: 0.85rem;
+      font-weight: 700;
+      line-height: 1.4;
+      margin-bottom: 4px;
+    }
+    .alert-card .alert-desc {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .alert-card .alert-mentions {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    /* --- Source table --- */
+    .source-table-wrap {
+      background: var(--card);
+      border: 1px solid var(--border-light);
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 28px;
+      overflow-x: auto;
+    }
+    .source-table-wrap h3 {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 14px;
+    }
+    .source-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.78rem;
+    }
+    .source-table th {
+      padding: 8px 10px;
+      text-align: left;
+      font-weight: 700;
+      color: var(--text-muted);
+      border-bottom: 2px solid var(--border);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+    }
+    .source-table th:hover { color: var(--text); }
+    .source-table td {
+      padding: 7px 10px;
+      border-bottom: 1px solid var(--border-light);
+      vertical-align: middle;
+    }
+    .source-table tr:hover td { background: var(--surface); }
+    .source-status {
+      display: inline-block;
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      margin-right: 4px;
+      vertical-align: middle;
+    }
+    .source-status.ok { background: var(--status-ok); }
+    .source-status.warn { background: var(--status-warn); }
+    .source-status.error { background: var(--status-error); }
+    .tier-badge {
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 1px 5px;
+      border: 1px solid var(--border);
+    }
+    .region-badge {
+      font-size: 0.65rem;
+      padding: 1px 5px;
+      background: var(--surface);
+    }
+
+    /* --- Loading --- */
+    .loading-overlay {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 200px;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+    .spinner {
+      width: 20px; height: 20px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-right: 10px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* --- Responsive --- */
+    @media (max-width: 900px) {
+      .chart-row { grid-template-columns: 1fr; }
+      .kpi-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 600px) {
+      .main { padding: 12px; }
+      .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+      .header { padding: 10px 12px; }
+      .header-left h1 { font-size: 0.95rem; }
+      .alert-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-left">
+      <h1><a href="app.html">Insight News</a> <span class="sep">/</span> <span class="page-label">Collection Dashboard</span></h1>
+    </div>
+    <div class="header-right">
+      <a href="app.html" class="back-link">Back to News</a>
+      <button class="theme-toggle" onclick="toggleTheme()">Theme</button>
+    </div>
+  </header>
+
+  <div class="main">
+
+    <!-- Pipeline status bar -->
+    <div class="status-bar" id="statusBar">
+      <span class="status-dot"></span>
+      <span id="statusText">Loading...</span>
+      <button class="refresh-btn" onclick="location.reload()">Refresh</button>
+    </div>
+
+    <!-- KPI Cards -->
+    <div class="kpi-grid" id="kpiGrid">
+      <div class="kpi-card">
+        <div class="kpi-label">Today's Articles</div>
+        <div class="kpi-value" id="kpiArticles">--</div>
+        <div class="kpi-sub" id="kpiArticlesSub">target: 2,004</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Active Feeds</div>
+        <div class="kpi-value" id="kpiFeeds">--</div>
+        <div class="kpi-sub" id="kpiFeedsSub">registered sources</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">PESTLE Coverage</div>
+        <div class="kpi-value" id="kpiCoverage">--</div>
+        <div class="kpi-sub">categories at target</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Data Freshness</div>
+        <div class="kpi-value" id="kpiFreshness">--</div>
+        <div class="kpi-sub" id="kpiFreshnessSub">last collection</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Active Alerts</div>
+        <div class="kpi-value" id="kpiAlerts">--</div>
+        <div class="kpi-sub" id="kpiAlertsSub">surge / emergence / crossover</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Total DB Articles</div>
+        <div class="kpi-value" id="kpiTotal">--</div>
+        <div class="kpi-sub" id="kpiTotalSub">cumulative</div>
+      </div>
+    </div>
+
+    <!-- Charts Row: PESTLE distribution + Source region/tier -->
+    <h2 class="section-title">Collection Distribution</h2>
+    <div class="chart-row">
+      <div class="chart-box">
+        <h3>PESTLE Category Breakdown (Today)</h3>
+        <canvas id="pestleChart"></canvas>
+      </div>
+      <div class="chart-box">
+        <h3>Source Distribution</h3>
+        <canvas id="sourceChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Charts Row: Quarterly trend + Papers -->
+    <div class="chart-row">
+      <div class="chart-box">
+        <h3>Quarterly Collection Trend (Recent 8Q)</h3>
+        <canvas id="trendChart"></canvas>
+      </div>
+      <div class="chart-box">
+        <h3>Academic Papers by Field</h3>
+        <canvas id="papersChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Coverage Heatmap -->
+    <h2 class="section-title">Coverage Heatmap (Recent 12 Quarters)</h2>
+    <div class="heatmap-container">
+      <table class="heatmap-table" id="heatmapTable">
+        <thead><tr><th>Category</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <!-- Alerts -->
+    <h2 class="section-title">Active Alerts</h2>
+    <div class="alert-grid" id="alertGrid">
+      <div class="loading-overlay"><span class="spinner"></span> Loading alerts...</div>
+    </div>
+
+    <!-- Source Health Table -->
+    <h2 class="section-title">Source Health</h2>
+    <div class="source-table-wrap">
+      <h3>All Sources (<span id="sourceCount">0</span>)</h3>
+      <table class="source-table" id="sourceTable">
+        <thead>
+          <tr>
+            <th data-sort="status">Status</th>
+            <th data-sort="name">Name</th>
+            <th data-sort="region">Region</th>
+            <th data-sort="categories">Category</th>
+            <th data-sort="tier">Tier</th>
+            <th data-sort="articles_count">Articles</th>
+            <th data-sort="last_fetched">Last Fetched</th>
+          </tr>
+        </thead>
+        <tbody id="sourceTableBody">
+          <tr><td colspan="7" class="loading-overlay"><span class="spinner"></span> Loading...</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <script src="js/shared/data-loader.js"></script>
+  <script>
+    // --- Theme ---
+    function toggleTheme() {
+      const t = document.documentElement.getAttribute('data-theme') === 'dark' ? '' : 'dark';
+      document.documentElement.setAttribute('data-theme', t);
+      localStorage.setItem('news-theme', t);
+      // Re-render charts with updated colors
+      if (window._chartsReady) renderAllCharts();
+    }
+    (function initTheme() {
+      const saved = localStorage.getItem('news-theme');
+      if (saved) document.documentElement.setAttribute('data-theme', saved);
+    })();
+
+    // --- Chart.js defaults ---
+    function getChartColors() {
+      const s = getComputedStyle(document.documentElement);
+      return {
+        P: s.getPropertyValue('--P').trim(),
+        E: s.getPropertyValue('--E').trim(),
+        S: s.getPropertyValue('--S').trim(),
+        T: s.getPropertyValue('--T').trim(),
+        L: s.getPropertyValue('--L').trim(),
+        En: s.getPropertyValue('--En').trim(),
+        text: s.getPropertyValue('--text-muted').trim(),
+        border: s.getPropertyValue('--border').trim(),
+        accent: s.getPropertyValue('--accent').trim(),
+        warn: s.getPropertyValue('--status-warn').trim(),
+        ok: s.getPropertyValue('--status-ok').trim(),
+        error: s.getPropertyValue('--status-error').trim(),
+      };
+    }
+
+    const PESTLE_KEYS = ['Political', 'Economic', 'Social', 'Technological', 'Legal', 'Environmental'];
+    const PESTLE_JA = { Political: '政治', Economic: '経済', Social: '社会', Technological: '技術', Legal: '法律', Environmental: '環境' };
+    const PESTLE_COLOR_MAP = { Political: 'P', Economic: 'E', Social: 'S', Technological: 'T', Legal: 'L', Environmental: 'En' };
+
+    // Global data store
+    let DATA = {};
+    let CHARTS = {};
+    window._chartsReady = false;
+
+    // --- Data Loading ---
+    async function loadAllData() {
+      const [latest, pestleIndex, mediaSources, alerts, papersStats] = await Promise.all([
+        DataLoader.loadNews(),
+        DataLoader.loadPestleIndex(),
+        DataLoader.fetchCached('media_sources.json'),
+        DataLoader.loadAlerts(),
+        DataLoader.loadPapersStats(),
+      ]);
+      DATA = { latest, pestleIndex, mediaSources, alerts, papersStats };
+      return DATA;
+    }
+
+    // --- KPI Rendering ---
+    function renderKPIs() {
+      const { latest, mediaSources, alerts, papersStats } = DATA;
+
+      // Total articles today
+      const total = latest.total_fetched || 0;
+      const target = (latest.target_per_category || 334) * 6;
+      const pct = Math.round((total / target) * 100);
+      document.getElementById('kpiArticles').innerHTML = total.toLocaleString() +
+        `<span class="delta ${pct >= 95 ? 'up' : 'down'}">${pct}%</span>`;
+      document.getElementById('kpiArticlesSub').textContent = `target: ${target.toLocaleString()}`;
+
+      // Active feeds
+      const feedsUsed = latest.feeds_count || 0;
+      const totalSources = mediaSources.count || 0;
+      document.getElementById('kpiFeeds').innerHTML = feedsUsed +
+        `<span class="delta" style="color:var(--text-muted)">/ ${totalSources}</span>`;
+      document.getElementById('kpiFeedsSub').textContent = `${totalSources} registered sources`;
+
+      // PESTLE coverage (how many categories hit target)
+      const targetPer = latest.target_per_category || 334;
+      let atTarget = 0;
+      PESTLE_KEYS.forEach(k => {
+        if (latest.pestle && latest.pestle[k] && latest.pestle[k].count >= targetPer * 0.9) atTarget++;
+      });
+      document.getElementById('kpiCoverage').innerHTML = `${atTarget}<span class="delta" style="color:var(--text-muted)">/6</span>`;
+
+      // Data freshness
+      const collectedAt = latest.collected_at ? new Date(latest.collected_at) : null;
+      if (collectedAt) {
+        const diffMs = Date.now() - collectedAt.getTime();
+        const diffH = Math.floor(diffMs / 3600000);
+        const diffM = Math.floor((diffMs % 3600000) / 60000);
+        const freshText = diffH > 0 ? `${diffH}h ${diffM}m` : `${diffM}m`;
+        document.getElementById('kpiFreshness').textContent = freshText;
+        document.getElementById('kpiFreshnessSub').textContent =
+          collectedAt.toLocaleString('ja-JP', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+        // Status bar
+        const bar = document.getElementById('statusBar');
+        const statusText = document.getElementById('statusText');
+        if (diffH < 24) {
+          bar.className = 'status-bar';
+          statusText.textContent = `Pipeline healthy -- Last collection: ${freshText} ago (${latest.date})`;
+        } else if (diffH < 48) {
+          bar.className = 'status-bar warn';
+          statusText.textContent = `Stale data -- Last collection: ${freshText} ago`;
+        } else {
+          bar.className = 'status-bar error';
+          statusText.textContent = `Pipeline may be down -- No data for ${diffH}h`;
+        }
+      }
+
+      // Alerts
+      const ac = alerts.alert_counts || {};
+      document.getElementById('kpiAlerts').textContent = ac.total || 0;
+      document.getElementById('kpiAlertsSub').textContent =
+        `${ac.surge || 0} surge / ${ac.emergence || 0} emergence / ${ac.crossover || 0} crossover`;
+
+      // Total DB articles
+      document.getElementById('kpiTotal').textContent = (mediaSources.total_articles_all || 0).toLocaleString();
+      document.getElementById('kpiTotalSub').textContent =
+        `RSS: ${(mediaSources.total_articles_rss || 0).toLocaleString()} / All: ${(mediaSources.total_articles_all || 0).toLocaleString()}`;
+    }
+
+    // --- Chart Rendering ---
+    function destroyCharts() {
+      Object.values(CHARTS).forEach(c => c.destroy());
+      CHARTS = {};
+    }
+
+    function renderAllCharts() {
+      destroyCharts();
+      const colors = getChartColors();
+      renderPestleChart(colors);
+      renderSourceChart(colors);
+      renderTrendChart(colors);
+      renderPapersChart(colors);
+      window._chartsReady = true;
+    }
+
+    function renderPestleChart(colors) {
+      const { latest } = DATA;
+      const target = latest.target_per_category || 334;
+      const counts = PESTLE_KEYS.map(k => (latest.pestle && latest.pestle[k]) ? latest.pestle[k].count : 0);
+      const pestleColors = PESTLE_KEYS.map(k => colors[PESTLE_COLOR_MAP[k]]);
+
+      CHARTS.pestle = new Chart(document.getElementById('pestleChart'), {
+        type: 'bar',
+        data: {
+          labels: PESTLE_KEYS.map(k => PESTLE_JA[k]),
+          datasets: [{
+            label: 'Collected',
+            data: counts,
+            backgroundColor: pestleColors,
+            borderWidth: 0,
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            annotation: false,
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: { color: colors.border + '40' },
+              ticks: { color: colors.text, font: { size: 11 } },
+            },
+            x: {
+              grid: { display: false },
+              ticks: { color: colors.text, font: { size: 11 } },
+            }
+          }
+        },
+        plugins: [{
+          // Draw target line
+          afterDraw(chart) {
+            const yScale = chart.scales.y;
+            const yPos = yScale.getPixelForValue(target);
+            const ctx = chart.ctx;
+            ctx.save();
+            ctx.beginPath();
+            ctx.setLineDash([4, 4]);
+            ctx.strokeStyle = colors.warn;
+            ctx.lineWidth = 1.5;
+            ctx.moveTo(chart.chartArea.left, yPos);
+            ctx.lineTo(chart.chartArea.right, yPos);
+            ctx.stroke();
+            ctx.fillStyle = colors.warn;
+            ctx.font = '10px sans-serif';
+            ctx.fillText(`Target: ${target}`, chart.chartArea.right - 70, yPos - 5);
+            ctx.restore();
+          }
+        }]
+      });
+    }
+
+    function renderSourceChart(colors) {
+      const { mediaSources } = DATA;
+      const sources = mediaSources.sources || [];
+
+      // Region breakdown
+      const japan = sources.filter(s => s.region === 'japan').length;
+      const global = sources.filter(s => s.region === 'global').length;
+
+      // Tier breakdown
+      const t1 = sources.filter(s => s.tier === 1).length;
+      const t2 = sources.filter(s => s.tier === 2).length;
+
+      // Category breakdown
+      const catCounts = {};
+      sources.forEach(s => {
+        const cat = s.categories || 'Unknown';
+        catCounts[cat] = (catCounts[cat] || 0) + 1;
+      });
+
+      CHARTS.source = new Chart(document.getElementById('sourceChart'), {
+        type: 'bar',
+        data: {
+          labels: [...PESTLE_KEYS.map(k => PESTLE_JA[k]), 'Japan', 'Global', 'Tier 1', 'Tier 2'],
+          datasets: [{
+            label: 'Sources',
+            data: [
+              ...PESTLE_KEYS.map(k => catCounts[k] || 0),
+              japan, global, t1, t2,
+            ],
+            backgroundColor: [
+              ...PESTLE_KEYS.map(k => colors[PESTLE_COLOR_MAP[k]]),
+              colors.accent + '80', colors.accent + '40',
+              colors.ok, colors.warn,
+            ],
+            borderWidth: 0,
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          indexAxis: 'y',
+          plugins: { legend: { display: false } },
+          scales: {
+            x: {
+              beginAtZero: true,
+              grid: { color: colors.border + '40' },
+              ticks: { color: colors.text, font: { size: 10 } },
+            },
+            y: {
+              grid: { display: false },
+              ticks: { color: colors.text, font: { size: 10 } },
+            }
+          }
+        }
+      });
+    }
+
+    function renderTrendChart(colors) {
+      const { pestleIndex } = DATA;
+      const quarters = Object.keys(pestleIndex).sort();
+      const recent = quarters.slice(-8);
+
+      const datasets = PESTLE_KEYS.map(k => ({
+        label: PESTLE_JA[k],
+        data: recent.map(q => pestleIndex[q][k] || 0),
+        borderColor: colors[PESTLE_COLOR_MAP[k]],
+        backgroundColor: colors[PESTLE_COLOR_MAP[k]] + '20',
+        borderWidth: 2,
+        pointRadius: 3,
+        tension: 0.3,
+        fill: false,
+      }));
+
+      CHARTS.trend = new Chart(document.getElementById('trendChart'), {
+        type: 'line',
+        data: { labels: recent, datasets },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: { color: colors.text, font: { size: 10 }, boxWidth: 12, padding: 8 },
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: { color: colors.border + '40' },
+              ticks: { color: colors.text, font: { size: 10 } },
+            },
+            x: {
+              grid: { display: false },
+              ticks: { color: colors.text, font: { size: 10 } },
+            }
+          }
+        }
+      });
+    }
+
+    function renderPapersChart(colors) {
+      const { papersStats } = DATA;
+      const fields = papersStats.by_field || {};
+      const labels = Object.keys(fields);
+      const data = Object.values(fields);
+      const paperColors = [colors.P, colors.E, colors.S, colors.T, colors.En];
+
+      CHARTS.papers = new Chart(document.getElementById('papersChart'), {
+        type: 'doughnut',
+        data: {
+          labels,
+          datasets: [{
+            data,
+            backgroundColor: paperColors,
+            borderWidth: 0,
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: { color: colors.text, font: { size: 10 }, boxWidth: 12, padding: 8 },
+            }
+          }
+        }
+      });
+    }
+
+    // --- Heatmap ---
+    function renderHeatmap() {
+      const { pestleIndex } = DATA;
+      const quarters = Object.keys(pestleIndex).sort();
+      const recent = quarters.slice(-12);
+      const table = document.getElementById('heatmapTable');
+
+      // Find max for color scaling
+      let maxVal = 0;
+      recent.forEach(q => {
+        PESTLE_KEYS.forEach(k => {
+          const v = pestleIndex[q][k] || 0;
+          if (v > maxVal) maxVal = v;
+        });
+      });
+
+      // Build header
+      const thead = table.querySelector('thead tr');
+      thead.innerHTML = '<th>Category</th>' + recent.map(q => `<th>${q}</th>`).join('');
+
+      // Build rows
+      const tbody = table.querySelector('tbody');
+      tbody.innerHTML = '';
+      const colors = getChartColors();
+
+      PESTLE_KEYS.forEach(k => {
+        const tr = document.createElement('tr');
+        let html = `<td style="color:${colors[PESTLE_COLOR_MAP[k]]}">${PESTLE_JA[k]}</td>`;
+        recent.forEach(q => {
+          const val = pestleIndex[q][k] || 0;
+          const intensity = maxVal > 0 ? val / maxVal : 0;
+          const bgColor = getHeatColor(intensity, colors);
+          const textColor = intensity > 0.6 ? '#fff' : colors.text;
+          html += `<td><span class="heatmap-cell" style="background:${bgColor};color:${textColor}">${val}</span></td>`;
+        });
+        tr.innerHTML = html;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function getHeatColor(intensity, colors) {
+      if (intensity < 0.01) return 'transparent';
+      // Green gradient: low=light, high=dark
+      const r = Math.round(30 + (1 - intensity) * 200);
+      const g = Math.round(100 + (1 - intensity) * 120);
+      const b = Math.round(60 + (1 - intensity) * 150);
+      return `rgb(${r}, ${g}, ${b})`;
+    }
+
+    // --- Alerts ---
+    function renderAlerts() {
+      const { alerts } = DATA;
+      const grid = document.getElementById('alertGrid');
+      const items = alerts.alerts || [];
+
+      if (items.length === 0) {
+        grid.innerHTML = '<div style="color:var(--text-muted);font-size:0.85rem;">No active alerts</div>';
+        return;
+      }
+
+      grid.innerHTML = items.slice(0, 12).map(a => `
+        <div class="alert-card">
+          <div class="alert-type ${a.type.toLowerCase()}">${a.type}
+            <span class="alert-level ${a.level}">${a.level}</span>
+          </div>
+          <div class="alert-title-text">${escHtml(a.alert_title || a.topic)}</div>
+          <div class="alert-desc">${escHtml(a.description || '')}</div>
+          <div class="alert-mentions">${a.mentions || 0} mentions / ${(a.categories || []).length} categories</div>
+        </div>
+      `).join('');
+    }
+
+    // --- Source Table ---
+    function renderSourceTable() {
+      const { mediaSources } = DATA;
+      const sources = (mediaSources.sources || []).slice();
+      document.getElementById('sourceCount').textContent = sources.length;
+
+      // Sort by articles_count desc
+      sources.sort((a, b) => (b.articles_count || 0) - (a.articles_count || 0));
+
+      const tbody = document.getElementById('sourceTableBody');
+      tbody.innerHTML = sources.map(s => {
+        const hasArticles = (s.articles_count || 0) > 0;
+        const hasFetched = !!s.last_fetched;
+        let statusClass = 'ok';
+        let statusLabel = 'Active';
+        if (!hasFetched) {
+          statusClass = 'error';
+          statusLabel = 'Never';
+        } else if (!hasArticles) {
+          statusClass = 'warn';
+          statusLabel = '0 articles';
+        }
+
+        const lastFetched = s.last_fetched
+          ? new Date(s.last_fetched).toLocaleString('ja-JP', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+          : '--';
+
+        return `<tr>
+          <td><span class="source-status ${statusClass}"></span>${statusLabel}</td>
+          <td><strong>${escHtml(s.name)}</strong></td>
+          <td><span class="region-badge">${s.region}</span></td>
+          <td>${s.categories || '--'}</td>
+          <td><span class="tier-badge">T${s.tier}</span></td>
+          <td style="text-align:right">${(s.articles_count || 0).toLocaleString()}</td>
+          <td>${lastFetched}</td>
+        </tr>`;
+      }).join('');
+
+      // Table sorting
+      document.querySelectorAll('#sourceTable th[data-sort]').forEach(th => {
+        th.addEventListener('click', () => sortSourceTable(th.dataset.sort, sources));
+      });
+    }
+
+    let sortDir = {};
+    function sortSourceTable(key, sources) {
+      sortDir[key] = !sortDir[key];
+      const dir = sortDir[key] ? 1 : -1;
+      sources.sort((a, b) => {
+        let va = a[key] ?? '', vb = b[key] ?? '';
+        if (typeof va === 'number') return (va - vb) * dir;
+        return String(va).localeCompare(String(vb)) * dir;
+      });
+      // Re-render after sort
+      const tbody = document.getElementById('sourceTableBody');
+      tbody.innerHTML = sources.map(s => {
+        const hasArticles = (s.articles_count || 0) > 0;
+        const hasFetched = !!s.last_fetched;
+        let statusClass = 'ok', statusLabel = 'Active';
+        if (!hasFetched) { statusClass = 'error'; statusLabel = 'Never'; }
+        else if (!hasArticles) { statusClass = 'warn'; statusLabel = '0 articles'; }
+        const lastFetched = s.last_fetched
+          ? new Date(s.last_fetched).toLocaleString('ja-JP', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+          : '--';
+        return `<tr>
+          <td><span class="source-status ${statusClass}"></span>${statusLabel}</td>
+          <td><strong>${escHtml(s.name)}</strong></td>
+          <td><span class="region-badge">${s.region}</span></td>
+          <td>${s.categories || '--'}</td>
+          <td><span class="tier-badge">T${s.tier}</span></td>
+          <td style="text-align:right">${(s.articles_count || 0).toLocaleString()}</td>
+          <td>${lastFetched}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    // --- Util ---
+    function escHtml(str) {
+      const d = document.createElement('div');
+      d.textContent = str;
+      return d.innerHTML;
+    }
+
+    // --- Init ---
+    async function init() {
+      try {
+        await loadAllData();
+        renderKPIs();
+        renderAllCharts();
+        renderHeatmap();
+        renderAlerts();
+        renderSourceTable();
+      } catch (err) {
+        console.error('Dashboard load error:', err);
+        document.getElementById('statusBar').className = 'status-bar error';
+        document.getElementById('statusText').textContent = `Error loading data: ${err.message}`;
+      }
+    }
+
+    init();
+  </script>
+
+</body>
+</html>
