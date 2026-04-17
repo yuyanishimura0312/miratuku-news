@@ -645,59 +645,89 @@
     .signal-title { font-size: 0.88rem; font-weight: 600; line-height: 1.45; margin-bottom: 4px; color: var(--text); }
     .signal-desc { font-size: 0.84rem; line-height: 1.65; color: var(--text-secondary); }
 
-    /* Weak signals section — overview always visible */
+    /* ================================================================
+       SIGNAL CARDS — fixed layout
+       ================================================================ */
+
+    /* Grid: min 320px per column to fit badges + title comfortably */
     .ws-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 12px;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 0;
     }
+
+    /* Card container */
     .ws-card {
       background: var(--card);
       border: none;
       border-top: 2px solid var(--border);
+      border-right: 1px solid var(--border-light);
       border-radius: 0;
       overflow: hidden;
-      transition: border-color 0.2s, box-shadow 0.2s;
+      transition: border-color 0.2s;
       padding: 16px 18px;
       box-shadow: none;
+      display: flex;
+      flex-direction: column;
     }
-    .ws-card:hover { border-color: var(--accent); box-shadow: none; }
-    .ws-card-noise { opacity: 0.6; border-top-style: dashed; }
+    .ws-card:hover { border-top-color: var(--accent); }
+    .ws-card-noise { opacity: 0.55; border-top-style: dashed; }
     .ws-card-noise:hover { opacity: 1; }
+
+    /* Header: badges row, then title — always vertical stack */
     .ws-card-header {
-      margin-bottom: 6px;
+      display: block;
+      margin-bottom: 8px;
     }
+
+    /* Badges row */
     .ws-card-badges {
       display: flex;
-      gap: 6px;
-      align-items: center;
       flex-wrap: wrap;
-      margin-bottom: 6px;
+      gap: 5px;
+      align-items: center;
+      margin-bottom: 8px;
     }
-    .ws-card-title { font-size: 0.88rem; font-weight: 600; line-height: 1.45; color: var(--text); }
+
+    /* Title: full width, never compressed */
+    .ws-card-title {
+      font-size: 0.88rem;
+      font-weight: 600;
+      line-height: 1.45;
+      color: var(--text);
+      word-break: break-word;
+      overflow-wrap: break-word;
+    }
+
+    /* Description: 3 lines max */
     .ws-card-desc {
       font-size: 0.8rem;
-      line-height: 1.6;
+      line-height: 1.65;
       color: var(--text-secondary);
-      margin-bottom: 8px;
+      margin-bottom: 10px;
       display: -webkit-box;
-      -webkit-line-clamp: 2;
+      -webkit-line-clamp: 3;
       -webkit-box-orient: vertical;
       overflow: hidden;
     }
+
+    /* Meta tags row */
     .ws-card-meta {
       display: flex;
       flex-wrap: wrap;
-      gap: 6px;
+      gap: 5px;
       align-items: center;
     }
     .ws-card-meta-tag {
-      font-size: 0.7rem;
-      padding: 2px 10px;
+      font-size: 0.68rem;
+      padding: 2px 8px;
       border-radius: 0;
       background: var(--surface);
       color: var(--text-secondary);
+      white-space: nowrap;
     }
+
+    /* Details toggle */
     .ws-card-details-toggle {
       font-size: 0.78rem;
       color: var(--accent);
@@ -705,7 +735,7 @@
       background: none;
       border: none;
       padding: 4px 0;
-      margin-top: 6px;
+      margin-top: 8px;
       display: inline-flex;
       align-items: center;
       gap: 4px;
@@ -717,18 +747,21 @@
       display: inline-block;
     }
     .ws-card.open .ws-card-details-toggle .chevron { transform: rotate(90deg); }
+
+    /* Expandable body */
     .ws-card-body {
       display: none;
       padding-top: 10px;
       margin-top: 10px;
-      border-top: 1px solid var(--border);
-      font-size: 0.84rem;
+      border-top: 1px solid var(--border-light);
+      font-size: 0.82rem;
       line-height: 1.7;
       color: var(--text-secondary);
     }
     .ws-card.open .ws-card-body { display: block; }
+
     .ws-label {
-      font-size: 0.72rem;
+      font-size: 0.68rem;
       font-weight: 700;
       color: var(--accent);
       text-transform: uppercase;
@@ -736,18 +769,57 @@
       margin-top: 12px;
       margin-bottom: 4px;
     }
+    .ws-label:first-child { margin-top: 0; }
     .ws-card-body ul { padding-left: 1.2rem; }
-    .ws-card-body li { margin-bottom: 4px; }
+    .ws-card-body li { margin-bottom: 4px; font-size: 0.8rem; }
 
-    /* Signal/Impact badges */
-    .ws-badge {
-      font-size: 0.65rem;
+    /* Score grid inside expanded body */
+    .ws-score-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px 16px;
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+    .ws-score-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .ws-score-row-label { min-width: 72px; font-weight: 500; }
+    .ws-score-row-bar {
+      flex: 1;
+      height: 4px;
+      background: var(--border-light);
+      overflow: hidden;
+    }
+    .ws-score-row-fill { height: 100%; background: var(--accent); }
+    .ws-score-row-val { min-width: 18px; text-align: right; font-weight: 700; font-size: 0.68rem; }
+    .ws-composite {
+      margin-top: 6px;
+      font-size: 0.72rem;
       font-weight: 700;
-      padding: 3px 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .ws-composite-bar { flex: 1; height: 6px; background: var(--border-light); overflow: hidden; }
+    .ws-composite-fill { height: 100%; }
+
+    /* ================================================================
+       SIGNAL BADGES — fixed size, never overflow
+       ================================================================ */
+    .ws-badge {
+      font-size: 0.62rem;
+      font-weight: 700;
+      padding: 2px 8px;
       border-radius: 0;
       color: #fff;
       text-transform: uppercase;
       letter-spacing: 0.04em;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
     .ws-badge-high { background: #CC1400; }
     .ws-badge-medium { background: #555555; }
@@ -2089,7 +2161,9 @@
       }
 
       /* --- ws-grid: force 1-column on mobile --- */
-      .ws-grid { grid-template-columns: 1fr; gap: 10px; }
+      .ws-grid { grid-template-columns: 1fr; gap: 0; }
+      .ws-card { border-right: none; }
+      .ws-score-grid { grid-template-columns: 1fr; }
 
       /* --- Touch targets: minimum 44px --- */
       .nav-link {
@@ -4919,8 +4993,12 @@
           const scores = ws.scores || {};
           const composite = ws.composite_score || 0;
           const isNoise = ws.noise_flag === true;
-          // Score bar helper
-          const scoreBar = function(val) { return '<div style="display:inline-block;width:60px;height:6px;background:#e5e7eb;border-radius:3px;vertical-align:middle;margin-left:4px"><div style="width:' + (val * 10) + '%;height:100%;background:#6366f1;border-radius:3px"></div></div>'; };
+          // Score bar helper (uses ws-score-row classes)
+          const scoreRow = function(label, val) {
+            return '<div class="ws-score-row"><span class="ws-score-row-label">' + label + '</span>' +
+              '<div class="ws-score-row-bar"><div class="ws-score-row-fill" style="width:' + (val * 10) + '%"></div></div>' +
+              '<span class="ws-score-row-val">' + val + '</span></div>';
+          };
           return '<div class="ws-card' + (isNoise ? ' ws-card-noise' : '') + '" id="ws-card-' + i + '">' +
             '<div class="ws-card-header">' +
               '<div class="ws-card-badges">' +
@@ -4939,15 +5017,18 @@
             '</div>' : '') +
             '<button class="ws-card-details-toggle" onclick="toggleWSCard(' + i + ')"><span class="chevron">&#9654;</span> 分析詳細</button>' +
             '<div class="ws-card-body">' +
-              // Academic scores section
-              (scores.novelty !== undefined ? '<div class="ws-label">Signal Quality Scores</div><div style="font-size:12px;line-height:2;color:#555">' +
-                'Novelty ' + (scores.novelty || 0) + scoreBar(scores.novelty || 0) +
-                ' &nbsp; Disruption ' + (scores.disruption || 0) + scoreBar(scores.disruption || 0) +
-                ' &nbsp; Connectivity ' + (scores.connectivity || 0) + scoreBar(scores.connectivity || 0) + '<br>' +
-                'Credibility ' + (scores.credibility || 0) + scoreBar(scores.credibility || 0) +
-                ' &nbsp; Early Stage ' + (scores.early_stage || 0) + scoreBar(scores.early_stage || 0) +
-                (composite ? ' &nbsp; <strong>Composite: ' + composite + '/10</strong>' : '') +
-              '</div>' : '') +
+              // Academic scores section (grid layout)
+              (scores.novelty !== undefined ? '<div class="ws-label">Signal Quality Scores</div>' +
+                '<div class="ws-score-grid">' +
+                  scoreRow('Novelty', scores.novelty || 0) +
+                  scoreRow('Disruption', scores.disruption || 0) +
+                  scoreRow('Connectivity', scores.connectivity || 0) +
+                  scoreRow('Credibility', scores.credibility || 0) +
+                  scoreRow('Early Stage', scores.early_stage || 0) +
+                '</div>' +
+                (composite ? '<div class="ws-composite"><span>Composite</span>' +
+                  '<div class="ws-composite-bar"><div class="ws-composite-fill" style="width:' + (composite * 10) + '%;background:' + (composite >= 7 ? '#1E8449' : composite >= 5 ? '#555' : '#CC1400') + '"></div></div>' +
+                  '<span style="color:' + (composite >= 7 ? '#1E8449' : composite >= 5 ? '#555' : '#CC1400') + '">' + composite + '/10</span></div>' : '') : '') +
               (Array.isArray(ws.related_headlines) && ws.related_headlines.length > 0 ?
                 '<div class="ws-label">関連ヘッドライン</div><ul>' + ws.related_headlines.map(h => '<li>' + escapeHtml(h) + '</li>').join('') + '</ul>' : '') +
               (ws.counter_trend ? '<div class="ws-label">カウンタートレンド</div><div>' + escapeHtml(ws.counter_trend) + '</div>' : '') +
