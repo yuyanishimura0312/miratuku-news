@@ -41,7 +41,7 @@
       /* PESTLE colors - more muted, editorial */
       --P: #8B0000;    /* deep red */
       --E: #1A5276;    /* navy */
-      --S: #1E8449;    /* deep green */
+      --S: #6E2C2C;    /* deep green */
       --T: #2C3E50;    /* dark slate */
       --L: #6C3483;    /* purple */
       --En: #0E6655;   /* teal */
@@ -847,9 +847,9 @@
       white-space: nowrap;
       flex-shrink: 0;
     }
-    .ws-badge-high { background: #CC1400; }
-    .ws-badge-medium { background: #555555; }
-    .ws-badge-low { background: #1E8449; }
+    .ws-badge-high { background: #6E2C2C; }
+    .ws-badge-medium { background: #A84A48; }
+    .ws-badge-low { background: #C4756A; }
     .ws-badge-horizon {
       background: var(--surface);
       color: var(--text-secondary);
@@ -2318,9 +2318,9 @@
 
       /* --- Impact badges: softer pill shapes --- */
       .ws-badge { border-radius: 0; font-size: 0.62rem; padding: 2px 8px; }
-      .ws-badge-high { background: #CC1400; }
-      .ws-badge-medium { background: #555555; }
-      .ws-badge-low { background: #1E8449; }
+      .ws-badge-high { background: #6E2C2C; }
+      .ws-badge-medium { background: #A84A48; }
+      .ws-badge-low { background: #C4756A; }
       .ws-badge-horizon { border-radius: 0; }
 
       /* --- CLA --- */
@@ -3880,7 +3880,7 @@
             '<div class="home-signal-badges">' +
               '<span class="ws-badge" style="background:' + st.c + '20;color:' + st.c + ';border:1px solid ' + st.c + '40;font-size:10px">' + st.l + '</span>' +
               '<span class="ws-badge ' + impactClass + '">' + escapeHtml(ws.potential_impact || '') + '</span>' +
-              (ws.three_horizons ? '<span class="ws-badge" style="background:#10b98120;color:#10b981;font-size:10px">' + escapeHtml(ws.three_horizons) + '</span>' : '') +
+              (ws.three_horizons ? '<span class="ws-badge" style="background:#C4756A20;color:#C4756A;font-size:10px">' + escapeHtml(ws.three_horizons) + '</span>' : '') +
             '</div>' +
             '<div class="home-signal-title">' + escapeHtml(ws.signal || '') + '</div>' +
             '<div class="home-signal-desc">' + escapeHtml(ws.description || '') + '</div>' +
@@ -5020,7 +5020,7 @@
           const wsBookmarkId = 'signal-' + i;
           const wsIsBookmarked = bookmarks.some(b => b.id === wsBookmarkId);
           // Score color based on composite
-          const scoreColor = composite >= 7 ? '#1E8449' : composite >= 5 ? stInfo.color : '#999';
+          const scoreColor = composite >= 7 ? '#6E2C2C' : composite >= 5 ? stInfo.color : '#999';
 
           return '<div class="ws-card' + (isNoise ? ' ws-card-noise' : '') + '" id="ws-card-' + i + '" onclick="openSignalModal(' + i + ')" style="border-left-color:' + stInfo.color + '">' +
             '<div class="ws-card-header">' +
@@ -5030,7 +5030,7 @@
                 '<div class="ws-card-badges">' +
                   '<span class="ws-badge" style="background:' + stInfo.color + '20;color:' + stInfo.color + ';border:1px solid ' + stInfo.color + '40">' + stInfo.label + '</span>' +
                   '<span class="ws-badge ' + impactClass + '">' + escapeHtml(ws.potential_impact || 'N/A') + '</span>' +
-                  (horizon ? '<span class="ws-badge" style="background:#10b98120;color:#10b981;border:1px solid #10b98140">' + (horizonMap[horizon] || horizon) + '</span>' : '') +
+                  (horizon ? '<span class="ws-badge" style="background:#C4756A20;color:#C4756A;border:1px solid #C4756A40">' + (horizonMap[horizon] || horizon) + '</span>' : '') +
                   '<button class="bookmark-btn ' + (wsIsBookmarked ? 'bookmarked' : '') + '" onclick="event.stopPropagation();toggleBookmark(\'' + wsBookmarkId + '\',\'' + escapeAttr(ws.description || '') + '\',\'\',this)" title="ブックマーク">&#9734;</button>' +
                 '</div>' +
                 '<div class="ws-card-title">' + escapeHtml(ws.signal || (ws.description ? ws.description.substring(0, 120) : '')) + '</div>' +
@@ -5077,7 +5077,7 @@
       const impactColors = { 'high': '#6E2C2C', 'medium': '#A84A48', 'low': '#C4756A' };
       const impactColor = impactColors[(ws.potential_impact || '').toLowerCase()] || '#6b7280';
       const composite = ws.composite_score || 0;
-      const scoreColor = composite >= 7 ? '#1E8449' : composite >= 5 ? stInfo.color : '#999';
+      const scoreColor = composite >= 7 ? '#6E2C2C' : composite >= 5 ? stInfo.color : '#999';
       const claMap = { 'litany': 'Litany (表層)', 'systemic': 'Systemic (構造)', 'worldview': 'Worldview (世界観)', 'myth': 'Myth/Metaphor (神話)' };
       const horizonMap = { 'H1': 'Horizon 1 — 衰退する現体制', 'H2': 'Horizon 2 — 移行期の革新', 'H3': 'Horizon 3 — 新興の未来' };
       var pestleColors = { 'Political': '#8E3A3A', 'Economic': '#A84A48', 'Social': '#B8605A', 'Technological': '#9E5050', 'Legal': '#7A3535', 'Environmental': '#C4756A' };
@@ -5103,7 +5103,7 @@
       html += '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">' +
         '<span style="display:inline-block;padding:4px 14px;border-radius:4px;font-size:0.78rem;font-weight:600;background:' + stInfo.color + ';color:#fff">' + escapeHtml(stInfo.label || '') + '</span>' +
         '<span style="display:inline-block;padding:4px 14px;border-radius:4px;font-size:0.78rem;font-weight:600;background:' + impactColor + '18;color:' + impactColor + ';border:1px solid ' + impactColor + '35">Impact: ' + escapeHtml(ws.potential_impact || 'N/A') + '</span>' +
-        (ws.three_horizons ? '<span style="display:inline-block;padding:4px 14px;border-radius:4px;font-size:0.78rem;font-weight:600;background:#10b98118;color:#10b981;border:1px solid #10b98135">' + escapeHtml(ws.three_horizons) + '</span>' : '') +
+        (ws.three_horizons ? '<span style="display:inline-block;padding:4px 14px;border-radius:4px;font-size:0.78rem;font-weight:600;background:#C4756A18;color:#C4756A;border:1px solid #C4756A35">' + escapeHtml(ws.three_horizons) + '</span>' : '') +
       '</div>';
       // Title
       html += '<h2 style="font-family:var(--font-serif);font-size:1.25rem;font-weight:700;line-height:1.5;color:var(--text);margin:0">' + escapeHtml(ws.signal || '') + '</h2>';
@@ -5161,7 +5161,7 @@
         Object.keys(ws.scores).forEach(function(key) {
           var val = ws.scores[key];
           var info = scoreLabels[key] || { ja: key, en: key };
-          var barColor = val >= 7 ? '#1E8449' : val >= 5 ? stInfo.color : '#bbb';
+          var barColor = val >= 7 ? '#6E2C2C' : val >= 5 ? stInfo.color : '#bbb';
           html += '<div>' +
             '<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px">' +
               '<span style="font-size:0.78rem;color:var(--text-secondary)">' + escapeHtml(info.ja) + '</span>' +
@@ -5689,7 +5689,7 @@
               '<span class="modal-signal-name">' + escapeHtml(ws.signal || '') + '</span>' +
               '<span class="modal-signal-badge" style="background:' + mst.c + '20;color:' + mst.c + '">' + mst.l + '</span>' +
               (ws.potential_impact ? '<span class="modal-signal-badge" style="background:' + impactColor + '20;color:' + impactColor + '">' + escapeHtml(ws.potential_impact) + '</span>' : '') +
-              (ws.three_horizons ? '<span class="modal-signal-badge" style="background:#10b98120;color:#10b981">' + escapeHtml(ws.three_horizons) + '</span>' : '') +
+              (ws.three_horizons ? '<span class="modal-signal-badge" style="background:#C4756A20;color:#C4756A">' + escapeHtml(ws.three_horizons) + '</span>' : '') +
             '</div>' +
             '<div class="modal-signal-desc">' + escapeHtml(ws.description || '') + '</div>' +
             (ws.composite_score ? '<div style="font-size:11px;color:#888;margin-top:2px">Quality Score: ' + ws.composite_score + '/10 | CLA: ' + (ws.cla_depth || 'N/A') + ' | Ansoff L' + (ws.ansoff_level || '?') + '</div>' : '') +
@@ -5848,7 +5848,7 @@
       html += '<div style="margin-bottom:12px">' +
         '<span style="display:inline-block;padding:4px 12px;border-radius:4px;font-size:0.78rem;font-weight:600;background:' + st.c + ';color:#fff">' + escapeHtml(st.l) + '</span>' +
         '<span style="display:inline-block;padding:4px 12px;border-radius:4px;font-size:0.78rem;font-weight:600;background:' + impactColor + '20;color:' + impactColor + ';border:1px solid ' + impactColor + '40;margin-left:6px">Impact: ' + escapeHtml(ws.potential_impact || 'N/A') + '</span>' +
-        (ws.three_horizons ? '<span style="display:inline-block;padding:4px 12px;border-radius:4px;font-size:0.78rem;font-weight:600;background:#10b98120;color:#10b981;border:1px solid #10b98140;margin-left:6px">' + escapeHtml(ws.three_horizons) + '</span>' : '') +
+        (ws.three_horizons ? '<span style="display:inline-block;padding:4px 12px;border-radius:4px;font-size:0.78rem;font-weight:600;background:#C4756A20;color:#C4756A;border:1px solid #C4756A40;margin-left:6px">' + escapeHtml(ws.three_horizons) + '</span>' : '') +
       '</div>';
 
       // Title
