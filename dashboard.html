@@ -433,10 +433,174 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
+    /* --- Tab Navigation --- */
+    .tab-nav {
+      display: flex;
+      gap: 0;
+      border-bottom: 2px solid var(--border);
+      margin-bottom: 24px;
+    }
+    .tab-btn {
+      padding: 10px 24px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      font-family: var(--font);
+      color: var(--text-secondary);
+      background: none;
+      border: none;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      letter-spacing: 0.04em;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .tab-btn:hover { color: var(--text); }
+    .tab-btn.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+      font-weight: 700;
+    }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* --- Methodology Report --- */
+    .meth-section {
+      margin-bottom: 48px;
+    }
+    .meth-section h2 {
+      font-family: var(--font-serif);
+      font-size: 1.2rem;
+      font-weight: 900;
+      margin-bottom: 8px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--border);
+      letter-spacing: 0.04em;
+    }
+    .meth-section h3 {
+      font-family: var(--font-serif);
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin: 20px 0 8px;
+      color: var(--accent);
+    }
+    .meth-section h4 {
+      font-size: 0.82rem;
+      font-weight: 700;
+      margin: 14px 0 6px;
+      color: var(--text-secondary);
+    }
+    .meth-prose {
+      font-size: 0.88rem;
+      line-height: 1.9;
+      color: var(--text);
+      margin-bottom: 12px;
+    }
+    .meth-ref {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      padding: 2px 6px;
+      background: var(--surface);
+      border-left: 2px solid var(--border);
+      display: inline-block;
+      margin: 2px 0;
+    }
+    .meth-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+      margin: 12px 0 16px;
+    }
+    .meth-table th, .meth-table td {
+      padding: 8px 12px;
+      border: 1px solid var(--border-light);
+      text-align: left;
+      vertical-align: top;
+    }
+    .meth-table th {
+      background: var(--surface);
+      font-weight: 700;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-secondary);
+    }
+    .meth-table td { color: var(--text); }
+    .meth-flow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin: 12px 0 16px;
+    }
+    .meth-flow-step {
+      padding: 8px 14px;
+      background: var(--surface);
+      border: 1px solid var(--border-light);
+      font-size: 0.78rem;
+      font-weight: 500;
+    }
+    .meth-flow-arrow {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+    .meth-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      border: 1px solid;
+      margin: 0 2px;
+    }
+    .meth-badge-ws { background: #8b5cf620; color: #8b5cf6; border-color: #8b5cf640; }
+    .meth-badge-et { background: #0ea5e920; color: #0ea5e9; border-color: #0ea5e940; }
+    .meth-badge-wc { background: #ef444420; color: #ef4444; border-color: #ef444440; }
+    .meth-badge-ct { background: #f59e0b20; color: #f59e0b; border-color: #f59e0b40; }
+    .meth-badge-ps { background: #ec489920; color: #ec4899; border-color: #ec489940; }
+    .meth-diagram {
+      background: var(--surface);
+      border: 1px solid var(--border-light);
+      padding: 20px;
+      margin: 16px 0;
+      font-family: monospace;
+      font-size: 0.78rem;
+      line-height: 1.8;
+      white-space: pre-wrap;
+      color: var(--text-secondary);
+      overflow-x: auto;
+    }
+    .meth-bib {
+      font-size: 0.78rem;
+      line-height: 1.8;
+      color: var(--text-secondary);
+      padding-left: 2em;
+      text-indent: -2em;
+      margin-bottom: 4px;
+    }
+    .meth-toc {
+      background: var(--surface);
+      padding: 16px 24px;
+      margin-bottom: 32px;
+      border: 1px solid var(--border-light);
+    }
+    .meth-toc h3 {
+      font-size: 0.82rem;
+      margin: 0 0 8px;
+      color: var(--text);
+    }
+    .meth-toc a {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      text-decoration: none;
+      display: block;
+      padding: 2px 0;
+    }
+    .meth-toc a:hover { color: var(--accent); text-decoration: underline; }
+
     /* --- Responsive --- */
     @media (max-width: 900px) {
       .chart-row { grid-template-columns: 1fr; }
       .kpi-grid { grid-template-columns: repeat(3, 1fr); }
+      .tab-btn { padding: 8px 14px; font-size: 0.75rem; }
     }
     @media (max-width: 600px) {
       .main { padding: 12px; }
@@ -444,6 +608,9 @@
       .header { padding: 10px 12px; }
       .header-left h1 { font-size: 0.95rem; }
       .alert-grid { grid-template-columns: 1fr; }
+      .tab-btn { padding: 6px 10px; font-size: 0.72rem; }
+      .meth-flow { flex-direction: column; align-items: flex-start; }
+      .meth-flow-arrow { transform: rotate(90deg); }
     }
   </style>
 </head>
@@ -461,6 +628,17 @@
   </header>
 
   <div class="main">
+
+    <!-- Tab Navigation -->
+    <nav class="tab-nav">
+      <button class="tab-btn active" onclick="switchTab('monitoring')">Monitoring</button>
+      <button class="tab-btn" onclick="switchTab('methodology')">Methodology</button>
+    </nav>
+
+    <!-- ================================================================
+         TAB 1: MONITORING (existing dashboard)
+         ================================================================ -->
+    <div class="tab-panel active" id="tab-monitoring">
 
     <!-- Pipeline status bar -->
     <div class="status-bar" id="statusBar">
@@ -564,11 +742,495 @@
         </tbody>
       </table>
     </div>
+    </div><!-- /tab-monitoring -->
+
+    <!-- ================================================================
+         TAB 2: METHODOLOGY REPORT
+         ================================================================ -->
+    <div class="tab-panel" id="tab-methodology">
+
+      <!-- Table of Contents -->
+      <div class="meth-toc">
+        <h3>Contents</h3>
+        <a href="#meth-overview">1. System Overview</a>
+        <a href="#meth-pestle">2. PESTLE Analysis: Data Collection and Classification</a>
+        <a href="#meth-cla">3. Causal Layered Analysis (CLA)</a>
+        <a href="#meth-signal">4. Weak Signal Extraction: Academic Signal Theory</a>
+        <a href="#meth-alert">5. Alert Detection</a>
+        <a href="#meth-pipeline">6. Daily Pipeline Architecture</a>
+        <a href="#meth-bib">7. References</a>
+      </div>
+
+      <!-- 1. Overview -->
+      <div class="meth-section" id="meth-overview">
+        <h2>1. System Overview</h2>
+        <p class="meth-prose">
+          Insight Newsは、グローバルな情報環境を体系的にモニタリングし、社会変化の初期兆候を検出するフォーサイト（先見）プラットフォームである。世界各地の124のRSSフィードとGDELT APIから毎日約2,000件のニュース記事を収集し、PESTLE（政治・経済・社会・技術・法律・環境）の6分野に分類した上で、3層の分析 ―― 因果階層分析（CLA）、学術的シグナル理論に基づくウィークシグナル抽出、アラート検出 ―― を重畳的に適用する。
+        </p>
+        <p class="meth-prose">
+          本システムの設計思想は、未来学における「走査（scanning）」の原則に基づいている。Popper（2008）が体系化した Foresight Diamond（走査・分析・予測・展望）のうち、走査と分析の段階を自動化し、人間の判断が最も価値を持つ解釈と展望の段階に読者の認知資源を集中させることを目指している。
+        </p>
+
+        <div class="meth-flow">
+          <div class="meth-flow-step">RSS 124 Feeds<br>+ GDELT API</div>
+          <span class="meth-flow-arrow">&rarr;</span>
+          <div class="meth-flow-step">PESTLE Classification<br>~2,000 articles/day</div>
+          <span class="meth-flow-arrow">&rarr;</span>
+          <div class="meth-flow-step">CLA 4-Layer<br>Analysis</div>
+          <span class="meth-flow-arrow">&rarr;</span>
+          <div class="meth-flow-step">Signal Extraction<br>~100 signals/day</div>
+          <span class="meth-flow-arrow">&rarr;</span>
+          <div class="meth-flow-step">Alert Detection<br>Surge / Emergence / Crossover</div>
+        </div>
+      </div>
+
+      <!-- 2. PESTLE -->
+      <div class="meth-section" id="meth-pestle">
+        <h2>2. PESTLE Analysis: Data Collection and Classification</h2>
+
+        <h3>2.1 PESTLE分析の理論的背景</h3>
+        <p class="meth-prose">
+          PESTLEフレームワークは、組織を取り巻くマクロ環境を6つの次元に分類して分析する手法である。1967年にAguilarが提唱した環境走査（Environmental Scanning）の概念を起源とし、その後PEST、STEEP、PESTLEなど複数の拡張を経て、現在では戦略的フォーサイトの標準的な分類体系として広く採用されている。
+        </p>
+        <p class="meth-prose">
+          本システムでは、PESTLEの6分野を等しい粒度で収集することで、特定分野への偏りを排除し、分野横断的な変化（crossover）の検出を可能にしている。各分野の目標収集数を334件（合計約2,000件）に設定しているのは、統計的に有意なパターン抽出に必要な母数を確保しつつ、AI分析のコストと処理速度のバランスを取るためである。
+        </p>
+
+        <h3>2.2 データソース構造</h3>
+        <p class="meth-prose">
+          情報源は124のRSSフィードとGDELT API（補完的使用）で構成される。RSSフィードは信頼性と多様性の観点から3段階のティアに分類され、収集時のスコアリングに反映される。
+        </p>
+
+        <table class="meth-table">
+          <thead>
+            <tr><th>Tier</th><th>分類</th><th>情報源の例</th><th>スコアブースト</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Tier 1</td><td>即時報道（News）</td><td>BBC, Reuters, NHK, NYT, Guardian, Bloomberg, Nikkei</td><td>1.0x</td></tr>
+            <tr><td>Tier 2</td><td>分析（Analysis）</td><td>Foreign Affairs, ECFR, AI Now Institute, NOEMA, Aeon</td><td>1.5x</td></tr>
+            <tr><td>Tier 3</td><td>構造的・弱信号（Weak Signals）</td><td>Cascade Institute, Earth4All, ScienceDaily</td><td>2.0x</td></tr>
+          </tbody>
+        </table>
+
+        <h4>地域カバレッジ</h4>
+        <table class="meth-table">
+          <thead>
+            <tr><th>地域</th><th>フィード数</th><th>主要ソース</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>グローバル（英語）</td><td>67</td><td>BBC, NYT, Guardian, TechCrunch, Nature, Foreign Affairs</td></tr>
+            <tr><td>日本</td><td>57</td><td>NHK (6系統), Yahoo News, Nikkei, 政府15省庁</td></tr>
+            <tr><td>グローバルサウス</td><td>含む</td><td>Al Jazeera, The Conversation Africa, Global Voices</td></tr>
+          </tbody>
+        </table>
+        <p class="meth-prose">
+          日本語ソースには、内閣官房、財務省、経産省、厚労省、デジタル庁、環境省など15以上の政府省庁のRSSフィードを含む。これは政策動向の初期検出において、一次情報源への直接的アクセスが重要であるという判断に基づいている。
+        </p>
+
+        <h3>2.3 分類アルゴリズム</h3>
+        <p class="meth-prose">
+          各記事はキーワードベースのスコアリングにより6つのPESTLEカテゴリに分類される。記事のタイトルと要約に対してカテゴリごとに50-60個のキーワード（英語・日本語両方）を照合し、合致スコアを算出する。最終スコアは以下の式で決定される:
+        </p>
+        <div class="meth-diagram">score = base_score x tier_boost x (1 + focus_affinity_bonus)
+
+base_score   = keyword match count
+tier_boost   = Tier 1: 1.0x / Tier 2: 1.5x / Tier 3: 2.0x
+focus_bonus  = +0.3 (if source's primary focus matches category)</div>
+        <p class="meth-prose">
+          Tier 2-3の分析記事・弱信号系ソースにブーストをかけることで、速報的な大量報道に埋もれがちな構造的変化の兆候を浮上させている。これはKuosa（2012）が指摘する「情報のノイズと真のシグナルの区別」において、情報源の性質を考慮することの重要性に基づいている。
+        </p>
+
+        <h3>2.4 6カテゴリの定義</h3>
+        <table class="meth-table">
+          <thead>
+            <tr><th>Category</th><th>和名</th><th>対象領域</th><th>キーワード例</th></tr>
+          </thead>
+          <tbody>
+            <tr><td style="color:var(--P);font-weight:700">Political</td><td>政治</td><td>選挙、外交、地政学、安全保障、制裁、同盟</td><td>elections, diplomacy, NATO, BRICS, sanctions, decoupling</td></tr>
+            <tr><td style="color:var(--E);font-weight:700">Economic</td><td>経済</td><td>GDP、貿易、金融、労働、フィンテック、産業政策</td><td>GDP, inflation, tariffs, fintech, circular economy</td></tr>
+            <tr><td style="color:var(--S);font-weight:700">Social</td><td>社会</td><td>教育、健康、人口動態、移民、格差、価値観変容</td><td>education, demographics, migration, inequality, aging</td></tr>
+            <tr><td style="color:var(--T);font-weight:700">Technological</td><td>技術</td><td>AI、量子、半導体、サイバーセキュリティ、自律システム</td><td>AI, quantum, semiconductor, cybersecurity, blockchain</td></tr>
+            <tr><td style="color:var(--L);font-weight:700">Legal</td><td>法律</td><td>規制、独占禁止、プライバシー、AI規制、知的財産</td><td>regulation, antitrust, GDPR, AI Act, data protection</td></tr>
+            <tr><td style="color:var(--En);font-weight:700">Environmental</td><td>環境</td><td>気候変動、エネルギー転換、生物多様性、資源</td><td>climate, renewable, biodiversity, tipping point, resilience</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 3. CLA -->
+      <div class="meth-section" id="meth-cla">
+        <h2>3. Causal Layered Analysis (CLA)</h2>
+
+        <h3>3.1 CLAの理論的背景</h3>
+        <p class="meth-prose">
+          因果階層分析（Causal Layered Analysis: CLA）は、パキスタン出身の未来学者Sohail Inayatullah（1998）が開発したフォーサイト手法である。CLAの核心的な洞察は、あらゆる社会的事象は4つの深度レベルで同時に存在しており、表層的な事実だけでなく、その背後にある構造的原因、世界観、そして最深部の神話的物語を読み解くことで、より本質的な変化の方向性が見えてくるという点にある。
+        </p>
+        <p class="meth-prose">
+          CLAは「脱構築」と「再構築」の2つのフェーズからなる。脱構築フェーズでは、表層の出来事から深層の物語へと掘り下げていく。再構築フェーズでは、深層で発見された代替的な物語を出発点として、新しい世界観、新しい構造、新しい表層的現実を構想する。本システムでは主に脱構築フェーズを自動化している。
+        </p>
+
+        <h3>3.2 4層モデルの構造</h3>
+        <table class="meth-table">
+          <thead>
+            <tr><th>Layer</th><th>名称</th><th>定義</th><th>問い</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="font-weight:700">Layer 1</td>
+              <td>Litany（リタニー）</td>
+              <td>表層的な事実、データ、出来事。メディアで報道される「何が起きたか」のレベル。</td>
+              <td>今日のニュースは何を伝えているか？</td>
+            </tr>
+            <tr>
+              <td style="font-weight:700">Layer 2</td>
+              <td>Systemic Causes（社会的・構造的原因）</td>
+              <td>表層の出来事を生み出している社会システム、制度、経済構造、政策枠組み。</td>
+              <td>なぜそれが起きているのか？どのような構造がそれを生み出しているか？</td>
+            </tr>
+            <tr>
+              <td style="font-weight:700">Layer 3</td>
+              <td>Worldview（世界観・ディスコース）</td>
+              <td>構造を正当化する無意識の前提、パラダイム、イデオロギー。何が「自然」で「合理的」と見なされているか。</td>
+              <td>どのような前提がこの構造を支えているか？誰にとっての「常識」か？</td>
+            </tr>
+            <tr>
+              <td style="font-weight:700">Layer 4</td>
+              <td>Myth / Metaphor（神話・メタファー）</td>
+              <td>文化の最深層にある物語、象徴、メタファー。世界観そのものを形作る無意識の集合的イメージ。</td>
+              <td>この社会の根底にあるどのような物語が、現在の現実を「当然のもの」にしているか？</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>3.3 本システムにおけるCLA実装</h3>
+        <p class="meth-prose">
+          本システムでは、PESTLEの各6分野について毎日独立にCLA分析を実施する。各分野の上位20件のニュース見出しをAI（Claude Haiku）に入力し、4層の分析に加えて「核心的緊張（key tension）」と「浮上しつつある新しいナラティブ（emerging narrative）」の2つの統合的解釈を生成する。
+        </p>
+        <p class="meth-prose">
+          「核心的緊張」は、その分野において異なる層のダイナミクスが衝突している地点を特定するものである。たとえば、表層では環境規制の強化が進む一方で、深層の神話レベルでは「経済成長は善である」という物語が依然として支配的である場合、その間の緊張が可視化される。「浮上しつつある新しいナラティブ」は、既存の神話に挑戦する萌芽的な物語を検出するもので、シグナル抽出と連動して未来の方向性を示唆する。
+        </p>
+
+        <div class="meth-diagram">
+Input: 20 headlines per PESTLE category (6 categories x daily)
+   |
+   v
+AI Analysis (Claude Haiku) per category:
+   |-- litany: Surface-level facts and trends (2-3 sentences)
+   |-- systemic_causes: Structural factors producing these events (2-3 sentences)
+   |-- worldview: Unconscious assumptions and ideologies (2-3 sentences)
+   |-- myth_metaphor: Deep cultural narratives and symbols (1-2 sentences)
+   |-- key_tension: Core contradiction in this domain (1 sentence)
+   |-- emerging_narrative: New narrative challenging the status quo (1 sentence)
+   |
+   v
+Output: 6 CLA analyses (one per PESTLE category) per day</div>
+
+        <p class="meth-ref">Inayatullah, S. (1998). Causal Layered Analysis: Poststructuralism as method. <em>Futures</em>, 30(8), 815-829.</p>
+      </div>
+
+      <!-- 4. Weak Signal Extraction -->
+      <div class="meth-section" id="meth-signal">
+        <h2>4. Weak Signal Extraction: Academic Signal Theory</h2>
+
+        <h3>4.1 ウィークシグナルの学術的定義</h3>
+        <p class="meth-prose">
+          ウィークシグナル（弱信号）の概念は、1975年にIgor Ansoffが戦略経営の文脈で提唱したものである。Ansoffは、企業が戦略的な不意打ち（strategic surprise）を避けるためには、まだ断片的で曖昧だが将来の大きな変化の前兆となる情報 ―― すなわちウィークシグナル ―― を組織的に検出する必要があると論じた。
+        </p>
+        <p class="meth-prose">
+          この概念はその後、未来学（Futures Studies）の中核的な手法として発展した。Hiltunen（2008）はシグナルを3次元モデル（Signal = 観察可能な現象、Issue = 解釈された課題、Interpretation = 未来に対する意義）として構造化し、Kuosa（2012）は戦略的フォーサイトの進化の中でシグナル検出の方法論を体系化した。本システムはこれらの学術的成果を統合し、以下のフレームワークを実装している。
+        </p>
+
+        <h3>4.2 Ansoff Signal Strength Levels</h3>
+        <p class="meth-prose">
+          Ansoff（1975）は、シグナルの強度を5段階で分類した。この分類は、シグナルが情報としてどの程度「成熟」しているかを示すものであり、本システムでは各シグナルに対してAIがこのレベルを判定する。Level 1-2が真のウィークシグナル（まだ十分に認識されていない変化の兆候）であり、Level 3-4は既にある程度認知されつつある変化、Level 5は既知のトレンドである。
+        </p>
+        <table class="meth-table">
+          <thead>
+            <tr><th>Level</th><th>名称</th><th>定義</th><th>情報の性質</th></tr>
+          </thead>
+          <tbody>
+            <tr><td style="font-weight:700">L1</td><td>Sense of turbulence</td><td>漠然とした変化の気配を感じるが、何が変わっているか特定できない</td><td>最も不確実。直感的。</td></tr>
+            <tr><td style="font-weight:700">L2</td><td>Source identified</td><td>脅威または機会の源泉が特定できるが、具体的な影響はまだ不明</td><td>方向性は見えるが輪郭は不明確。</td></tr>
+            <tr><td style="font-weight:700">L3</td><td>Shape visible</td><td>脅威/機会の輪郭が見え、影響範囲が推測可能になる</td><td>分析可能。対応策の検討開始。</td></tr>
+            <tr><td style="font-weight:700">L4</td><td>Response clear</td><td>対応戦略が立てられるほど十分な情報がある</td><td>意思決定に使える。</td></tr>
+            <tr><td style="font-weight:700">L5</td><td>Outcome calculable</td><td>影響を定量的に予測できる</td><td>既にトレンドとして確立。</td></tr>
+          </tbody>
+        </table>
+
+        <h3>4.3 シグナルの5類型分類</h3>
+        <p class="meth-prose">
+          本システムでは、検出されるシグナルを学術的根拠に基づき5つの類型に分類する。この分類は、Ansoff（1975）のウィークシグナル概念、Taleb（2007）のブラックスワン理論、Kuhn（1962）のパラダイムシフト論、およびPetersen（1999）のワイルドカード研究を統合したものである。
+        </p>
+        <table class="meth-table">
+          <thead>
+            <tr><th>Type</th><th>ラベル</th><th>定義</th><th>学術的根拠</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="meth-badge meth-badge-ws">Weak Signal</span></td>
+              <td>ウィークシグナル</td>
+              <td>断片的だが潜在的影響が大きい変化の兆し。Ansoff L1-2に相当。</td>
+              <td>Ansoff (1975); Hiltunen (2008)</td>
+            </tr>
+            <tr>
+              <td><span class="meth-badge meth-badge-et">Emerging Trend</span></td>
+              <td>新興トレンド</td>
+              <td>パターンが形成され始めている変化。Ansoff L3に相当。</td>
+              <td>Molitor (1977) Issue Lifecycle</td>
+            </tr>
+            <tr>
+              <td><span class="meth-badge meth-badge-wc">Wild Card</span></td>
+              <td>ワイルドカード</td>
+              <td>発生確率は低いが、実現すれば極めて大きな影響を持つ事象。</td>
+              <td>Taleb (2007); Petersen (1999)</td>
+            </tr>
+            <tr>
+              <td><span class="meth-badge meth-badge-ct">Counter Trend</span></td>
+              <td>カウンタートレンド</td>
+              <td>支配的トレンドに対する逆行的な動き。</td>
+              <td>Naisbitt (1982) Megatrends</td>
+            </tr>
+            <tr>
+              <td><span class="meth-badge meth-badge-ps">Paradigm Shift</span></td>
+              <td>パラダイムシフト</td>
+              <td>世界観や前提そのものが揺らいでいる兆候。</td>
+              <td>Kuhn (1962) Scientific Revolutions</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>4.4 Three Horizons分類</h3>
+        <p class="meth-prose">
+          Sharpe（2013）のThree Horizonsフレームワークは、変化のダイナミクスを3つの時間的地平で捉える手法である。本システムでは各シグナルがどのホライゾンに属するかをAIが判定し、「現在の支配的システムの衰退を示すシグナル（H1）」「新旧の間を橋渡しする移行的イノベーション（H2）」「現在の中に埋め込まれた未来の種（H3）」を区別する。H3シグナルの検出がフォーサイトにおいて最も価値が高い。
+        </p>
+        <table class="meth-table">
+          <thead>
+            <tr><th>Horizon</th><th>名称</th><th>特徴</th><th>シグナルの意味</th></tr>
+          </thead>
+          <tbody>
+            <tr><td style="font-weight:700">H1</td><td>Decline</td><td>支配的システムが限界に達しつつある</td><td>現行システムの持続不可能性を示す</td></tr>
+            <tr><td style="font-weight:700">H2</td><td>Transition</td><td>既存と新興の間を橋渡しする</td><td>イノベーションの「翻訳」が進行中</td></tr>
+            <tr><td style="font-weight:700">H3</td><td>Emerging</td><td>「現在の中の未来の種」</td><td>フォーサイトにおいて最も価値が高い</td></tr>
+          </tbody>
+        </table>
+
+        <h3>4.5 CLA深度分類との統合</h3>
+        <p class="meth-prose">
+          各シグナルは、Inayatullah（1998）のCLA 4層モデルに基づき、そのシグナルが最も深く作用する層を判定される。表層的な事実レベルの変化（litany）から、社会構造の変化（systemic）、パラダイムの揺らぎ（worldview）、文化の深層にある物語の変容（myth）まで、シグナルの「深さ」が可視化される。worldviewレベルやmythレベルに作用するシグナルは、表面的には目立たないが、長期的により深い影響を持つ可能性が高い。
+        </p>
+
+        <h3>4.6 多次元品質スコアリング</h3>
+        <p class="meth-prose">
+          各シグナルは以下の5軸で0-10のスコアを付与される。このスコアリングはMendonca（2004）の信号品質基準とHiltunen（2008）のシグナル特性理論に基づいている。5軸のスコアは加重平均されてComposite Score（総合品質スコア）として統合される。
+        </p>
+        <table class="meth-table">
+          <thead>
+            <tr><th>Axis</th><th>名称</th><th>定義</th><th>Weight</th></tr>
+          </thead>
+          <tbody>
+            <tr><td style="font-weight:700">Novelty</td><td>新規性</td><td>既存の議論やトレンドからどれだけ逸脱しているか</td><td>25%</td></tr>
+            <tr><td style="font-weight:700">Disruption</td><td>破壊性</td><td>既存のシステム・制度・前提をどれだけ揺るがすか</td><td>20%</td></tr>
+            <tr><td style="font-weight:700">Connectivity</td><td>接続性</td><td>他の分野・領域とどれだけ横断的に関連するか</td><td>20%</td></tr>
+            <tr><td style="font-weight:700">Credibility</td><td>信頼性</td><td>エビデンスの質と情報源の信頼度</td><td>15%</td></tr>
+            <tr><td style="font-weight:700">Early Stage</td><td>早期性</td><td>発展のどれだけ初期段階にあるか（初期ほど高い）</td><td>20%</td></tr>
+          </tbody>
+        </table>
+        <div class="meth-diagram">Composite Score = Novelty x 0.25 + Disruption x 0.20 + Connectivity x 0.20
+                 + Credibility x 0.15 + Early Stage x 0.20
+
+Noise Detection:
+  IF Novelty &lt;= 3 AND Early Stage &lt;= 3 THEN noise_flag = true
+  (= likely a repackaging of known trends, not a genuine signal)</div>
+        <p class="meth-prose">
+          NoveltyとEarly Stageの重みが高いのは、Hiltunen（2008）が指摘するように、真のウィークシグナルの最大の特性が「新しさ」と「まだ初期であること」だからである。Credibilityの重みが相対的に低いのは、ウィークシグナルは本質的に不確実であり、過度に「信頼できる情報」のみを求めると最も価値の高い初期段階のシグナルを見落とすリスクがあるためである（Ansoff 1975のパラドックス）。
+        </p>
+
+        <h3>4.7 ノイズフィルタリング</h3>
+        <p class="meth-prose">
+          Silver（2012）とMendonca（2004）に基づき、以下の条件に該当する情報はノイズとして識別される:
+        </p>
+        <table class="meth-table">
+          <thead>
+            <tr><th>ノイズ類型</th><th>説明</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>メインストリーム反復</td><td>すでに広く報道・議論されているニュースの繰り返し</td></tr>
+            <tr><td>一過性のバズ</td><td>センセーショナルだが構造的変化を伴わない話題</td></tr>
+            <tr><td>季節性パターン</td><td>定期的に繰り返される選挙サイクルや季節イベント</td></tr>
+            <tr><td>単一ソース依存</td><td>他の情報源で裏付けがない孤立した情報</td></tr>
+            <tr><td>メガトレンドの直線的延長</td><td>高齢化、都市化、デジタル化など既知の大トレンドの既に予測された展開</td></tr>
+          </tbody>
+        </table>
+
+        <h3>4.8 8視点の並列走査</h3>
+        <p class="meth-prose">
+          Popper（2008）のForesight DiamondとIFTF（Institute for the Future）のシグナル手法に基づき、毎日8つの異なる視点から並列にシグナルを走査する。これは、単一の視点からのスキャニングでは認知バイアスにより特定のパターンが見落とされるリスクを低減するための設計である。
+        </p>
+        <table class="meth-table">
+          <thead>
+            <tr><th>#</th><th>視点</th><th>焦点</th><th>目標数</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>1</td><td>技術・イノベーション</td><td>破壊的イノベーション、技術融合、techno-skepticism</td><td>12</td></tr>
+            <tr><td>2</td><td>地政学・国際関係</td><td>国際秩序の転換、非国家主体の台頭</td><td>12</td></tr>
+            <tr><td>3</td><td>経済・金融・労働</td><td>資本主義の前提への挑戦、仕事の意味の変化</td><td>12</td></tr>
+            <tr><td>4</td><td>社会・文化・価値観</td><td>社会規範の崩壊、新しい共同体形成</td><td>12</td></tr>
+            <tr><td>5</td><td>環境・気候・資源</td><td>ティッピングポイント、人間-自然関係の再定義</td><td>12</td></tr>
+            <tr><td>6</td><td>法律・規制・ガバナンス</td><td>正当性の変化、新しい権利概念</td><td>12</td></tr>
+            <tr><td>7</td><td>分野横断（Cross-impact）</td><td>予期しない接続、カウンタームーブメント</td><td>14</td></tr>
+            <tr><td>8</td><td>日本・アジア固有</td><td>非西欧的シグナル、課題先進国としての実験</td><td>14</td></tr>
+          </tbody>
+        </table>
+        <p class="meth-prose">
+          視点7のCross-impact Analysisは、Gordon & Hayward（1968）が開発した手法を応用したものである。独立した分野で観察される変化の間に予期しない相互作用が存在する場合、それは単一分野のシグナルよりも大きな構造的変化の兆候である可能性が高い。視点8は西欧中心のフォーサイトでは見落とされがちな非西欧的シグナルを意図的に走査するものである。
+        </p>
+      </div>
+
+      <!-- 5. Alert Detection -->
+      <div class="meth-section" id="meth-alert">
+        <h2>5. Alert Detection</h2>
+
+        <p class="meth-prose">
+          シグナル抽出が「何が変化の兆しか」を検出するのに対し、アラート検出は「情報のパターンそのものの異常」を検出する。これはYoon（2012）が提唱した計算的弱信号検出（Computational Weak Signal Detection）のアプローチに基づくものであり、テキストマイニングと時系列分析を組み合わせて情報空間の構造的変化を自動検出する。
+        </p>
+
+        <h3>5.1 3つのアラート類型</h3>
+        <table class="meth-table">
+          <thead>
+            <tr><th>Type</th><th>名称</th><th>検出ロジック</th><th>閾値</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="font-weight:700;color:var(--status-ok)">EMERGENCE</td>
+              <td>初出</td>
+              <td>過去3ヶ月に出現歴のない新しいバイグラム（2語の組み合わせ）が一定頻度で出現</td>
+              <td>5回以上出現 かつ 過去に0回</td>
+            </tr>
+            <tr>
+              <td style="font-weight:700;color:var(--status-error)">SURGE</td>
+              <td>急増</td>
+              <td>特定のキーワードの出現頻度が過去の平均を大幅に上回る異常スパイク</td>
+              <td>過去平均の4倍以上 かつ 6回以上出現</td>
+            </tr>
+            <tr>
+              <td style="font-weight:700;color:var(--status-warn)">CROSSOVER</td>
+              <td>横断</td>
+              <td>同一トピックが3つ以上のPESTLEカテゴリに同時に出現（分野横断的変化の兆候）</td>
+              <td>3カテゴリ以上に6回以上出現（バイグラム）<br>4カテゴリ以上に15回以上出現（キーワード）</td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="meth-prose">
+          EMERGENCEは「これまで存在しなかったものの出現」を検出する。SURGEは「既知のものの急激な加速」を検出する。CROSSOVERは「複数の独立した分野での同時変化」を検出する。この3つの組み合わせにより、新しい現象の出現、既存の変化の加速、そして分野横断的な構造変化の3つの次元でアラートを発する。
+        </p>
+        <p class="meth-prose">
+          各アラートはAI（Claude Haiku）によって分析が付加され、日本語と英語の両方でタイトルと解説が生成される。アラートには high / medium / low の3段階の重要度が付与される。
+        </p>
+      </div>
+
+      <!-- 6. Pipeline -->
+      <div class="meth-section" id="meth-pipeline">
+        <h2>6. Daily Pipeline Architecture</h2>
+        <p class="meth-prose">
+          全ての分析は毎日自動で実行される。パイプラインは以下の9つのステップから構成され、収集からデプロイまでを一貫して処理する。
+        </p>
+        <div class="meth-diagram">Daily Update Pipeline (JST 4:00 AM):
+
+  Step 1: collect_news.py
+          124 RSS feeds + GDELT API -> ~2,000 articles
+          Keyword scoring -> PESTLE classification
+
+  Step 2: collect_papers.py
+          Semantic Scholar API -> ~1,000 academic papers/day
+          6 fields (AI, Climate, Biotech, Geopolitics, Society, Law)
+
+  Step 3: ai_analyze.py
+          (a) Translation: JP &lt;-&gt; EN for all articles
+          (b) CLA: 4-layer analysis per PESTLE category
+          (c) Signal Extraction: ~100 signals via 8 perspectives
+
+  Step 4: generate_daily_report.py
+          Trend summary + key developments
+
+  Step 5: curate_daily_papers.py
+          Paper selection and summarization
+
+  Step 6: generate_insight_reports.py
+          Weekly/monthly synthesis reports
+
+  Step 7: detect_alerts.py
+          Emergence + Surge + Crossover detection
+
+  Step 8: Collect historical data
+          Archive daily snapshot to SQLite
+
+  Step 9: Deploy to GitHub Pages
+          git commit + push -> public site update</div>
+
+        <h3>6.1 データ規模</h3>
+        <table class="meth-table">
+          <thead>
+            <tr><th>指標</th><th>値</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>総収集日数</td><td>142日間（継続稼働中）</td></tr>
+            <tr><td>総記事数</td><td>223,244件</td></tr>
+            <tr><td>言語比率</td><td>英語 98.3% / 日本語 1.7%</td></tr>
+            <tr><td>日次記事数</td><td>約2,000件（6カテゴリ x 334件）</td></tr>
+            <tr><td>日次シグナル数</td><td>約100件（8視点から生成）</td></tr>
+            <tr><td>学術論文数</td><td>831件（Semantic Scholar経由）</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 7. References -->
+      <div class="meth-section" id="meth-bib">
+        <h2>7. References</h2>
+        <p class="meth-bib">Aguilar, F. J. (1967). <em>Scanning the Business Environment</em>. Macmillan.</p>
+        <p class="meth-bib">Ansoff, H. I. (1975). Managing strategic surprise by response to weak signals. <em>California Management Review</em>, 18(2), 21-33.</p>
+        <p class="meth-bib">Gordon, T. J., & Hayward, H. (1968). Initial experiments with the cross-impact matrix method of forecasting. <em>Futures</em>, 1(2), 100-116.</p>
+        <p class="meth-bib">Hiltunen, E. (2008). The future sign and its three dimensions. <em>Futures</em>, 40(3), 247-260.</p>
+        <p class="meth-bib">Inayatullah, S. (1998). Causal Layered Analysis: Poststructuralism as method. <em>Futures</em>, 30(8), 815-829.</p>
+        <p class="meth-bib">Kuhn, T. S. (1962). <em>The Structure of Scientific Revolutions</em>. University of Chicago Press.</p>
+        <p class="meth-bib">Kuosa, T. (2012). <em>The Evolution of Strategic Foresight: Navigating Public Policy Making</em>. Gower.</p>
+        <p class="meth-bib">Mendonca, S., Pina e Cunha, M., Kaivo-oja, J., & Ruff, F. (2004). Wild cards, weak signals and organisational improvisation. <em>Futures</em>, 36(2), 201-218.</p>
+        <p class="meth-bib">Molitor, G. T. T. (1977). How to anticipate public-policy changes. <em>SAM Advanced Management Journal</em>, 42(3), 4-13.</p>
+        <p class="meth-bib">Naisbitt, J. (1982). <em>Megatrends: Ten New Directions Transforming Our Lives</em>. Warner Books.</p>
+        <p class="meth-bib">Petersen, J. L. (1999). <em>Out of the Blue: How to Anticipate Big Future Surprises</em>. Madison Books.</p>
+        <p class="meth-bib">Popper, R. (2008). Foresight methodology. In L. Georghiou et al. (Eds.), <em>The Handbook of Technology Foresight</em> (pp. 44-88). Edward Elgar.</p>
+        <p class="meth-bib">Sharpe, B. (2013). <em>Three Horizons: The Patterning of Hope</em>. Triarchy Press.</p>
+        <p class="meth-bib">Silver, N. (2012). <em>The Signal and the Noise: Why So Many Predictions Fail -- but Some Don't</em>. Penguin.</p>
+        <p class="meth-bib">Taleb, N. N. (2007). <em>The Black Swan: The Impact of the Highly Improbable</em>. Random House.</p>
+        <p class="meth-bib">Yoon, J. (2012). Detecting weak signals for long-term business opportunities using text mining of Web news. <em>Expert Systems with Applications</em>, 39(16), 12543-12550.</p>
+      </div>
+
+    </div><!-- /tab-methodology -->
 
   </div>
 
   <script src="js/shared/data-loader.js"></script>
   <script>
+    // --- Tab Switching ---
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      document.getElementById('tab-' + tabId).classList.add('active');
+      event.target.classList.add('active');
+      // Update URL hash
+      history.replaceState(null, '', '#' + tabId);
+    }
+    // Restore tab from URL hash
+    (function initTab() {
+      const hash = location.hash.replace('#', '');
+      if (hash === 'methodology') {
+        const panels = document.querySelectorAll('.tab-panel');
+        const btns = document.querySelectorAll('.tab-btn');
+        panels.forEach(p => p.classList.remove('active'));
+        btns.forEach(b => b.classList.remove('active'));
+        document.getElementById('tab-methodology').classList.add('active');
+        btns[1].classList.add('active');
+      }
+    })();
+
     // --- Theme ---
     function toggleTheme() {
       const t = document.documentElement.getAttribute('data-theme') === 'dark' ? '' : 'dark';
