@@ -17,21 +17,24 @@
   <script src="js/shared/firebase-config.js"></script>
 
   <style>
-    /* ============================================================
-       DESIGN SYSTEM
-       ============================================================ */
+    /* ================================================================
+       DESIGN SYSTEM — FIW-Compliant (matching app.html)
+       ================================================================ */
     :root {
       --bg: #FFFFFF;
       --card: #FFFFFF;
       --card-hover: #F7F7F5;
       --accent: #121212;
       --accent-soft: #555555;
+      --accent-light: #F7F7F5;
       --accent-warm: #CC1400;
+      --accent-muted: rgba(204,20,0,0.06);
       --text: #121212;
       --text-secondary: #555555;
       --text-muted: #6B6B6B;
       --border: #D9D9D9;
       --border-light: #EEEEEE;
+      --highlight: #CC1400;
       --surface: #F7F7F5;
       --surface2: #EEEEEE;
       --P: #8B0000;
@@ -42,6 +45,7 @@
       --En: #0E6655;
       --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
       --shadow-md: 0 2px 8px rgba(0,0,0,0.08);
+      --radius: 0px;
       --font: "Noto Sans JP", "Hiragino Sans", -apple-system, BlinkMacSystemFont, sans-serif;
       --font-serif: "Noto Serif JP", "Hiragino Mincho ProN", Georgia, serif;
       --ws: #8b5cf6;
@@ -49,9 +53,6 @@
       --wc: #ef4444;
       --ct: #f59e0b;
       --ps: #ec4899;
-      --h1c: #6366f1;
-      --h2c: #f59e0b;
-      --h3c: #10b981;
     }
 
     [data-theme="dark"] {
@@ -61,11 +62,13 @@
       --accent: #E0E0E0;
       --accent-soft: #999999;
       --accent-warm: #FF4444;
+      --accent-light: #1A1A1A;
       --text: #E0E0E0;
       --text-secondary: #AAAAAA;
       --text-muted: #8A8A8A;
       --border: #333333;
       --border-light: #2A2A2A;
+      --highlight: #FF4444;
       --surface: #1A1A1A;
       --surface2: #222222;
       --P: #E06060;
@@ -91,86 +94,142 @@
       min-height: 100vh;
     }
 
-    /* --- Header --- */
-    .header {
-      border-bottom: 2px solid var(--accent);
-      padding: 12px 24px;
+    a { color: var(--accent); text-decoration: none; transition: color 0.2s; }
+    a:hover { color: var(--accent-warm); }
+
+    .container { max-width: 1280px; margin: 0 auto; padding: 0 32px; }
+
+    /* ================================================================
+       HEADER — matching app.html site-header
+       ================================================================ */
+    .site-header {
+      background: var(--bg);
+      border-top: 3px solid #121212;
+      border-bottom: 1px solid var(--border);
+      box-shadow: none;
+      position: sticky;
+      top: 0;
+      z-index: 200;
+    }
+    .header-main {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: var(--bg);
-      position: sticky;
-      top: 0;
-      z-index: 100;
+      padding: 14px 0;
     }
-    .header-left { display: flex; align-items: center; gap: 16px; }
-    .header-left h1 {
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+    }
+    .site-title {
       font-family: var(--font-serif);
-      font-size: 1.1rem;
-      font-weight: 900;
-      letter-spacing: 0.06em;
+      font-weight: 700;
+      font-size: 1.15rem;
+      color: var(--text);
+      letter-spacing: -0.02em;
     }
-    .header-left h1 a { color: var(--text); text-decoration: none; }
-    .header-left .sep { color: var(--text-muted); font-weight: 300; }
-    .header-left .page-label {
-      font-size: 0.85rem;
-      font-weight: 500;
-      color: var(--text-secondary);
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
+    .header-date {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      border-left: 1px solid var(--border);
+      padding-left: 1.25rem;
     }
-    .header-right { display: flex; align-items: center; gap: 12px; }
-    .header-right .back-link {
-      font-size: 0.8rem;
-      color: var(--text-secondary);
-      text-decoration: none;
-      border: 1px solid var(--border);
-      padding: 4px 12px;
-      transition: background 0.15s;
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
     }
-    .header-right .back-link:hover { background: var(--surface); }
     .theme-toggle {
-      background: none; border: 1px solid var(--border);
-      color: var(--text-secondary); cursor: pointer;
-      padding: 4px 10px; font-size: 0.8rem;
-      font-family: var(--font);
+      background: var(--surface);
+      border: 1px solid var(--border-light);
+      border-radius: 0;
+      padding: 6px 12px;
+      cursor: pointer;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      line-height: 1;
+      transition: all 0.2s;
     }
-    .theme-toggle:hover { background: var(--surface); }
+    .theme-toggle:hover { background: var(--surface2); }
 
-    /* --- Main --- */
-    .main { max-width: 1440px; margin: 0 auto; padding: 24px; }
+    /* --- Nav Bar (matching app.html) --- */
+    .site-nav {
+      background: var(--bg);
+      border-bottom: 1px solid var(--border-light);
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 0 4px;
+    }
+    .site-nav::-webkit-scrollbar { height: 0; }
+    .nav-list {
+      display: flex;
+      list-style: none;
+      gap: 8px;
+      padding: 8px 0 12px;
+    }
+    .nav-link {
+      display: block;
+      padding: 8px 20px;
+      border-radius: 0;
+      font-size: 0.6875rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-secondary);
+      background: transparent;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .nav-link:hover { background: var(--surface); color: var(--text); }
+    .nav-link.active { background: var(--accent); color: #fff; box-shadow: none; }
 
-    /* --- Section Title --- */
+    /* ================================================================
+       SECTIONS
+       ================================================================ */
+    .app-section { padding: 2rem 0 3rem; }
+
+    .section-header { margin-bottom: 1.5rem; }
     .section-title {
       font-family: var(--font-serif);
-      font-size: 1.05rem;
       font-weight: 700;
-      margin: 32px 0 16px;
-      padding-bottom: 8px;
-      border-bottom: 1px solid var(--border);
-      letter-spacing: 0.04em;
+      font-size: 1.25rem;
+      color: var(--text);
+      letter-spacing: -0.02em;
+      line-height: 1.35;
     }
-    .section-title:first-of-type { margin-top: 8px; }
+    .section-title::after {
+      content: '';
+      display: block;
+      width: 3rem;
+      height: 2px;
+      background: var(--accent);
+      margin-top: 8px;
+    }
     .section-subtitle {
-      font-size: 0.75rem;
-      font-weight: 400;
+      font-size: 0.78rem;
       color: var(--text-muted);
-      margin-left: 8px;
+      margin-top: 4px;
+      display: block;
     }
 
-    /* --- KPI Grid --- */
+    /* ================================================================
+       KPI GRID
+       ================================================================ */
     .kpi-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 12px;
-      margin-bottom: 28px;
+      gap: 0;
     }
     .kpi-card {
       background: var(--card);
-      border: 1px solid var(--border-light);
-      padding: 14px 16px;
-      box-shadow: var(--shadow-sm);
+      border: none;
+      border-top: 2px solid var(--border);
+      border-right: 1px solid var(--border-light);
+      padding: 16px 18px;
+      box-shadow: none;
     }
+    .kpi-card:last-child { border-right: none; }
     .kpi-label {
       font-size: 0.68rem;
       font-weight: 700;
@@ -191,59 +250,69 @@
       margin-top: 2px;
     }
 
-    /* --- Chart Grid --- */
+    /* ================================================================
+       CHARTS
+       ================================================================ */
     .chart-row {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-      gap: 16px;
-      margin-bottom: 24px;
+      gap: 0;
+      margin-bottom: 0;
     }
     .chart-box {
       background: var(--card);
-      border: 1px solid var(--border-light);
-      padding: 16px;
-      box-shadow: var(--shadow-sm);
+      border: none;
+      border-top: 2px solid var(--border);
+      border-right: 1px solid var(--border-light);
+      padding: 20px;
+      box-shadow: none;
     }
+    .chart-box:last-child { border-right: none; }
     .chart-box h3 {
-      font-size: 0.78rem;
+      font-size: 0.72rem;
       font-weight: 700;
-      color: var(--text-secondary);
+      color: var(--text-muted);
       margin-bottom: 12px;
       text-transform: uppercase;
       letter-spacing: 0.06em;
     }
 
-    /* --- Filter Bar --- */
+    /* ================================================================
+       FILTER BAR
+       ================================================================ */
     .filter-bar {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
       align-items: center;
+      padding: 12px 0;
+      border-top: 1px solid var(--border-light);
+      border-bottom: 1px solid var(--border-light);
       margin-bottom: 20px;
-      padding: 12px 16px;
-      background: var(--surface);
-      border: 1px solid var(--border-light);
     }
     .filter-label {
-      font-size: 0.72rem;
+      font-size: 0.68rem;
       font-weight: 700;
       color: var(--text-muted);
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      margin-right: 4px;
+      margin-right: 2px;
     }
     .filter-btn {
       font-family: var(--font);
-      font-size: 0.74rem;
-      padding: 4px 12px;
+      font-size: 0.72rem;
+      font-weight: 500;
+      padding: 5px 14px;
       border: 1px solid var(--border);
-      background: var(--card);
+      border-radius: 0;
+      background: transparent;
       color: var(--text-secondary);
       cursor: pointer;
-      transition: all 0.15s;
+      transition: all 0.2s;
     }
-    .filter-btn:hover { background: var(--card-hover); color: var(--text); }
-    .filter-btn.active { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+    .filter-btn:hover { background: var(--surface); color: var(--text); }
+    .filter-btn.active { background: #121212; color: #fff; border-color: #121212; }
+    [data-theme="dark"] .filter-btn.active { background: var(--accent); color: var(--bg); border-color: var(--accent); }
     .filter-sep {
       width: 1px;
       height: 20px;
@@ -253,8 +322,9 @@
     .filter-search {
       font-family: var(--font);
       font-size: 0.78rem;
-      padding: 4px 12px;
+      padding: 5px 14px;
       border: 1px solid var(--border);
+      border-radius: 0;
       background: var(--card);
       color: var(--text);
       min-width: 180px;
@@ -267,73 +337,115 @@
       margin-left: auto;
     }
 
-    /* --- Signal Grid --- */
-    .signal-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-      gap: 14px;
-      margin-bottom: 32px;
+    /* ================================================================
+       VIEW TOGGLE & SORT
+       ================================================================ */
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .view-toggle { display: flex; gap: 0; }
+    .view-btn {
+      font-family: var(--font);
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 6px 16px;
+      border: 1px solid var(--border);
+      border-radius: 0;
+      background: transparent;
+      color: var(--text-secondary);
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      transition: all 0.2s;
+    }
+    .view-btn:first-child { border-right: none; }
+    .view-btn.active { background: #121212; color: #fff; border-color: #121212; }
+    [data-theme="dark"] .view-btn.active { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+    .sort-select {
+      font-family: var(--font);
+      font-size: 0.72rem;
+      padding: 5px 10px;
+      border: 1px solid var(--border);
+      border-radius: 0;
+      background: var(--card);
+      color: var(--text);
+      cursor: pointer;
     }
 
-    /* --- Signal Card --- */
+    /* ================================================================
+       SIGNAL GRID (card view) — matching ws-card in app.html
+       ================================================================ */
+    .signal-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 0 0;
+    }
+
     .sig-card {
       background: var(--card);
-      border: 1px solid var(--border-light);
+      border: none;
+      border-top: 2px solid var(--border);
+      border-right: 1px solid var(--border-light);
+      border-radius: 0;
       padding: 0;
-      box-shadow: var(--shadow-sm);
-      transition: border-color 0.15s, box-shadow 0.15s;
-      position: relative;
+      box-shadow: none;
+      transition: border-color 0.2s;
       overflow: hidden;
     }
-    .sig-card:hover { border-color: var(--accent); box-shadow: var(--shadow-md); }
+    .sig-card:hover { border-top-color: var(--accent); }
     .sig-card.noise { opacity: 0.55; border-top-style: dashed; }
     .sig-card.noise:hover { opacity: 1; }
 
-    .sig-card-top {
-      height: 3px;
-    }
-
-    .sig-card-body {
-      padding: 14px 16px;
-    }
+    .sig-card-body { padding: 16px 18px; }
 
     .sig-card-badges {
       display: flex;
       flex-wrap: wrap;
-      gap: 4px;
+      gap: 6px;
       margin-bottom: 8px;
+      align-items: center;
     }
     .sig-badge {
-      font-size: 0.66rem;
+      font-size: 0.65rem;
       font-weight: 700;
-      padding: 2px 8px;
-      letter-spacing: 0.02em;
+      padding: 3px 10px;
+      border-radius: 0;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
     }
 
     .sig-card-title {
-      font-family: var(--font-serif);
-      font-size: 0.9rem;
-      font-weight: 700;
-      line-height: 1.5;
-      margin-bottom: 6px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      line-height: 1.45;
+      margin-bottom: 4px;
+      color: var(--text);
     }
 
     .sig-card-desc {
-      font-size: 0.78rem;
+      font-size: 0.8rem;
       color: var(--text-secondary);
-      line-height: 1.7;
+      line-height: 1.65;
       margin-bottom: 10px;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
 
     .sig-card-meta {
       display: flex;
       flex-wrap: wrap;
-      gap: 4px;
-      margin-bottom: 8px;
+      gap: 6px;
+      align-items: center;
     }
     .sig-meta-tag {
-      font-size: 0.66rem;
-      padding: 1px 6px;
+      font-size: 0.7rem;
+      padding: 2px 10px;
+      border-radius: 0;
       background: var(--surface);
       color: var(--text-secondary);
     }
@@ -345,8 +457,8 @@
       gap: 4px 16px;
       font-size: 0.7rem;
       color: var(--text-secondary);
-      margin-top: 8px;
-      padding-top: 8px;
+      margin-top: 10px;
+      padding-top: 10px;
       border-top: 1px solid var(--border-light);
     }
     .sig-score-row {
@@ -354,22 +466,14 @@
       align-items: center;
       gap: 6px;
     }
-    .sig-score-label {
-      min-width: 70px;
-      font-weight: 500;
-    }
+    .sig-score-label { min-width: 72px; font-weight: 500; }
     .sig-score-bar {
       flex: 1;
-      height: 5px;
+      height: 4px;
       background: var(--border-light);
-      border-radius: 3px;
       overflow: hidden;
     }
-    .sig-score-fill {
-      height: 100%;
-      border-radius: 3px;
-      background: #6366f1;
-    }
+    .sig-score-fill { height: 100%; background: var(--accent); }
     .sig-score-val {
       min-width: 18px;
       text-align: right;
@@ -381,75 +485,66 @@
       display: flex;
       align-items: center;
       gap: 6px;
-      margin-top: 6px;
-      padding-top: 6px;
+      margin-top: 8px;
+      padding-top: 8px;
       border-top: 1px solid var(--border-light);
       font-size: 0.72rem;
       font-weight: 700;
     }
     .sig-composite-bar {
       flex: 1;
-      height: 7px;
+      height: 6px;
       background: var(--border-light);
-      border-radius: 4px;
       overflow: hidden;
     }
-    .sig-composite-fill {
-      height: 100%;
-      border-radius: 4px;
-    }
+    .sig-composite-fill { height: 100%; }
 
     /* Expandable details */
     .sig-details-toggle {
       font-family: var(--font);
-      font-size: 0.72rem;
-      color: var(--text-muted);
+      font-size: 0.78rem;
+      color: var(--accent);
       background: none;
       border: none;
       cursor: pointer;
-      padding: 6px 16px;
-      width: 100%;
-      text-align: left;
-      border-top: 1px solid var(--border-light);
-      transition: background 0.1s;
+      padding: 4px 0;
+      margin-top: 8px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
     }
-    .sig-details-toggle:hover { background: var(--surface); color: var(--text); }
+    .sig-details-toggle:hover { text-decoration: underline; }
     .sig-details-toggle .chevron {
       display: inline-block;
-      transition: transform 0.2s;
+      transition: transform 0.25s;
       font-size: 0.6rem;
-      margin-right: 4px;
     }
     .sig-details {
       display: none;
-      padding: 10px 16px 14px;
-      font-size: 0.76rem;
-      color: var(--text-secondary);
-      line-height: 1.7;
+      padding-top: 10px;
+      margin-top: 10px;
       border-top: 1px solid var(--border-light);
-      background: var(--surface);
+      font-size: 0.84rem;
+      line-height: 1.7;
+      color: var(--text-secondary);
     }
     .sig-details.open { display: block; }
     .sig-details-label {
-      font-size: 0.68rem;
+      font-size: 0.72rem;
       font-weight: 700;
-      color: var(--text-muted);
+      color: var(--accent);
       text-transform: uppercase;
       letter-spacing: 0.06em;
-      margin: 8px 0 4px;
+      margin: 12px 0 4px;
     }
     .sig-details-label:first-child { margin-top: 0; }
-    .sig-details ul {
-      margin: 0;
-      padding-left: 1.2em;
-    }
-    .sig-details li {
-      margin-bottom: 2px;
-      font-size: 0.74rem;
-    }
+    .sig-details ul { margin: 0; padding-left: 1.2em; }
+    .sig-details li { margin-bottom: 4px; font-size: 0.8rem; }
 
-    /* --- Signal Table (list view) --- */
-    .sig-table-wrap { overflow-x: auto; margin-bottom: 32px; }
+    /* ================================================================
+       TABLE VIEW
+       ================================================================ */
+    .sig-table-wrap { overflow-x: auto; }
     .sig-table {
       width: 100%;
       border-collapse: collapse;
@@ -462,60 +557,24 @@
       letter-spacing: 0.06em;
       color: var(--text-muted);
       text-align: left;
-      padding: 8px 10px;
-      border-bottom: 2px solid var(--border);
+      padding: 10px 12px;
+      border-bottom: 2px solid var(--accent);
       cursor: pointer;
       white-space: nowrap;
       user-select: none;
     }
     .sig-table th:hover { color: var(--text); }
-    .sig-table th .sort-arrow { font-size: 0.6rem; margin-left: 2px; }
     .sig-table td {
-      padding: 8px 10px;
+      padding: 10px 12px;
       border-bottom: 1px solid var(--border-light);
       vertical-align: top;
     }
-    .sig-table tr:hover { background: var(--card-hover); }
-    .sig-table .td-title {
-      font-weight: 600;
-      max-width: 280px;
-    }
-    .sig-table .td-desc {
-      max-width: 320px;
-      color: var(--text-secondary);
-      font-size: 0.74rem;
-    }
+    .sig-table tr:hover { background: var(--accent-light); }
+    .sig-table .td-title { font-weight: 600; max-width: 280px; }
 
-    /* --- View Toggle --- */
-    .view-toggle {
-      display: flex;
-      gap: 0;
-      margin-bottom: 16px;
-    }
-    .view-btn {
-      font-family: var(--font);
-      font-size: 0.74rem;
-      padding: 6px 14px;
-      border: 1px solid var(--border);
-      background: var(--card);
-      color: var(--text-secondary);
-      cursor: pointer;
-    }
-    .view-btn:first-child { border-right: none; }
-    .view-btn.active { background: var(--accent); color: var(--bg); border-color: var(--accent); }
-
-    /* --- Sort select --- */
-    .sort-select {
-      font-family: var(--font);
-      font-size: 0.74rem;
-      padding: 4px 8px;
-      border: 1px solid var(--border);
-      background: var(--card);
-      color: var(--text);
-      cursor: pointer;
-    }
-
-    /* --- Loading --- */
+    /* ================================================================
+       LOADING & EMPTY
+       ================================================================ */
     .loading-overlay {
       display: flex;
       align-items: center;
@@ -533,8 +592,6 @@
       margin-right: 10px;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* --- Empty state --- */
     .empty-state {
       text-align: center;
       padding: 48px 24px;
@@ -542,153 +599,218 @@
       font-size: 0.85rem;
     }
 
-    /* --- Responsive --- */
+    /* ================================================================
+       FOOTER
+       ================================================================ */
+    .site-footer {
+      border-top: 2px solid var(--accent);
+      padding: 16px 0;
+      margin-top: 3rem;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    /* ================================================================
+       RESPONSIVE
+       ================================================================ */
     @media (max-width: 900px) {
       .chart-row { grid-template-columns: 1fr; }
-      .kpi-grid { grid-template-columns: repeat(3, 1fr); }
-      .signal-grid { grid-template-columns: 1fr; }
+      .kpi-grid { grid-template-columns: repeat(4, 1fr); }
+      .signal-grid { grid-template-columns: 1fr 1fr; }
     }
     @media (max-width: 600px) {
-      .main { padding: 12px; }
+      .container { padding: 0 16px; }
       .kpi-grid { grid-template-columns: repeat(2, 1fr); }
-      .header { padding: 10px 12px; }
-      .header-left h1 { font-size: 0.95rem; }
+      .signal-grid { grid-template-columns: 1fr; }
       .filter-bar { flex-direction: column; align-items: stretch; }
       .filter-sep { display: none; }
       .filter-count { margin-left: 0; }
-      .signal-grid { grid-template-columns: 1fr; }
       .sig-scores { grid-template-columns: 1fr; }
+      .toolbar { flex-direction: column; gap: 8px; align-items: stretch; }
+      .site-nav { padding: 0 16px; overflow: hidden; }
+      .nav-list { width: max-content; min-width: 100%; }
+      .nav-link { padding: 8px 14px; font-size: 0.62rem; }
+      .header-main { flex-direction: column; gap: 8px; align-items: flex-start; }
+    }
+
+    @media print {
+      .site-header, .site-nav, .site-footer, .filter-bar, .toolbar,
+      .theme-toggle, .sig-details-toggle { display: none !important; }
+      body { background: #fff; color: #000; }
+      .sig-card { border: 1px solid #ccc; }
     }
   </style>
 </head>
 <body>
 
-  <!-- Header -->
-  <header class="header">
-    <div class="header-left">
-      <h1><a href="app.html">Insight News</a> <span class="sep">/</span> <span class="page-label">Signal Dashboard</span></h1>
+  <!-- ================================================================
+       HEADER — matching app.html
+       ================================================================ -->
+  <header class="site-header">
+    <div class="container">
+      <div class="header-main">
+        <div class="header-left">
+          <a href="app.html" class="site-title">Insight News</a>
+          <span class="header-date" id="headerDate"></span>
+        </div>
+        <div class="header-right">
+          <button class="theme-toggle" id="themeToggle" title="Theme" aria-label="Theme">&#9789;</button>
+        </div>
+      </div>
     </div>
-    <div class="header-right">
-      <a href="app.html" class="back-link">Back to News</a>
-      <a href="dashboard.html" class="back-link">Collection</a>
-      <a href="dashboard.html#methodology" class="back-link">Methodology</a>
-      <button class="theme-toggle" onclick="toggleTheme()">Theme</button>
-    </div>
+    <nav class="site-nav" aria-label="Navigation">
+      <div class="container">
+        <ul class="nav-list">
+          <li><a href="app.html" class="nav-link">Home</a></li>
+          <li><a href="app.html#section-signals" class="nav-link">Signals</a></li>
+          <li><a href="signals.html" class="nav-link active">Signal Dashboard</a></li>
+          <li><a href="app.html#section-cla" class="nav-link">CLA</a></li>
+          <li><a href="app.html#section-foresight" class="nav-link">Foresight</a></li>
+          <li><a href="dashboard.html" class="nav-link">Collection</a></li>
+          <li><a href="dashboard.html#methodology" class="nav-link">Methodology</a></li>
+        </ul>
+      </div>
+    </nav>
   </header>
 
-  <div class="main">
+  <!-- ================================================================
+       MAIN CONTENT
+       ================================================================ -->
+  <main class="container">
 
-    <!-- KPI Cards -->
-    <div class="kpi-grid" id="kpiGrid"></div>
+    <!-- KPI Section -->
+    <section class="app-section">
+      <div class="section-header">
+        <h2 class="section-title">Signal Overview</h2>
+        <span class="section-subtitle">Academic signal theory-based detection metrics</span>
+      </div>
+      <div class="kpi-grid" id="kpiGrid"></div>
+    </section>
 
-    <!-- Charts -->
-    <h2 class="section-title">Signal Distribution</h2>
-    <div class="chart-row">
-      <div class="chart-box">
-        <h3>Signal Type Distribution</h3>
-        <canvas id="typeChart"></canvas>
+    <!-- Charts Section -->
+    <section class="app-section" style="padding-top:0">
+      <div class="section-header">
+        <h2 class="section-title">Distribution Analysis</h2>
+        <span class="section-subtitle">Signal composition across academic frameworks</span>
       </div>
-      <div class="chart-box">
-        <h3>Three Horizons Distribution</h3>
-        <canvas id="horizonChart"></canvas>
+      <div class="chart-row">
+        <div class="chart-box">
+          <h3>Signal Type Distribution</h3>
+          <canvas id="typeChart"></canvas>
+        </div>
+        <div class="chart-box">
+          <h3>Three Horizons (Sharpe 2013)</h3>
+          <canvas id="horizonChart"></canvas>
+        </div>
       </div>
+      <div class="chart-row">
+        <div class="chart-box">
+          <h3>CLA Depth (Inayatullah 1998)</h3>
+          <canvas id="claChart"></canvas>
+        </div>
+        <div class="chart-box">
+          <h3>PESTLE Category Coverage</h3>
+          <canvas id="pestleChart"></canvas>
+        </div>
+      </div>
+      <div class="chart-row">
+        <div class="chart-box">
+          <h3>Impact vs Composite Score</h3>
+          <canvas id="scatterChart"></canvas>
+        </div>
+        <div class="chart-box">
+          <h3>Score Radar by Signal Type</h3>
+          <canvas id="radarChart"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- Signal List Section -->
+    <section class="app-section" style="padding-top:0">
+      <div class="section-header">
+        <h2 class="section-title">All Signals</h2>
+        <span class="section-subtitle" id="signalCountLabel"></span>
+      </div>
+
+      <div class="filter-bar" id="filterBar">
+        <span class="filter-label">Type</span>
+        <button class="filter-btn active" data-filter="type" data-value="all">All</button>
+        <button class="filter-btn" data-filter="type" data-value="weak_signal">Weak Signal</button>
+        <button class="filter-btn" data-filter="type" data-value="emerging_trend">Emerging</button>
+        <button class="filter-btn" data-filter="type" data-value="wild_card">Wild Card</button>
+        <button class="filter-btn" data-filter="type" data-value="counter_trend">Counter</button>
+        <button class="filter-btn" data-filter="type" data-value="paradigm_shift">Paradigm</button>
+        <div class="filter-sep"></div>
+        <span class="filter-label">Impact</span>
+        <button class="filter-btn active" data-filter="impact" data-value="all">All</button>
+        <button class="filter-btn" data-filter="impact" data-value="high">High</button>
+        <button class="filter-btn" data-filter="impact" data-value="medium">Medium</button>
+        <button class="filter-btn" data-filter="impact" data-value="low">Low</button>
+        <div class="filter-sep"></div>
+        <span class="filter-label">Horizon</span>
+        <button class="filter-btn active" data-filter="horizon" data-value="all">All</button>
+        <button class="filter-btn" data-filter="horizon" data-value="H1">H1</button>
+        <button class="filter-btn" data-filter="horizon" data-value="H2">H2</button>
+        <button class="filter-btn" data-filter="horizon" data-value="H3">H3</button>
+        <div class="filter-sep"></div>
+        <input class="filter-search" type="text" id="searchInput" placeholder="Search signals...">
+        <span class="filter-count" id="filterCount"></span>
+      </div>
+
+      <div class="toolbar">
+        <div class="view-toggle">
+          <button class="view-btn active" onclick="setView('grid',this)">Grid</button>
+          <button class="view-btn" onclick="setView('table',this)">Table</button>
+        </div>
+        <div>
+          <select class="sort-select" id="sortSelect">
+            <option value="composite_desc">Composite Score (high)</option>
+            <option value="composite_asc">Composite Score (low)</option>
+            <option value="novelty_desc">Novelty (high)</option>
+            <option value="disruption_desc">Disruption (high)</option>
+            <option value="early_desc">Early Stage (high)</option>
+            <option value="connectivity_desc">Connectivity (high)</option>
+            <option value="ansoff_asc">Ansoff Level (weak first)</option>
+            <option value="ansoff_desc">Ansoff Level (strong first)</option>
+            <option value="alpha">Alphabetical</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Grid View -->
+      <div class="signal-grid" id="signalGrid">
+        <div class="loading-overlay"><span class="spinner"></span> Loading signals...</div>
+      </div>
+
+      <!-- Table View -->
+      <div class="sig-table-wrap" id="signalTableWrap" style="display:none">
+        <table class="sig-table">
+          <thead>
+            <tr>
+              <th data-col="signal">Signal</th>
+              <th data-col="signal_type">Type</th>
+              <th data-col="potential_impact">Impact</th>
+              <th data-col="three_horizons">Horizon</th>
+              <th data-col="cla_depth">CLA</th>
+              <th data-col="ansoff_level">Ansoff</th>
+              <th data-col="composite_score">Score</th>
+              <th data-col="pestle">PESTLE</th>
+              <th data-col="time_horizon">Time</th>
+            </tr>
+          </thead>
+          <tbody id="signalTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      Insight News Signal Dashboard &mdash; Academic signal theory-based foresight analytics
     </div>
-    <div class="chart-row">
-      <div class="chart-box">
-        <h3>CLA Depth Distribution</h3>
-        <canvas id="claChart"></canvas>
-      </div>
-      <div class="chart-box">
-        <h3>PESTLE Category Coverage</h3>
-        <canvas id="pestleChart"></canvas>
-      </div>
-    </div>
-    <div class="chart-row">
-      <div class="chart-box">
-        <h3>Impact x Composite Score</h3>
-        <canvas id="scatterChart"></canvas>
-      </div>
-      <div class="chart-box">
-        <h3>Score Radar (Average by Signal Type)</h3>
-        <canvas id="radarChart"></canvas>
-      </div>
-    </div>
-
-    <!-- Filters & View Toggle -->
-    <h2 class="section-title">All Signals <span class="section-subtitle" id="signalCountLabel"></span></h2>
-
-    <div class="filter-bar" id="filterBar">
-      <span class="filter-label">Type</span>
-      <button class="filter-btn active" data-filter="type" data-value="all">All</button>
-      <button class="filter-btn" data-filter="type" data-value="weak_signal" style="border-left-color:var(--ws)">Weak Signal</button>
-      <button class="filter-btn" data-filter="type" data-value="emerging_trend" style="border-left-color:var(--et)">Emerging</button>
-      <button class="filter-btn" data-filter="type" data-value="wild_card" style="border-left-color:var(--wc)">Wild Card</button>
-      <button class="filter-btn" data-filter="type" data-value="counter_trend" style="border-left-color:var(--ct)">Counter</button>
-      <button class="filter-btn" data-filter="type" data-value="paradigm_shift" style="border-left-color:var(--ps)">Paradigm</button>
-      <div class="filter-sep"></div>
-      <span class="filter-label">Impact</span>
-      <button class="filter-btn active" data-filter="impact" data-value="all">All</button>
-      <button class="filter-btn" data-filter="impact" data-value="high">High</button>
-      <button class="filter-btn" data-filter="impact" data-value="medium">Medium</button>
-      <button class="filter-btn" data-filter="impact" data-value="low">Low</button>
-      <div class="filter-sep"></div>
-      <span class="filter-label">Horizon</span>
-      <button class="filter-btn active" data-filter="horizon" data-value="all">All</button>
-      <button class="filter-btn" data-filter="horizon" data-value="H1">H1</button>
-      <button class="filter-btn" data-filter="horizon" data-value="H2">H2</button>
-      <button class="filter-btn" data-filter="horizon" data-value="H3">H3</button>
-      <div class="filter-sep"></div>
-      <input class="filter-search" type="text" id="searchInput" placeholder="Search signals...">
-      <span class="filter-count" id="filterCount"></span>
-    </div>
-
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-      <div class="view-toggle">
-        <button class="view-btn active" onclick="setView('grid')">Grid</button>
-        <button class="view-btn" onclick="setView('table')">Table</button>
-      </div>
-      <div>
-        <label style="font-size:0.72rem;color:var(--text-muted);margin-right:6px">Sort:</label>
-        <select class="sort-select" id="sortSelect">
-          <option value="composite_desc">Composite Score (high)</option>
-          <option value="composite_asc">Composite Score (low)</option>
-          <option value="novelty_desc">Novelty (high)</option>
-          <option value="disruption_desc">Disruption (high)</option>
-          <option value="early_desc">Early Stage (high)</option>
-          <option value="connectivity_desc">Connectivity (high)</option>
-          <option value="ansoff_asc">Ansoff Level (weak first)</option>
-          <option value="ansoff_desc">Ansoff Level (strong first)</option>
-          <option value="alpha">Alphabetical</option>
-        </select>
-      </div>
-    </div>
-
-    <!-- Grid View -->
-    <div class="signal-grid" id="signalGrid">
-      <div class="loading-overlay"><span class="spinner"></span> Loading signals...</div>
-    </div>
-
-    <!-- Table View -->
-    <div class="sig-table-wrap" id="signalTableWrap" style="display:none">
-      <table class="sig-table">
-        <thead>
-          <tr>
-            <th data-col="signal">Signal</th>
-            <th data-col="signal_type">Type</th>
-            <th data-col="potential_impact">Impact</th>
-            <th data-col="three_horizons">Horizon</th>
-            <th data-col="cla_depth">CLA</th>
-            <th data-col="ansoff_level">Ansoff</th>
-            <th data-col="composite_score">Score</th>
-            <th data-col="pestle">PESTLE</th>
-            <th data-col="time_horizon">Time</th>
-          </tr>
-        </thead>
-        <tbody id="signalTableBody"></tbody>
-      </table>
-    </div>
-
-  </div>
+  </footer>
 
   <script src="js/shared/data-loader.js"></script>
   <script>
@@ -699,9 +821,17 @@
       localStorage.setItem('news-theme', t);
       if (window._chartsReady) renderCharts();
     }
+    document.getElementById('themeToggle').addEventListener('click', toggleTheme);
     (function() {
       const saved = localStorage.getItem('news-theme');
       if (saved) document.documentElement.setAttribute('data-theme', saved);
+    })();
+
+    // === Date display ===
+    (function() {
+      const d = new Date();
+      document.getElementById('headerDate').textContent =
+        d.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' });
     })();
 
     // === Constants ===
@@ -715,9 +845,7 @@
     const HORIZON_MAP = { H1: 'H1 Decline', H2: 'H2 Transition', H3: 'H3 Emerging' };
     const CLA_MAP = { litany: 'Litany', systemic: 'Systemic', worldview: 'Worldview', myth: 'Myth' };
     const CLA_COLORS = { litany: '#94a3b8', systemic: '#6366f1', worldview: '#8b5cf6', myth: '#ec4899' };
-    const IMPACT_COLORS = { high: '#ef4444', medium: '#f59e0b', low: '#94a3b8' };
-    const PESTLE_JA = { '政治': 'P', '経済': 'E', '社会': 'S', '技術': 'T', '法律': 'L', '環境': 'En',
-                        Political: 'P', Economic: 'E', Social: 'S', Technological: 'T', Legal: 'L', Environmental: 'En' };
+    const IMPACT_COLORS = { high: '#CC1400', medium: '#555555', low: '#1E8449' };
 
     // === State ===
     let ALL_SIGNALS = [];
@@ -731,7 +859,6 @@
     async function loadSignals() {
       const ai = await DataLoader.loadAIAnalysis();
       const raw = ai?.weak_signals || [];
-      // Normalize fields with defaults for pre-academic-theory data
       ALL_SIGNALS = raw.map((s, i) => ({
         ...s,
         _id: i,
@@ -749,7 +876,7 @@
       return ALL_SIGNALS;
     }
 
-    // === Filtering ===
+    // === Filtering & Sorting ===
     function applyFilters() {
       const { type, impact, horizon, search } = currentFilters;
       const q = search.toLowerCase();
@@ -761,8 +888,8 @@
         return true;
       });
       sortSignals();
-      document.getElementById('filterCount').textContent = FILTERED.length + ' / ' + ALL_SIGNALS.length + ' signals';
-      document.getElementById('signalCountLabel').textContent = '(' + ALL_SIGNALS.length + ' total)';
+      document.getElementById('filterCount').textContent = FILTERED.length + ' / ' + ALL_SIGNALS.length;
+      document.getElementById('signalCountLabel').textContent = ALL_SIGNALS.length + ' signals detected';
       renderSignalView();
     }
 
@@ -784,11 +911,11 @@
       });
     }
 
-    // === View switching ===
-    function setView(v) {
+    // === View ===
+    function setView(v, btn) {
       currentView = v;
       document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
-      event.target.classList.add('active');
+      btn.classList.add('active');
       renderSignalView();
     }
 
@@ -804,53 +931,47 @@
       }
     }
 
-    // === Escape HTML ===
-    function esc(str) {
-      const d = document.createElement('div');
-      d.textContent = str || '';
-      return d.innerHTML;
-    }
+    // === Helpers ===
+    function esc(str) { const d = document.createElement('div'); d.textContent = str || ''; return d.innerHTML; }
 
-    // === Score bar helper ===
-    function scoreBar(val, maxVal) {
-      maxVal = maxVal || 10;
-      const pct = Math.min(100, (val / maxVal) * 100);
+    function scoreBar(val) {
+      const pct = Math.min(100, (val / 10) * 100);
       return '<div class="sig-score-bar"><div class="sig-score-fill" style="width:' + pct + '%"></div></div>';
     }
 
     function compositeColor(score) {
-      if (score >= 7) return '#10b981';
-      if (score >= 5) return '#6366f1';
-      if (score >= 3) return '#f59e0b';
-      return '#94a3b8';
+      if (score >= 7) return '#1E8449';
+      if (score >= 5) return '#555555';
+      if (score >= 3) return '#CC1400';
+      return '#999999';
     }
 
-    // === Badge HTML ===
     function typeBadge(s) {
       const t = TYPE_MAP[s.signal_type] || TYPE_MAP.weak_signal;
       return '<span class="sig-badge" style="background:' + t.color + '18;color:' + t.color + ';border:1px solid ' + t.color + '40">' + t.label + '</span>';
     }
     function impactBadge(s) {
-      const c = IMPACT_COLORS[(s.potential_impact || '').toLowerCase()] || '#94a3b8';
-      return '<span class="sig-badge" style="background:' + c + '18;color:' + c + ';border:1px solid ' + c + '40">' + esc(s.potential_impact || 'N/A') + '</span>';
+      const imp = (s.potential_impact || '').toLowerCase();
+      const c = IMPACT_COLORS[imp] || '#999';
+      return '<span class="sig-badge" style="background:' + c + ';color:#fff">' + esc(s.potential_impact || 'N/A') + '</span>';
     }
     function horizonBadge(s) {
       if (!s.three_horizons) return '';
-      const colors = { H1: '#6366f1', H2: '#f59e0b', H3: '#10b981' };
-      const c = colors[s.three_horizons] || '#94a3b8';
+      const colors = { H1: '#6366f1', H2: '#f59e0b', H3: '#1E8449' };
+      const c = colors[s.three_horizons] || '#999';
       return '<span class="sig-badge" style="background:' + c + '18;color:' + c + ';border:1px solid ' + c + '40">' + (HORIZON_MAP[s.three_horizons] || s.three_horizons) + '</span>';
     }
     function claBadge(s) {
       if (!s.cla_depth) return '';
-      const c = CLA_COLORS[s.cla_depth] || '#94a3b8';
+      const c = CLA_COLORS[s.cla_depth] || '#999';
       return '<span class="sig-badge" style="background:' + c + '18;color:' + c + ';border:1px solid ' + c + '40">CLA: ' + (CLA_MAP[s.cla_depth] || s.cla_depth) + '</span>';
     }
     function ansoffBadge(s) {
       if (!s.ansoff_level) return '';
-      return '<span class="sig-badge" style="background:#fff3e0;color:#e65100;border:1px solid #ffcc8040">Ansoff L' + s.ansoff_level + '</span>';
+      return '<span class="sig-badge" style="background:var(--surface);color:var(--text-secondary)">Ansoff L' + s.ansoff_level + '</span>';
     }
 
-    // === Grid Rendering ===
+    // === Grid ===
     function renderGrid() {
       const container = document.getElementById('signalGrid');
       if (FILTERED.length === 0) {
@@ -858,8 +979,7 @@
         return;
       }
 
-      container.innerHTML = FILTERED.map((s, i) => {
-        const t = TYPE_MAP[s.signal_type] || TYPE_MAP.weak_signal;
+      container.innerHTML = FILTERED.map(s => {
         const scores = s.scores || {};
         const hasScores = scores.novelty !== undefined;
 
@@ -870,7 +990,7 @@
               const v = scores[k] || 0;
               const label = k === 'early_stage' ? 'Early Stage' : k.charAt(0).toUpperCase() + k.slice(1);
               return '<div class="sig-score-row"><span class="sig-score-label">' + label + '</span>' +
-                scoreBar(v, 10) + '<span class="sig-score-val">' + v + '</span></div>';
+                scoreBar(v) + '<span class="sig-score-val">' + v + '</span></div>';
             }).join('') + '</div>';
         }
 
@@ -883,7 +1003,6 @@
             '<span style="color:' + cc + '">' + s.composite_score + '/10</span></div>';
         }
 
-        // Expandable details
         let detailsHtml = '';
         if (s.related_headlines && s.related_headlines.length > 0) {
           detailsHtml += '<div class="sig-details-label">Related Headlines</div><ul>' +
@@ -893,14 +1012,13 @@
           detailsHtml += '<div class="sig-details-label">Counter Trend</div><div>' + esc(s.counter_trend) + '</div>';
         }
         if (s.evidence_type) {
-          detailsHtml += '<div class="sig-details-label">Evidence Type</div><div>' + esc(s.evidence_type) + '</div>';
+          detailsHtml += '<div class="sig-details-label">Evidence</div><div>' + esc(s.evidence_type) + '</div>';
         }
         if (s.time_horizon) {
           detailsHtml += '<div class="sig-details-label">Time Horizon</div><div>' + esc(s.time_horizon) + '</div>';
         }
 
         return '<div class="sig-card' + (s.noise_flag ? ' noise' : '') + '">' +
-          '<div class="sig-card-top" style="background:' + t.color + '"></div>' +
           '<div class="sig-card-body">' +
             '<div class="sig-card-badges">' +
               typeBadge(s) + impactBadge(s) + horizonBadge(s) + claBadge(s) + ansoffBadge(s) +
@@ -912,9 +1030,9 @@
             '</div>' +
             scoresHtml +
             compositeHtml +
+            (detailsHtml ? '<button class="sig-details-toggle" onclick="toggleDetails(this)"><span class="chevron">&#9654;</span> Details</button>' +
+              '<div class="sig-details">' + detailsHtml + '</div>' : '') +
           '</div>' +
-          (detailsHtml ? '<button class="sig-details-toggle" onclick="toggleDetails(this)"><span class="chevron">&#9654;</span> Details</button>' +
-            '<div class="sig-details">' + detailsHtml + '</div>' : '') +
         '</div>';
       }).join('');
     }
@@ -931,21 +1049,21 @@
       }
     }
 
-    // === Table Rendering ===
+    // === Table ===
     function renderTable() {
       const tbody = document.getElementById('signalTableBody');
       if (FILTERED.length === 0) {
         tbody.innerHTML = '<tr><td colspan="9" class="empty-state">No signals match the current filters.</td></tr>';
         return;
       }
-
       tbody.innerHTML = FILTERED.map(s => {
         const t = TYPE_MAP[s.signal_type] || TYPE_MAP.weak_signal;
         const cc = compositeColor(s.composite_score || 0);
+        const impC = IMPACT_COLORS[(s.potential_impact || '').toLowerCase()] || '#999';
         return '<tr>' +
           '<td class="td-title">' + esc(s.signal) + '</td>' +
-          '<td><span class="sig-badge" style="background:' + t.color + '18;color:' + t.color + ';border:1px solid ' + t.color + '40;font-size:0.64rem">' + t.short + '</span></td>' +
-          '<td><span style="color:' + (IMPACT_COLORS[(s.potential_impact || '').toLowerCase()] || '#94a3b8') + ';font-weight:600">' + esc(s.potential_impact || '--') + '</span></td>' +
+          '<td><span class="sig-badge" style="background:' + t.color + '18;color:' + t.color + ';border:1px solid ' + t.color + '40;font-size:0.62rem">' + t.short + '</span></td>' +
+          '<td><span class="sig-badge" style="background:' + impC + ';color:#fff;font-size:0.62rem">' + esc(s.potential_impact || '--') + '</span></td>' +
           '<td>' + esc(s.three_horizons || '--') + '</td>' +
           '<td>' + esc(s.cla_depth ? CLA_MAP[s.cla_depth] || s.cla_depth : '--') + '</td>' +
           '<td>' + (s.ansoff_level || '--') + '</td>' +
@@ -956,7 +1074,7 @@
       }).join('');
     }
 
-    // === KPI Rendering ===
+    // === KPI ===
     function renderKPIs() {
       const total = ALL_SIGNALS.length;
       const highImpact = ALL_SIGNALS.filter(s => (s.potential_impact || '').toLowerCase() === 'high').length;
@@ -973,10 +1091,10 @@
         { label: 'High Impact', value: highImpact, sub: Math.round(highImpact / Math.max(total, 1) * 100) + '% of total' },
         { label: 'Wild Cards', value: wildCards, sub: 'low probability, high impact' },
         { label: 'H3 Emerging', value: h3Count, sub: 'pockets of future' },
-        { label: 'Deep Signals', value: mythCount, sub: 'worldview + myth level' },
-        { label: 'Avg Quality', value: avgComposite, sub: 'composite score /10' },
-        { label: 'PESTLE Coverage', value: pestleSet.size + '/6', sub: 'categories represented' },
-        { label: 'Noise Flagged', value: noiseCount, sub: 'potential false signals' },
+        { label: 'Deep Signals', value: mythCount, sub: 'worldview + myth' },
+        { label: 'Avg Quality', value: avgComposite, sub: 'composite /10' },
+        { label: 'PESTLE', value: pestleSet.size + '/6', sub: 'categories covered' },
+        { label: 'Noise', value: noiseCount, sub: 'flagged' },
       ];
 
       document.getElementById('kpiGrid').innerHTML = kpis.map(k =>
@@ -986,7 +1104,7 @@
       ).join('');
     }
 
-    // === Chart Rendering ===
+    // === Charts ===
     function getStyle(prop) { return getComputedStyle(document.documentElement).getPropertyValue(prop).trim(); }
 
     function destroyCharts() { Object.values(CHARTS).forEach(c => c.destroy()); CHARTS = {}; }
@@ -994,7 +1112,6 @@
     function renderCharts() {
       destroyCharts();
       const textColor = getStyle('--text-muted');
-      const borderColor = getStyle('--border');
       const gridColor = getStyle('--border-light');
 
       Chart.defaults.color = textColor;
@@ -1002,7 +1119,7 @@
       Chart.defaults.font.family = getStyle('--font');
       Chart.defaults.font.size = 11;
 
-      // 1. Signal Type Distribution (doughnut)
+      // 1. Signal Type (doughnut)
       const typeCounts = {};
       Object.keys(TYPE_MAP).forEach(k => typeCounts[k] = 0);
       ALL_SIGNALS.forEach(s => { typeCounts[s.signal_type] = (typeCounts[s.signal_type] || 0) + 1; });
@@ -1020,32 +1137,26 @@
         },
         options: {
           responsive: true,
-          plugins: {
-            legend: { position: 'right', labels: { boxWidth: 12, padding: 10, font: { size: 11 } } },
-          },
+          plugins: { legend: { position: 'right', labels: { boxWidth: 12, padding: 10, font: { size: 11 } } } },
         },
       });
 
-      // 2. Three Horizons Distribution (bar)
-      const horizonCounts = { H1: 0, H2: 0, H3: 0, '': 0 };
-      ALL_SIGNALS.forEach(s => { horizonCounts[s.three_horizons || ''] = (horizonCounts[s.three_horizons || ''] || 0) + 1; });
+      // 2. Three Horizons (bar)
+      const hCounts = { H1: 0, H2: 0, H3: 0, '': 0 };
+      ALL_SIGNALS.forEach(s => { hCounts[s.three_horizons || ''] = (hCounts[s.three_horizons || ''] || 0) + 1; });
 
       CHARTS.horizon = new Chart(document.getElementById('horizonChart'), {
         type: 'bar',
         data: {
           labels: ['H1 Decline', 'H2 Transition', 'H3 Emerging', 'Unclassified'],
           datasets: [{
-            data: [horizonCounts.H1, horizonCounts.H2, horizonCounts.H3, horizonCounts['']],
-            backgroundColor: ['#6366f130', '#f59e0b30', '#10b98130', '#94a3b820'],
-            borderColor: ['#6366f1', '#f59e0b', '#10b981', '#94a3b8'],
+            data: [hCounts.H1, hCounts.H2, hCounts.H3, hCounts['']],
+            backgroundColor: ['#6366f130', '#f59e0b30', '#1E844930', '#99999920'],
+            borderColor: ['#6366f1', '#f59e0b', '#1E8449', '#999999'],
             borderWidth: 2,
           }],
         },
-        options: {
-          responsive: true,
-          plugins: { legend: { display: false } },
-          scales: { y: { beginAtZero: true, ticks: { stepSize: 5 } } },
-        },
+        options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 5 } } } },
       });
 
       // 3. CLA Depth (horizontal bar)
@@ -1055,31 +1166,22 @@
       CHARTS.cla = new Chart(document.getElementById('claChart'), {
         type: 'bar',
         data: {
-          labels: ['Litany (Surface)', 'Systemic (Structure)', 'Worldview (Paradigm)', 'Myth (Deep)', 'Unclassified'],
+          labels: ['Litany', 'Systemic', 'Worldview', 'Myth', 'Unclassified'],
           datasets: [{
             data: [claCounts.litany, claCounts.systemic, claCounts.worldview, claCounts.myth, claCounts['']],
-            backgroundColor: [CLA_COLORS.litany + '30', CLA_COLORS.systemic + '30', CLA_COLORS.worldview + '30', CLA_COLORS.myth + '30', '#94a3b820'],
-            borderColor: [CLA_COLORS.litany, CLA_COLORS.systemic, CLA_COLORS.worldview, CLA_COLORS.myth, '#94a3b8'],
+            backgroundColor: [CLA_COLORS.litany + '30', CLA_COLORS.systemic + '30', CLA_COLORS.worldview + '30', CLA_COLORS.myth + '30', '#99999920'],
+            borderColor: [CLA_COLORS.litany, CLA_COLORS.systemic, CLA_COLORS.worldview, CLA_COLORS.myth, '#999999'],
             borderWidth: 2,
           }],
         },
-        options: {
-          indexAxis: 'y',
-          responsive: true,
-          plugins: { legend: { display: false } },
-          scales: { x: { beginAtZero: true, ticks: { stepSize: 5 } } },
-        },
+        options: { indexAxis: 'y', responsive: true, plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true, ticks: { stepSize: 5 } } } },
       });
 
-      // 4. PESTLE coverage (bar)
-      const pestleCounts = {};
-      ALL_SIGNALS.forEach(s => {
-        (s.pestle_categories || []).forEach(c => {
-          pestleCounts[c] = (pestleCounts[c] || 0) + 1;
-        });
-      });
-      const pestleLabels = Object.keys(pestleCounts).sort((a, b) => (pestleCounts[b] || 0) - (pestleCounts[a] || 0));
-      const pestleColorMap = { '政治': getStyle('--P'), '経済': getStyle('--E'), '社会': getStyle('--S'),
+      // 4. PESTLE coverage
+      const pCounts = {};
+      ALL_SIGNALS.forEach(s => { (s.pestle_categories || []).forEach(c => { pCounts[c] = (pCounts[c] || 0) + 1; }); });
+      const pLabels = Object.keys(pCounts).sort((a, b) => (pCounts[b] || 0) - (pCounts[a] || 0));
+      const pColorMap = { '政治': getStyle('--P'), '経済': getStyle('--E'), '社会': getStyle('--S'),
         '技術': getStyle('--T'), '法律': getStyle('--L'), '環境': getStyle('--En'),
         Political: getStyle('--P'), Economic: getStyle('--E'), Social: getStyle('--S'),
         Technological: getStyle('--T'), Legal: getStyle('--L'), Environmental: getStyle('--En') };
@@ -1087,27 +1189,24 @@
       CHARTS.pestle = new Chart(document.getElementById('pestleChart'), {
         type: 'bar',
         data: {
-          labels: pestleLabels,
+          labels: pLabels,
           datasets: [{
-            data: pestleLabels.map(l => pestleCounts[l] || 0),
-            backgroundColor: pestleLabels.map(l => (pestleColorMap[l] || '#94a3b8') + '30'),
-            borderColor: pestleLabels.map(l => pestleColorMap[l] || '#94a3b8'),
+            data: pLabels.map(l => pCounts[l] || 0),
+            backgroundColor: pLabels.map(l => (pColorMap[l] || '#999') + '30'),
+            borderColor: pLabels.map(l => pColorMap[l] || '#999'),
             borderWidth: 2,
           }],
         },
-        options: {
-          responsive: true,
-          plugins: { legend: { display: false } },
-          scales: { y: { beginAtZero: true, ticks: { stepSize: 10 } } },
-        },
+        options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 10 } } } },
       });
 
-      // 5. Impact x Composite Score Scatter
+      // 5. Scatter: Impact x Composite
       const impactVal = { high: 3, medium: 2, low: 1 };
       const scatterData = ALL_SIGNALS.filter(s => s.composite_score).map(s => ({
         x: s.composite_score,
         y: impactVal[(s.potential_impact || '').toLowerCase()] || 0,
         label: s.signal,
+        type: s.signal_type,
       }));
 
       if (scatterData.length > 0) {
@@ -1116,67 +1215,47 @@
           data: {
             datasets: [{
               data: scatterData,
-              backgroundColor: scatterData.map(d => {
-                const s = ALL_SIGNALS.find(sg => sg.signal === d.label);
-                return (TYPE_MAP[s?.signal_type]?.color || '#94a3b8') + '60';
-              }),
-              borderColor: scatterData.map(d => {
-                const s = ALL_SIGNALS.find(sg => sg.signal === d.label);
-                return TYPE_MAP[s?.signal_type]?.color || '#94a3b8';
-              }),
-              borderWidth: 1,
-              pointRadius: 6,
+              backgroundColor: scatterData.map(d => (TYPE_MAP[d.type]?.color || '#999') + '60'),
+              borderColor: scatterData.map(d => TYPE_MAP[d.type]?.color || '#999'),
+              borderWidth: 1, pointRadius: 6,
             }],
           },
           options: {
             responsive: true,
-            plugins: {
-              legend: { display: false },
-              tooltip: {
-                callbacks: { label: ctx => ctx.raw.label + ' (Score: ' + ctx.raw.x + ')' }
-              },
-            },
+            plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ctx.raw.label + ' (' + ctx.raw.x + ')' } } },
             scales: {
               x: { title: { display: true, text: 'Composite Score' }, min: 0, max: 10 },
-              y: { title: { display: true, text: 'Impact' }, min: 0, max: 4,
-                ticks: { callback: v => ['', 'Low', 'Medium', 'High', ''][v] || '' } },
+              y: { title: { display: true, text: 'Impact' }, min: 0, max: 4, ticks: { callback: v => ['', 'Low', 'Medium', 'High', ''][v] || '' } },
             },
           },
         });
       } else {
         document.getElementById('scatterChart').parentElement.innerHTML =
-          '<h3>Impact x Composite Score</h3><div class="empty-state" style="min-height:100px">Score data will appear after the next pipeline run.</div>';
+          '<h3>Impact vs Composite Score</h3><div class="empty-state" style="min-height:100px">Score data available after next pipeline run.</div>';
       }
 
-      // 6. Radar chart (average scores by signal type)
-      const radarTypes = Object.keys(TYPE_MAP);
+      // 6. Radar
       const scoreKeys = ['novelty', 'disruption', 'connectivity', 'credibility', 'early_stage'];
       const hasAnyScores = ALL_SIGNALS.some(s => s.scores?.novelty !== undefined);
 
       if (hasAnyScores) {
-        const radarDatasets = radarTypes.map(type => {
-          const signals = ALL_SIGNALS.filter(s => s.signal_type === type);
+        const radarDatasets = Object.keys(TYPE_MAP).map(type => {
+          const sigs = ALL_SIGNALS.filter(s => s.signal_type === type);
           const avgs = scoreKeys.map(k => {
-            const vals = signals.map(s => s.scores?.[k] || 0).filter(v => v > 0);
+            const vals = sigs.map(s => s.scores?.[k] || 0).filter(v => v > 0);
             return vals.length > 0 ? vals.reduce((a, b) => a + b, 0) / vals.length : 0;
           });
           return {
-            label: TYPE_MAP[type].label,
-            data: avgs,
+            label: TYPE_MAP[type].label, data: avgs,
             backgroundColor: TYPE_MAP[type].color + '15',
-            borderColor: TYPE_MAP[type].color,
-            borderWidth: 2,
-            pointRadius: 3,
+            borderColor: TYPE_MAP[type].color, borderWidth: 2, pointRadius: 3,
           };
         }).filter(ds => ds.data.some(v => v > 0));
 
         if (radarDatasets.length > 0) {
           CHARTS.radar = new Chart(document.getElementById('radarChart'), {
             type: 'radar',
-            data: {
-              labels: ['Novelty', 'Disruption', 'Connectivity', 'Credibility', 'Early Stage'],
-              datasets: radarDatasets,
-            },
+            data: { labels: ['Novelty', 'Disruption', 'Connectivity', 'Credibility', 'Early Stage'], datasets: radarDatasets },
             options: {
               responsive: true,
               plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, padding: 8, font: { size: 10 } } } },
@@ -1185,25 +1264,23 @@
           });
         } else {
           document.getElementById('radarChart').parentElement.innerHTML =
-            '<h3>Score Radar (Average by Signal Type)</h3><div class="empty-state" style="min-height:100px">Score data will appear after the next pipeline run.</div>';
+            '<h3>Score Radar by Signal Type</h3><div class="empty-state" style="min-height:100px">Score data available after next pipeline run.</div>';
         }
       } else {
         document.getElementById('radarChart').parentElement.innerHTML =
-          '<h3>Score Radar (Average by Signal Type)</h3><div class="empty-state" style="min-height:100px">Score data will appear after the next pipeline run.</div>';
+          '<h3>Score Radar by Signal Type</h3><div class="empty-state" style="min-height:100px">Score data available after next pipeline run.</div>';
       }
 
       window._chartsReady = true;
     }
 
-    // === Filter Event Handlers ===
+    // === Event Handlers ===
     document.querySelectorAll('.filter-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         const filter = btn.dataset.filter;
-        const value = btn.dataset.value;
-        // Toggle active state within same filter group
         document.querySelectorAll('.filter-btn[data-filter="' + filter + '"]').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        currentFilters[filter] = value;
+        currentFilters[filter] = btn.dataset.value;
         applyFilters();
       });
     });
@@ -1213,24 +1290,11 @@
     });
     document.getElementById('sortSelect').addEventListener('change', () => applyFilters());
 
-    // === Table header sorting ===
     document.querySelectorAll('.sig-table th[data-col]').forEach(th => {
       th.addEventListener('click', () => {
         const col = th.dataset.col;
-        const select = document.getElementById('sortSelect');
-        const sortMap = {
-          signal: 'alpha',
-          signal_type: 'alpha',
-          potential_impact: 'composite_desc',
-          three_horizons: 'composite_desc',
-          cla_depth: 'composite_desc',
-          ansoff_level: 'ansoff_asc',
-          composite_score: 'composite_desc',
-        };
-        if (sortMap[col]) {
-          select.value = sortMap[col];
-          applyFilters();
-        }
+        const map = { signal: 'alpha', composite_score: 'composite_desc', ansoff_level: 'ansoff_asc' };
+        if (map[col]) { document.getElementById('sortSelect').value = map[col]; applyFilters(); }
       });
     });
 
