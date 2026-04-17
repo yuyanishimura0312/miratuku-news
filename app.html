@@ -663,13 +663,16 @@
     .ws-card-noise { opacity: 0.6; border-top-style: dashed; }
     .ws-card-noise:hover { opacity: 1; }
     .ws-card-header {
-      display: flex;
-      align-items: flex-start;
-      gap: 8px;
       margin-bottom: 6px;
     }
-    .ws-card-title { flex: 1; font-size: 0.82rem; font-weight: 600; line-height: 1.4; color: var(--text); }
-    .ws-card-badges { display: flex; gap: 6px; flex-shrink: 0; align-items: center; flex-wrap: wrap; }
+    .ws-card-badges {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 6px;
+    }
+    .ws-card-title { font-size: 0.88rem; font-weight: 600; line-height: 1.45; color: var(--text); }
     .ws-card-desc {
       font-size: 0.8rem;
       line-height: 1.6;
@@ -4916,7 +4919,6 @@
           const scoreBar = function(val) { return '<div style="display:inline-block;width:60px;height:6px;background:#e5e7eb;border-radius:3px;vertical-align:middle;margin-left:4px"><div style="width:' + (val * 10) + '%;height:100%;background:#6366f1;border-radius:3px"></div></div>'; };
           return '<div class="ws-card' + (isNoise ? ' ws-card-noise' : '') + '" id="ws-card-' + i + '">' +
             '<div class="ws-card-header">' +
-              '<div class="ws-card-title">' + escapeHtml(ws.signal || (ws.description ? ws.description.substring(0, 120) : '')) + '</div>' +
               '<div class="ws-card-badges">' +
                 '<span class="ws-badge" style="background:' + stInfo.color + '20;color:' + stInfo.color + ';border:1px solid ' + stInfo.color + '40">' + stInfo.label + '</span>' +
                 '<span class="ws-badge ' + impactClass + '">' + escapeHtml(ws.potential_impact || 'N/A') + '</span>' +
@@ -4924,6 +4926,7 @@
                 (horizon ? '<span class="ws-badge" style="background:#10b98120;color:#10b981;border:1px solid #10b98140">' + (horizonMap[horizon] || horizon) + '</span>' : '') +
                 '<button class="bookmark-btn ' + (wsIsBookmarked ? 'bookmarked' : '') + '" onclick="event.stopPropagation();toggleBookmark(\'' + wsBookmarkId + '\',\'' + escapeAttr(ws.description || '') + '\',\'\',this)" title="ブックマーク">&#9734;</button>' +
               '</div>' +
+              '<div class="ws-card-title">' + escapeHtml(ws.signal || (ws.description ? ws.description.substring(0, 120) : '')) + '</div>' +
             '</div>' +
             '<div class="ws-card-desc">' + escapeHtml(ws.description || '') + '</div>' +
             (cats ? '<div class="ws-card-meta">' + (ws.pestle_categories || []).map(c => '<span class="ws-card-meta-tag">' + escapeHtml(c) + '</span>').join('') +
