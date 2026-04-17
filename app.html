@@ -503,7 +503,9 @@
     .home-signal-item {
       padding: 10px 0;
       border-bottom: 1px solid var(--border);
+      transition: background 0.15s;
     }
+    .home-signal-item:hover { background: var(--surface); margin: 0 -8px; padding: 10px 8px; border-radius: 4px; }
     .home-signal-item:last-child { border-bottom: none; }
     .home-signal-badges { display: flex; gap: 4px; margin-bottom: 4px; }
     .home-signal-title {
@@ -3767,12 +3769,14 @@
           '<h3 class="home-sidebar-title">新着シグナル</h3>' +
           '<div id="homeSidebarSignals">';
       if (signals.length > 0) {
+        // Store signals globally for popup access
+        window._sidebarSignals = signals;
         const stMap = { 'weak_signal': { l: 'WS', c: '#8b5cf6' }, 'emerging_trend': { l: 'ET', c: '#0ea5e9' }, 'wild_card': { l: 'WC', c: '#ef4444' }, 'counter_trend': { l: 'CT', c: '#f59e0b' }, 'paradigm_shift': { l: 'PS', c: '#ec4899' } };
-        signals.forEach(ws => {
+        signals.forEach((ws, idx) => {
           const impactClass = (ws.potential_impact || '').toLowerCase() === 'high' ? 'ws-badge-high' :
                               (ws.potential_impact || '').toLowerCase() === 'medium' ? 'ws-badge-medium' : 'ws-badge-low';
           const st = stMap[ws.signal_type] || stMap['weak_signal'];
-          html += '<div class="home-signal-item">' +
+          html += '<div class="home-signal-item" style="cursor:pointer" onclick="openSignalDetail(' + idx + ')" role="button" tabindex="0" aria-label="シグナル詳細を表示: ' + escapeAttr(ws.signal || '') + '">' +
             '<div class="home-signal-badges">' +
               '<span class="ws-badge" style="background:' + st.c + '20;color:' + st.c + ';border:1px solid ' + st.c + '40;font-size:10px">' + st.l + '</span>' +
               '<span class="ws-badge ' + impactClass + '">' + escapeHtml(ws.potential_impact || '') + '</span>' +
@@ -5549,6 +5553,128 @@
       if (window._modalReturnFocus) { window._modalReturnFocus.focus(); window._modalReturnFocus = null; }
       // Pop the modal history entry (unless we're already handling popstate)
       if (!fromPopstate) history.back();
+    };
+
+    // --- Signal detail popup ---
+    window.openSignalDetail = function(idx) {
+      const signals = window._sidebarSignals;
+      if (!signals || !signals[idx]) return;
+      const ws = signals[idx];
+
+      const stMap = { 'weak_signal': { l: 'Weak Signal', c: '#8b5cf6' }, 'emerging_trend': { l: 'Emerging Trend', c: '#0ea5e9' }, 'wild_card': { l: 'Wild Card', c: '#ef4444' }, 'counter_trend': { l: 'Counter Trend', c: '#f59e0b' }, 'paradigm_shift': { l: 'Paradigm Shift', c: '#ec4899' } };
+      const st = stMap[ws.signal_type] || stMap['weak_signal'];
+      const impactColors = { 'high': '#ef4444', 'medium': '#f59e0b', 'low': '#6b7280' };
+      const impactColor = impactColors[(ws.potential_impact || '').toLowerCase()] || '#6b7280';
+
+      const content = document.getElementById('articleModalContent');
+      let html = '';
+
+      // Back bar
+      html += '<div class="modal-back-bar">' +
+        '<button class="modal-back-btn" onclick="closeArticleModal()">&larr; 戻る</button>' +
+        '<button class="modal-close" onclick="closeArticleModal()" aria-label="閉じる">&times;</button>' +
+      '</div>';
+
+      // Signal type badge
+      html += '<div style="margin-bottom:12px">' +
+        '<span style="display:inline-block;padding:4px 12px;border-radius:4px;font-size:0.78rem;font-weight:600;background:' + st.c + ';color:#fff">' + escapeHtml(st.l) + '</span>' +
+        '<span style="display:inline-block;padding:4px 12px;border-radius:4px;font-size:0.78rem;font-weight:600;background:' + impactColor + '20;color:' + impactColor + ';border:1px solid ' + impactColor + '40;margin-left:6px">Impact: ' + escapeHtml(ws.potential_impact || 'N/A') + '</span>' +
+        (ws.three_horizons ? '<span style="display:inline-block;padding:4px 12px;border-radius:4px;font-size:0.78rem;font-weight:600;background:#10b98120;color:#10b981;border:1px solid #10b98140;margin-left:6px">' + escapeHtml(ws.three_horizons) + '</span>' : '') +
+      '</div>';
+
+      // Title
+      html += '<div class="modal-title" style="font-size:1.2rem;line-height:1.5">' + escapeHtml(ws.signal || '') + '</div>';
+
+      // Scores meta
+      html += '<div class="modal-meta" style="display:flex;gap:16px;flex-wrap:wrap;margin:12px 0 20px">' +
+        '<span>Composite Score: <strong>' + (ws.composite_score != null ? Number(ws.composite_score).toFixed(1) : 'N/A') + '</strong>/10</span>' +
+        '<span>Ansoff Level: <strong>' + (ws.ansoff_level != null ? ws.ansoff_level : 'N/A') + '</strong></span>' +
+        '<span>CLA: <strong>' + escapeHtml(ws.cla_depth || 'N/A') + '</strong></span>' +
+        '<span>Time Horizon: <strong>' + escapeHtml(ws.time_horizon || 'N/A') + '</strong></span>' +
+      '</div>';
+
+      // Description
+      html += '<div class="modal-summary" style="margin:0 0 24px">' +
+        '<p class="modal-summary-main" style="font-size:1rem;line-height:2.0;color:var(--text)">' + escapeHtml(ws.description || '') + '</p>' +
+      '</div>';
+
+      // PESTLE categories
+      if (ws.pestle_categories && ws.pestle_categories.length > 0) {
+        html += '<div style="margin-bottom:20px">' +
+          '<h4 style="font-size:0.85rem;font-weight:700;color:var(--text);margin-bottom:8px">PESTLE Categories</h4>' +
+          '<div style="display:flex;gap:6px;flex-wrap:wrap">';
+        var pestleColors = { 'Political': '#ef4444', 'Economic': '#f59e0b', 'Social': '#10b981', 'Technological': '#3b82f6', 'Legal': '#8b5cf6', 'Environmental': '#22c55e' };
+        ws.pestle_categories.forEach(function(cat) {
+          var pc = pestleColors[cat] || '#6b7280';
+          html += '<span style="display:inline-block;padding:3px 10px;border-radius:4px;font-size:0.75rem;font-weight:600;background:' + pc + '18;color:' + pc + ';border:1px solid ' + pc + '30">' + escapeHtml(cat) + '</span>';
+        });
+        html += '</div></div>';
+      }
+
+      // Counter trend
+      if (ws.counter_trend) {
+        html += '<div style="margin-bottom:20px;padding:14px 16px;background:var(--surface);border-left:3px solid #f59e0b;border-radius:0 4px 4px 0">' +
+          '<h4 style="font-size:0.85rem;font-weight:700;color:var(--text);margin-bottom:6px">Counter Trend</h4>' +
+          '<p style="font-size:0.9rem;line-height:1.7;color:var(--text-secondary)">' + escapeHtml(ws.counter_trend) + '</p>' +
+        '</div>';
+      }
+
+      // Detailed scores
+      if (ws.scores) {
+        html += '<div style="margin-bottom:20px">' +
+          '<h4 style="font-size:0.85rem;font-weight:700;color:var(--text);margin-bottom:10px">Detailed Scores</h4>' +
+          '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px">';
+        var scoreLabels = {
+          novelty: '新規性', disruption: '破壊性', cross_domain: '分野横断性',
+          evidence_diversity: 'エビデンスの多様性', acceleration: '加速度',
+          counter_narrative: '対抗的ナラティブ', global_local: 'グローバル-ローカル'
+        };
+        Object.keys(ws.scores).forEach(function(key) {
+          var val = ws.scores[key];
+          var label = scoreLabels[key] || key;
+          var barWidth = (val / 10 * 100);
+          html += '<div style="padding:6px 0">' +
+            '<div style="display:flex;justify-content:space-between;font-size:0.78rem;margin-bottom:3px">' +
+              '<span style="color:var(--text-secondary)">' + escapeHtml(label) + '</span>' +
+              '<span style="font-weight:600;color:var(--text)">' + Number(val).toFixed(1) + '</span>' +
+            '</div>' +
+            '<div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden">' +
+              '<div style="height:100%;width:' + barWidth + '%;background:' + st.c + ';border-radius:2px"></div>' +
+            '</div>' +
+          '</div>';
+        });
+        html += '</div></div>';
+      }
+
+      // Related headlines
+      if (ws.related_headlines && ws.related_headlines.length > 0) {
+        html += '<div style="margin-bottom:20px">' +
+          '<h4 style="font-size:0.85rem;font-weight:700;color:var(--text);margin-bottom:8px">Related Headlines (' + ws.related_headlines.length + ')</h4>' +
+          '<div style="display:flex;flex-direction:column;gap:6px">';
+        ws.related_headlines.forEach(function(h) {
+          var headline = typeof h === 'string' ? h : (h.title || h.headline || JSON.stringify(h));
+          html += '<div style="padding:8px 12px;background:var(--surface);border-radius:4px;font-size:0.82rem;line-height:1.5;color:var(--text-secondary)">' + escapeHtml(headline) + '</div>';
+        });
+        html += '</div></div>';
+      }
+
+      content.innerHTML = '<div class="modal-reader-col">' + html + '</div>';
+
+      // Open modal (reuse existing pattern)
+      var modalBoxEl = document.getElementById('modalBox');
+      if (modalBoxEl) modalBoxEl.scrollTop = 0;
+      var alreadyInModal = document.getElementById('articleModal').classList.contains('visible');
+      window._modalReturnFocus = document.activeElement;
+      document.getElementById('articleModal').classList.add('visible');
+      document.body.style.overflow = 'hidden';
+      var mainEl = document.querySelector('main');
+      if (mainEl) mainEl.setAttribute('aria-hidden', 'true');
+      setTimeout(function() { var btn = document.querySelector('.modal-back-btn'); if (btn) btn.focus(); }, 100);
+      if (alreadyInModal) {
+        history.replaceState({ modal: true }, '', location.href);
+      } else {
+        history.pushState({ modal: true }, '', location.href);
+      }
     };
 
     document.getElementById('articleModal').addEventListener('click', function(e) {
