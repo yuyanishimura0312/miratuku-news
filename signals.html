@@ -1,0 +1,1255 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Signal Dashboard | Insight News</title>
+  <link rel="icon" href="https://esse-sense.com/favicon.ico">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&family=Noto+Serif+JP:wght@400;700;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="js/shared/firebase-config.js"></script>
+
+  <style>
+    /* ============================================================
+       DESIGN SYSTEM
+       ============================================================ */
+    :root {
+      --bg: #FFFFFF;
+      --card: #FFFFFF;
+      --card-hover: #F7F7F5;
+      --accent: #121212;
+      --accent-soft: #555555;
+      --accent-warm: #CC1400;
+      --text: #121212;
+      --text-secondary: #555555;
+      --text-muted: #6B6B6B;
+      --border: #D9D9D9;
+      --border-light: #EEEEEE;
+      --surface: #F7F7F5;
+      --surface2: #EEEEEE;
+      --P: #8B0000;
+      --E: #1A5276;
+      --S: #1E8449;
+      --T: #2C3E50;
+      --L: #6C3483;
+      --En: #0E6655;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+      --shadow-md: 0 2px 8px rgba(0,0,0,0.08);
+      --font: "Noto Sans JP", "Hiragino Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-serif: "Noto Serif JP", "Hiragino Mincho ProN", Georgia, serif;
+      --ws: #8b5cf6;
+      --et: #0ea5e9;
+      --wc: #ef4444;
+      --ct: #f59e0b;
+      --ps: #ec4899;
+      --h1c: #6366f1;
+      --h2c: #f59e0b;
+      --h3c: #10b981;
+    }
+
+    [data-theme="dark"] {
+      --bg: #121212;
+      --card: #1A1A1A;
+      --card-hover: #222222;
+      --accent: #E0E0E0;
+      --accent-soft: #999999;
+      --accent-warm: #FF4444;
+      --text: #E0E0E0;
+      --text-secondary: #AAAAAA;
+      --text-muted: #8A8A8A;
+      --border: #333333;
+      --border-light: #2A2A2A;
+      --surface: #1A1A1A;
+      --surface2: #222222;
+      --P: #E06060;
+      --E: #5599CC;
+      --S: #55AA77;
+      --T: #7799BB;
+      --L: #AA77CC;
+      --En: #44AA88;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+      --shadow-md: 0 2px 8px rgba(0,0,0,0.4);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+
+    body {
+      font-family: var(--font);
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.7;
+      letter-spacing: 0.02em;
+      font-feature-settings: "palt";
+      min-height: 100vh;
+    }
+
+    /* --- Header --- */
+    .header {
+      border-bottom: 2px solid var(--accent);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .header-left { display: flex; align-items: center; gap: 16px; }
+    .header-left h1 {
+      font-family: var(--font-serif);
+      font-size: 1.1rem;
+      font-weight: 900;
+      letter-spacing: 0.06em;
+    }
+    .header-left h1 a { color: var(--text); text-decoration: none; }
+    .header-left .sep { color: var(--text-muted); font-weight: 300; }
+    .header-left .page-label {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .header-right { display: flex; align-items: center; gap: 12px; }
+    .header-right .back-link {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      text-decoration: none;
+      border: 1px solid var(--border);
+      padding: 4px 12px;
+      transition: background 0.15s;
+    }
+    .header-right .back-link:hover { background: var(--surface); }
+    .theme-toggle {
+      background: none; border: 1px solid var(--border);
+      color: var(--text-secondary); cursor: pointer;
+      padding: 4px 10px; font-size: 0.8rem;
+      font-family: var(--font);
+    }
+    .theme-toggle:hover { background: var(--surface); }
+
+    /* --- Main --- */
+    .main { max-width: 1440px; margin: 0 auto; padding: 24px; }
+
+    /* --- Section Title --- */
+    .section-title {
+      font-family: var(--font-serif);
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin: 32px 0 16px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+      letter-spacing: 0.04em;
+    }
+    .section-title:first-of-type { margin-top: 8px; }
+    .section-subtitle {
+      font-size: 0.75rem;
+      font-weight: 400;
+      color: var(--text-muted);
+      margin-left: 8px;
+    }
+
+    /* --- KPI Grid --- */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+    .kpi-card {
+      background: var(--card);
+      border: 1px solid var(--border-light);
+      padding: 14px 16px;
+      box-shadow: var(--shadow-sm);
+    }
+    .kpi-label {
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 4px;
+    }
+    .kpi-value {
+      font-size: 1.6rem;
+      font-weight: 900;
+      font-family: var(--font-serif);
+      line-height: 1.2;
+    }
+    .kpi-sub {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* --- Chart Grid --- */
+    .chart-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .chart-box {
+      background: var(--card);
+      border: 1px solid var(--border-light);
+      padding: 16px;
+      box-shadow: var(--shadow-sm);
+    }
+    .chart-box h3 {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    /* --- Filter Bar --- */
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 20px;
+      padding: 12px 16px;
+      background: var(--surface);
+      border: 1px solid var(--border-light);
+    }
+    .filter-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-right: 4px;
+    }
+    .filter-btn {
+      font-family: var(--font);
+      font-size: 0.74rem;
+      padding: 4px 12px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .filter-btn:hover { background: var(--card-hover); color: var(--text); }
+    .filter-btn.active { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+    .filter-sep {
+      width: 1px;
+      height: 20px;
+      background: var(--border);
+      margin: 0 4px;
+    }
+    .filter-search {
+      font-family: var(--font);
+      font-size: 0.78rem;
+      padding: 4px 12px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      min-width: 180px;
+      outline: none;
+    }
+    .filter-search:focus { border-color: var(--accent); }
+    .filter-count {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-left: auto;
+    }
+
+    /* --- Signal Grid --- */
+    .signal-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 14px;
+      margin-bottom: 32px;
+    }
+
+    /* --- Signal Card --- */
+    .sig-card {
+      background: var(--card);
+      border: 1px solid var(--border-light);
+      padding: 0;
+      box-shadow: var(--shadow-sm);
+      transition: border-color 0.15s, box-shadow 0.15s;
+      position: relative;
+      overflow: hidden;
+    }
+    .sig-card:hover { border-color: var(--accent); box-shadow: var(--shadow-md); }
+    .sig-card.noise { opacity: 0.55; border-top-style: dashed; }
+    .sig-card.noise:hover { opacity: 1; }
+
+    .sig-card-top {
+      height: 3px;
+    }
+
+    .sig-card-body {
+      padding: 14px 16px;
+    }
+
+    .sig-card-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-bottom: 8px;
+    }
+    .sig-badge {
+      font-size: 0.66rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      letter-spacing: 0.02em;
+    }
+
+    .sig-card-title {
+      font-family: var(--font-serif);
+      font-size: 0.9rem;
+      font-weight: 700;
+      line-height: 1.5;
+      margin-bottom: 6px;
+    }
+
+    .sig-card-desc {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      margin-bottom: 10px;
+    }
+
+    .sig-card-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-bottom: 8px;
+    }
+    .sig-meta-tag {
+      font-size: 0.66rem;
+      padding: 1px 6px;
+      background: var(--surface);
+      color: var(--text-secondary);
+    }
+
+    /* Score bars */
+    .sig-scores {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px 16px;
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid var(--border-light);
+    }
+    .sig-score-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .sig-score-label {
+      min-width: 70px;
+      font-weight: 500;
+    }
+    .sig-score-bar {
+      flex: 1;
+      height: 5px;
+      background: var(--border-light);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .sig-score-fill {
+      height: 100%;
+      border-radius: 3px;
+      background: #6366f1;
+    }
+    .sig-score-val {
+      min-width: 18px;
+      text-align: right;
+      font-weight: 700;
+      font-size: 0.68rem;
+    }
+
+    .sig-composite {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 6px;
+      padding-top: 6px;
+      border-top: 1px solid var(--border-light);
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+    .sig-composite-bar {
+      flex: 1;
+      height: 7px;
+      background: var(--border-light);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .sig-composite-fill {
+      height: 100%;
+      border-radius: 4px;
+    }
+
+    /* Expandable details */
+    .sig-details-toggle {
+      font-family: var(--font);
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 6px 16px;
+      width: 100%;
+      text-align: left;
+      border-top: 1px solid var(--border-light);
+      transition: background 0.1s;
+    }
+    .sig-details-toggle:hover { background: var(--surface); color: var(--text); }
+    .sig-details-toggle .chevron {
+      display: inline-block;
+      transition: transform 0.2s;
+      font-size: 0.6rem;
+      margin-right: 4px;
+    }
+    .sig-details {
+      display: none;
+      padding: 10px 16px 14px;
+      font-size: 0.76rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      border-top: 1px solid var(--border-light);
+      background: var(--surface);
+    }
+    .sig-details.open { display: block; }
+    .sig-details-label {
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin: 8px 0 4px;
+    }
+    .sig-details-label:first-child { margin-top: 0; }
+    .sig-details ul {
+      margin: 0;
+      padding-left: 1.2em;
+    }
+    .sig-details li {
+      margin-bottom: 2px;
+      font-size: 0.74rem;
+    }
+
+    /* --- Signal Table (list view) --- */
+    .sig-table-wrap { overflow-x: auto; margin-bottom: 32px; }
+    .sig-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.78rem;
+    }
+    .sig-table th {
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      text-align: left;
+      padding: 8px 10px;
+      border-bottom: 2px solid var(--border);
+      cursor: pointer;
+      white-space: nowrap;
+      user-select: none;
+    }
+    .sig-table th:hover { color: var(--text); }
+    .sig-table th .sort-arrow { font-size: 0.6rem; margin-left: 2px; }
+    .sig-table td {
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--border-light);
+      vertical-align: top;
+    }
+    .sig-table tr:hover { background: var(--card-hover); }
+    .sig-table .td-title {
+      font-weight: 600;
+      max-width: 280px;
+    }
+    .sig-table .td-desc {
+      max-width: 320px;
+      color: var(--text-secondary);
+      font-size: 0.74rem;
+    }
+
+    /* --- View Toggle --- */
+    .view-toggle {
+      display: flex;
+      gap: 0;
+      margin-bottom: 16px;
+    }
+    .view-btn {
+      font-family: var(--font);
+      font-size: 0.74rem;
+      padding: 6px 14px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text-secondary);
+      cursor: pointer;
+    }
+    .view-btn:first-child { border-right: none; }
+    .view-btn.active { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+
+    /* --- Sort select --- */
+    .sort-select {
+      font-family: var(--font);
+      font-size: 0.74rem;
+      padding: 4px 8px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      cursor: pointer;
+    }
+
+    /* --- Loading --- */
+    .loading-overlay {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 200px;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+    .spinner {
+      width: 20px; height: 20px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-right: 10px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* --- Empty state --- */
+    .empty-state {
+      text-align: center;
+      padding: 48px 24px;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    /* --- Responsive --- */
+    @media (max-width: 900px) {
+      .chart-row { grid-template-columns: 1fr; }
+      .kpi-grid { grid-template-columns: repeat(3, 1fr); }
+      .signal-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 600px) {
+      .main { padding: 12px; }
+      .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+      .header { padding: 10px 12px; }
+      .header-left h1 { font-size: 0.95rem; }
+      .filter-bar { flex-direction: column; align-items: stretch; }
+      .filter-sep { display: none; }
+      .filter-count { margin-left: 0; }
+      .signal-grid { grid-template-columns: 1fr; }
+      .sig-scores { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-left">
+      <h1><a href="app.html">Insight News</a> <span class="sep">/</span> <span class="page-label">Signal Dashboard</span></h1>
+    </div>
+    <div class="header-right">
+      <a href="app.html" class="back-link">Back to News</a>
+      <a href="dashboard.html" class="back-link">Collection</a>
+      <a href="dashboard.html#methodology" class="back-link">Methodology</a>
+      <button class="theme-toggle" onclick="toggleTheme()">Theme</button>
+    </div>
+  </header>
+
+  <div class="main">
+
+    <!-- KPI Cards -->
+    <div class="kpi-grid" id="kpiGrid"></div>
+
+    <!-- Charts -->
+    <h2 class="section-title">Signal Distribution</h2>
+    <div class="chart-row">
+      <div class="chart-box">
+        <h3>Signal Type Distribution</h3>
+        <canvas id="typeChart"></canvas>
+      </div>
+      <div class="chart-box">
+        <h3>Three Horizons Distribution</h3>
+        <canvas id="horizonChart"></canvas>
+      </div>
+    </div>
+    <div class="chart-row">
+      <div class="chart-box">
+        <h3>CLA Depth Distribution</h3>
+        <canvas id="claChart"></canvas>
+      </div>
+      <div class="chart-box">
+        <h3>PESTLE Category Coverage</h3>
+        <canvas id="pestleChart"></canvas>
+      </div>
+    </div>
+    <div class="chart-row">
+      <div class="chart-box">
+        <h3>Impact x Composite Score</h3>
+        <canvas id="scatterChart"></canvas>
+      </div>
+      <div class="chart-box">
+        <h3>Score Radar (Average by Signal Type)</h3>
+        <canvas id="radarChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Filters & View Toggle -->
+    <h2 class="section-title">All Signals <span class="section-subtitle" id="signalCountLabel"></span></h2>
+
+    <div class="filter-bar" id="filterBar">
+      <span class="filter-label">Type</span>
+      <button class="filter-btn active" data-filter="type" data-value="all">All</button>
+      <button class="filter-btn" data-filter="type" data-value="weak_signal" style="border-left-color:var(--ws)">Weak Signal</button>
+      <button class="filter-btn" data-filter="type" data-value="emerging_trend" style="border-left-color:var(--et)">Emerging</button>
+      <button class="filter-btn" data-filter="type" data-value="wild_card" style="border-left-color:var(--wc)">Wild Card</button>
+      <button class="filter-btn" data-filter="type" data-value="counter_trend" style="border-left-color:var(--ct)">Counter</button>
+      <button class="filter-btn" data-filter="type" data-value="paradigm_shift" style="border-left-color:var(--ps)">Paradigm</button>
+      <div class="filter-sep"></div>
+      <span class="filter-label">Impact</span>
+      <button class="filter-btn active" data-filter="impact" data-value="all">All</button>
+      <button class="filter-btn" data-filter="impact" data-value="high">High</button>
+      <button class="filter-btn" data-filter="impact" data-value="medium">Medium</button>
+      <button class="filter-btn" data-filter="impact" data-value="low">Low</button>
+      <div class="filter-sep"></div>
+      <span class="filter-label">Horizon</span>
+      <button class="filter-btn active" data-filter="horizon" data-value="all">All</button>
+      <button class="filter-btn" data-filter="horizon" data-value="H1">H1</button>
+      <button class="filter-btn" data-filter="horizon" data-value="H2">H2</button>
+      <button class="filter-btn" data-filter="horizon" data-value="H3">H3</button>
+      <div class="filter-sep"></div>
+      <input class="filter-search" type="text" id="searchInput" placeholder="Search signals...">
+      <span class="filter-count" id="filterCount"></span>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div class="view-toggle">
+        <button class="view-btn active" onclick="setView('grid')">Grid</button>
+        <button class="view-btn" onclick="setView('table')">Table</button>
+      </div>
+      <div>
+        <label style="font-size:0.72rem;color:var(--text-muted);margin-right:6px">Sort:</label>
+        <select class="sort-select" id="sortSelect">
+          <option value="composite_desc">Composite Score (high)</option>
+          <option value="composite_asc">Composite Score (low)</option>
+          <option value="novelty_desc">Novelty (high)</option>
+          <option value="disruption_desc">Disruption (high)</option>
+          <option value="early_desc">Early Stage (high)</option>
+          <option value="connectivity_desc">Connectivity (high)</option>
+          <option value="ansoff_asc">Ansoff Level (weak first)</option>
+          <option value="ansoff_desc">Ansoff Level (strong first)</option>
+          <option value="alpha">Alphabetical</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Grid View -->
+    <div class="signal-grid" id="signalGrid">
+      <div class="loading-overlay"><span class="spinner"></span> Loading signals...</div>
+    </div>
+
+    <!-- Table View -->
+    <div class="sig-table-wrap" id="signalTableWrap" style="display:none">
+      <table class="sig-table">
+        <thead>
+          <tr>
+            <th data-col="signal">Signal</th>
+            <th data-col="signal_type">Type</th>
+            <th data-col="potential_impact">Impact</th>
+            <th data-col="three_horizons">Horizon</th>
+            <th data-col="cla_depth">CLA</th>
+            <th data-col="ansoff_level">Ansoff</th>
+            <th data-col="composite_score">Score</th>
+            <th data-col="pestle">PESTLE</th>
+            <th data-col="time_horizon">Time</th>
+          </tr>
+        </thead>
+        <tbody id="signalTableBody"></tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <script src="js/shared/data-loader.js"></script>
+  <script>
+    // === Theme ===
+    function toggleTheme() {
+      const t = document.documentElement.getAttribute('data-theme') === 'dark' ? '' : 'dark';
+      document.documentElement.setAttribute('data-theme', t);
+      localStorage.setItem('news-theme', t);
+      if (window._chartsReady) renderCharts();
+    }
+    (function() {
+      const saved = localStorage.getItem('news-theme');
+      if (saved) document.documentElement.setAttribute('data-theme', saved);
+    })();
+
+    // === Constants ===
+    const TYPE_MAP = {
+      weak_signal:    { label: 'Weak Signal',    color: '#8b5cf6', short: 'WS' },
+      emerging_trend: { label: 'Emerging Trend',  color: '#0ea5e9', short: 'ET' },
+      wild_card:      { label: 'Wild Card',       color: '#ef4444', short: 'WC' },
+      counter_trend:  { label: 'Counter Trend',   color: '#f59e0b', short: 'CT' },
+      paradigm_shift: { label: 'Paradigm Shift',  color: '#ec4899', short: 'PS' },
+    };
+    const HORIZON_MAP = { H1: 'H1 Decline', H2: 'H2 Transition', H3: 'H3 Emerging' };
+    const CLA_MAP = { litany: 'Litany', systemic: 'Systemic', worldview: 'Worldview', myth: 'Myth' };
+    const CLA_COLORS = { litany: '#94a3b8', systemic: '#6366f1', worldview: '#8b5cf6', myth: '#ec4899' };
+    const IMPACT_COLORS = { high: '#ef4444', medium: '#f59e0b', low: '#94a3b8' };
+    const PESTLE_JA = { '政治': 'P', '経済': 'E', '社会': 'S', '技術': 'T', '法律': 'L', '環境': 'En',
+                        Political: 'P', Economic: 'E', Social: 'S', Technological: 'T', Legal: 'L', Environmental: 'En' };
+
+    // === State ===
+    let ALL_SIGNALS = [];
+    let FILTERED = [];
+    let CHARTS = {};
+    let currentView = 'grid';
+    let currentFilters = { type: 'all', impact: 'all', horizon: 'all', search: '' };
+    window._chartsReady = false;
+
+    // === Data Loading ===
+    async function loadSignals() {
+      const ai = await DataLoader.loadAIAnalysis();
+      const raw = ai?.weak_signals || [];
+      // Normalize fields with defaults for pre-academic-theory data
+      ALL_SIGNALS = raw.map((s, i) => ({
+        ...s,
+        _id: i,
+        signal_type: s.signal_type || 'weak_signal',
+        ansoff_level: s.ansoff_level || 0,
+        three_horizons: s.three_horizons || '',
+        cla_depth: s.cla_depth || '',
+        evidence_type: s.evidence_type || '',
+        scores: s.scores || {},
+        composite_score: s.composite_score || 0,
+        noise_flag: s.noise_flag || false,
+        pestle_categories: s.pestle_categories || [],
+        related_headlines: s.related_headlines || [],
+      }));
+      return ALL_SIGNALS;
+    }
+
+    // === Filtering ===
+    function applyFilters() {
+      const { type, impact, horizon, search } = currentFilters;
+      const q = search.toLowerCase();
+      FILTERED = ALL_SIGNALS.filter(s => {
+        if (type !== 'all' && s.signal_type !== type) return false;
+        if (impact !== 'all' && (s.potential_impact || '').toLowerCase() !== impact) return false;
+        if (horizon !== 'all' && s.three_horizons !== horizon) return false;
+        if (q && !(s.signal || '').toLowerCase().includes(q) && !(s.description || '').toLowerCase().includes(q)) return false;
+        return true;
+      });
+      sortSignals();
+      document.getElementById('filterCount').textContent = FILTERED.length + ' / ' + ALL_SIGNALS.length + ' signals';
+      document.getElementById('signalCountLabel').textContent = '(' + ALL_SIGNALS.length + ' total)';
+      renderSignalView();
+    }
+
+    function sortSignals() {
+      const val = document.getElementById('sortSelect').value;
+      FILTERED.sort((a, b) => {
+        switch(val) {
+          case 'composite_desc': return (b.composite_score || 0) - (a.composite_score || 0);
+          case 'composite_asc': return (a.composite_score || 0) - (b.composite_score || 0);
+          case 'novelty_desc': return ((b.scores?.novelty) || 0) - ((a.scores?.novelty) || 0);
+          case 'disruption_desc': return ((b.scores?.disruption) || 0) - ((a.scores?.disruption) || 0);
+          case 'early_desc': return ((b.scores?.early_stage) || 0) - ((a.scores?.early_stage) || 0);
+          case 'connectivity_desc': return ((b.scores?.connectivity) || 0) - ((a.scores?.connectivity) || 0);
+          case 'ansoff_asc': return (a.ansoff_level || 0) - (b.ansoff_level || 0);
+          case 'ansoff_desc': return (b.ansoff_level || 0) - (a.ansoff_level || 0);
+          case 'alpha': return (a.signal || '').localeCompare(b.signal || '');
+          default: return 0;
+        }
+      });
+    }
+
+    // === View switching ===
+    function setView(v) {
+      currentView = v;
+      document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+      renderSignalView();
+    }
+
+    function renderSignalView() {
+      if (currentView === 'grid') {
+        document.getElementById('signalGrid').style.display = '';
+        document.getElementById('signalTableWrap').style.display = 'none';
+        renderGrid();
+      } else {
+        document.getElementById('signalGrid').style.display = 'none';
+        document.getElementById('signalTableWrap').style.display = '';
+        renderTable();
+      }
+    }
+
+    // === Escape HTML ===
+    function esc(str) {
+      const d = document.createElement('div');
+      d.textContent = str || '';
+      return d.innerHTML;
+    }
+
+    // === Score bar helper ===
+    function scoreBar(val, maxVal) {
+      maxVal = maxVal || 10;
+      const pct = Math.min(100, (val / maxVal) * 100);
+      return '<div class="sig-score-bar"><div class="sig-score-fill" style="width:' + pct + '%"></div></div>';
+    }
+
+    function compositeColor(score) {
+      if (score >= 7) return '#10b981';
+      if (score >= 5) return '#6366f1';
+      if (score >= 3) return '#f59e0b';
+      return '#94a3b8';
+    }
+
+    // === Badge HTML ===
+    function typeBadge(s) {
+      const t = TYPE_MAP[s.signal_type] || TYPE_MAP.weak_signal;
+      return '<span class="sig-badge" style="background:' + t.color + '18;color:' + t.color + ';border:1px solid ' + t.color + '40">' + t.label + '</span>';
+    }
+    function impactBadge(s) {
+      const c = IMPACT_COLORS[(s.potential_impact || '').toLowerCase()] || '#94a3b8';
+      return '<span class="sig-badge" style="background:' + c + '18;color:' + c + ';border:1px solid ' + c + '40">' + esc(s.potential_impact || 'N/A') + '</span>';
+    }
+    function horizonBadge(s) {
+      if (!s.three_horizons) return '';
+      const colors = { H1: '#6366f1', H2: '#f59e0b', H3: '#10b981' };
+      const c = colors[s.three_horizons] || '#94a3b8';
+      return '<span class="sig-badge" style="background:' + c + '18;color:' + c + ';border:1px solid ' + c + '40">' + (HORIZON_MAP[s.three_horizons] || s.three_horizons) + '</span>';
+    }
+    function claBadge(s) {
+      if (!s.cla_depth) return '';
+      const c = CLA_COLORS[s.cla_depth] || '#94a3b8';
+      return '<span class="sig-badge" style="background:' + c + '18;color:' + c + ';border:1px solid ' + c + '40">CLA: ' + (CLA_MAP[s.cla_depth] || s.cla_depth) + '</span>';
+    }
+    function ansoffBadge(s) {
+      if (!s.ansoff_level) return '';
+      return '<span class="sig-badge" style="background:#fff3e0;color:#e65100;border:1px solid #ffcc8040">Ansoff L' + s.ansoff_level + '</span>';
+    }
+
+    // === Grid Rendering ===
+    function renderGrid() {
+      const container = document.getElementById('signalGrid');
+      if (FILTERED.length === 0) {
+        container.innerHTML = '<div class="empty-state">No signals match the current filters.</div>';
+        return;
+      }
+
+      container.innerHTML = FILTERED.map((s, i) => {
+        const t = TYPE_MAP[s.signal_type] || TYPE_MAP.weak_signal;
+        const scores = s.scores || {};
+        const hasScores = scores.novelty !== undefined;
+
+        let scoresHtml = '';
+        if (hasScores) {
+          scoresHtml = '<div class="sig-scores">' +
+            ['novelty', 'disruption', 'connectivity', 'credibility', 'early_stage'].map(k => {
+              const v = scores[k] || 0;
+              const label = k === 'early_stage' ? 'Early Stage' : k.charAt(0).toUpperCase() + k.slice(1);
+              return '<div class="sig-score-row"><span class="sig-score-label">' + label + '</span>' +
+                scoreBar(v, 10) + '<span class="sig-score-val">' + v + '</span></div>';
+            }).join('') + '</div>';
+        }
+
+        let compositeHtml = '';
+        if (s.composite_score) {
+          const cc = compositeColor(s.composite_score);
+          compositeHtml = '<div class="sig-composite">' +
+            '<span>Composite</span>' +
+            '<div class="sig-composite-bar"><div class="sig-composite-fill" style="width:' + (s.composite_score * 10) + '%;background:' + cc + '"></div></div>' +
+            '<span style="color:' + cc + '">' + s.composite_score + '/10</span></div>';
+        }
+
+        // Expandable details
+        let detailsHtml = '';
+        if (s.related_headlines && s.related_headlines.length > 0) {
+          detailsHtml += '<div class="sig-details-label">Related Headlines</div><ul>' +
+            s.related_headlines.map(h => '<li>' + esc(h) + '</li>').join('') + '</ul>';
+        }
+        if (s.counter_trend) {
+          detailsHtml += '<div class="sig-details-label">Counter Trend</div><div>' + esc(s.counter_trend) + '</div>';
+        }
+        if (s.evidence_type) {
+          detailsHtml += '<div class="sig-details-label">Evidence Type</div><div>' + esc(s.evidence_type) + '</div>';
+        }
+        if (s.time_horizon) {
+          detailsHtml += '<div class="sig-details-label">Time Horizon</div><div>' + esc(s.time_horizon) + '</div>';
+        }
+
+        return '<div class="sig-card' + (s.noise_flag ? ' noise' : '') + '">' +
+          '<div class="sig-card-top" style="background:' + t.color + '"></div>' +
+          '<div class="sig-card-body">' +
+            '<div class="sig-card-badges">' +
+              typeBadge(s) + impactBadge(s) + horizonBadge(s) + claBadge(s) + ansoffBadge(s) +
+            '</div>' +
+            '<div class="sig-card-title">' + esc(s.signal) + '</div>' +
+            '<div class="sig-card-desc">' + esc(s.description) + '</div>' +
+            '<div class="sig-card-meta">' +
+              (s.pestle_categories || []).map(c => '<span class="sig-meta-tag">' + esc(c) + '</span>').join('') +
+            '</div>' +
+            scoresHtml +
+            compositeHtml +
+          '</div>' +
+          (detailsHtml ? '<button class="sig-details-toggle" onclick="toggleDetails(this)"><span class="chevron">&#9654;</span> Details</button>' +
+            '<div class="sig-details">' + detailsHtml + '</div>' : '') +
+        '</div>';
+      }).join('');
+    }
+
+    function toggleDetails(btn) {
+      const details = btn.nextElementSibling;
+      const chevron = btn.querySelector('.chevron');
+      if (details.classList.contains('open')) {
+        details.classList.remove('open');
+        chevron.style.transform = '';
+      } else {
+        details.classList.add('open');
+        chevron.style.transform = 'rotate(90deg)';
+      }
+    }
+
+    // === Table Rendering ===
+    function renderTable() {
+      const tbody = document.getElementById('signalTableBody');
+      if (FILTERED.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" class="empty-state">No signals match the current filters.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = FILTERED.map(s => {
+        const t = TYPE_MAP[s.signal_type] || TYPE_MAP.weak_signal;
+        const cc = compositeColor(s.composite_score || 0);
+        return '<tr>' +
+          '<td class="td-title">' + esc(s.signal) + '</td>' +
+          '<td><span class="sig-badge" style="background:' + t.color + '18;color:' + t.color + ';border:1px solid ' + t.color + '40;font-size:0.64rem">' + t.short + '</span></td>' +
+          '<td><span style="color:' + (IMPACT_COLORS[(s.potential_impact || '').toLowerCase()] || '#94a3b8') + ';font-weight:600">' + esc(s.potential_impact || '--') + '</span></td>' +
+          '<td>' + esc(s.three_horizons || '--') + '</td>' +
+          '<td>' + esc(s.cla_depth ? CLA_MAP[s.cla_depth] || s.cla_depth : '--') + '</td>' +
+          '<td>' + (s.ansoff_level || '--') + '</td>' +
+          '<td style="font-weight:700;color:' + cc + '">' + (s.composite_score || '--') + '</td>' +
+          '<td style="font-size:0.68rem">' + (s.pestle_categories || []).join(', ') + '</td>' +
+          '<td style="font-size:0.72rem">' + esc(s.time_horizon || '--') + '</td>' +
+        '</tr>';
+      }).join('');
+    }
+
+    // === KPI Rendering ===
+    function renderKPIs() {
+      const total = ALL_SIGNALS.length;
+      const highImpact = ALL_SIGNALS.filter(s => (s.potential_impact || '').toLowerCase() === 'high').length;
+      const wildCards = ALL_SIGNALS.filter(s => s.signal_type === 'wild_card').length;
+      const h3Count = ALL_SIGNALS.filter(s => s.three_horizons === 'H3').length;
+      const noiseCount = ALL_SIGNALS.filter(s => s.noise_flag).length;
+      const avgComposite = total > 0 ? (ALL_SIGNALS.reduce((a, s) => a + (s.composite_score || 0), 0) / total).toFixed(1) : '--';
+      const mythCount = ALL_SIGNALS.filter(s => s.cla_depth === 'myth' || s.cla_depth === 'worldview').length;
+      const pestleSet = new Set();
+      ALL_SIGNALS.forEach(s => (s.pestle_categories || []).forEach(c => pestleSet.add(c)));
+
+      const kpis = [
+        { label: 'Total Signals', value: total, sub: 'detected today' },
+        { label: 'High Impact', value: highImpact, sub: Math.round(highImpact / Math.max(total, 1) * 100) + '% of total' },
+        { label: 'Wild Cards', value: wildCards, sub: 'low probability, high impact' },
+        { label: 'H3 Emerging', value: h3Count, sub: 'pockets of future' },
+        { label: 'Deep Signals', value: mythCount, sub: 'worldview + myth level' },
+        { label: 'Avg Quality', value: avgComposite, sub: 'composite score /10' },
+        { label: 'PESTLE Coverage', value: pestleSet.size + '/6', sub: 'categories represented' },
+        { label: 'Noise Flagged', value: noiseCount, sub: 'potential false signals' },
+      ];
+
+      document.getElementById('kpiGrid').innerHTML = kpis.map(k =>
+        '<div class="kpi-card"><div class="kpi-label">' + k.label + '</div>' +
+        '<div class="kpi-value">' + k.value + '</div>' +
+        '<div class="kpi-sub">' + k.sub + '</div></div>'
+      ).join('');
+    }
+
+    // === Chart Rendering ===
+    function getStyle(prop) { return getComputedStyle(document.documentElement).getPropertyValue(prop).trim(); }
+
+    function destroyCharts() { Object.values(CHARTS).forEach(c => c.destroy()); CHARTS = {}; }
+
+    function renderCharts() {
+      destroyCharts();
+      const textColor = getStyle('--text-muted');
+      const borderColor = getStyle('--border');
+      const gridColor = getStyle('--border-light');
+
+      Chart.defaults.color = textColor;
+      Chart.defaults.borderColor = gridColor;
+      Chart.defaults.font.family = getStyle('--font');
+      Chart.defaults.font.size = 11;
+
+      // 1. Signal Type Distribution (doughnut)
+      const typeCounts = {};
+      Object.keys(TYPE_MAP).forEach(k => typeCounts[k] = 0);
+      ALL_SIGNALS.forEach(s => { typeCounts[s.signal_type] = (typeCounts[s.signal_type] || 0) + 1; });
+
+      CHARTS.type = new Chart(document.getElementById('typeChart'), {
+        type: 'doughnut',
+        data: {
+          labels: Object.values(TYPE_MAP).map(t => t.label),
+          datasets: [{
+            data: Object.keys(TYPE_MAP).map(k => typeCounts[k] || 0),
+            backgroundColor: Object.values(TYPE_MAP).map(t => t.color + '30'),
+            borderColor: Object.values(TYPE_MAP).map(t => t.color),
+            borderWidth: 2,
+          }],
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { position: 'right', labels: { boxWidth: 12, padding: 10, font: { size: 11 } } },
+          },
+        },
+      });
+
+      // 2. Three Horizons Distribution (bar)
+      const horizonCounts = { H1: 0, H2: 0, H3: 0, '': 0 };
+      ALL_SIGNALS.forEach(s => { horizonCounts[s.three_horizons || ''] = (horizonCounts[s.three_horizons || ''] || 0) + 1; });
+
+      CHARTS.horizon = new Chart(document.getElementById('horizonChart'), {
+        type: 'bar',
+        data: {
+          labels: ['H1 Decline', 'H2 Transition', 'H3 Emerging', 'Unclassified'],
+          datasets: [{
+            data: [horizonCounts.H1, horizonCounts.H2, horizonCounts.H3, horizonCounts['']],
+            backgroundColor: ['#6366f130', '#f59e0b30', '#10b98130', '#94a3b820'],
+            borderColor: ['#6366f1', '#f59e0b', '#10b981', '#94a3b8'],
+            borderWidth: 2,
+          }],
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { display: false } },
+          scales: { y: { beginAtZero: true, ticks: { stepSize: 5 } } },
+        },
+      });
+
+      // 3. CLA Depth (horizontal bar)
+      const claCounts = { litany: 0, systemic: 0, worldview: 0, myth: 0, '': 0 };
+      ALL_SIGNALS.forEach(s => { claCounts[s.cla_depth || ''] = (claCounts[s.cla_depth || ''] || 0) + 1; });
+
+      CHARTS.cla = new Chart(document.getElementById('claChart'), {
+        type: 'bar',
+        data: {
+          labels: ['Litany (Surface)', 'Systemic (Structure)', 'Worldview (Paradigm)', 'Myth (Deep)', 'Unclassified'],
+          datasets: [{
+            data: [claCounts.litany, claCounts.systemic, claCounts.worldview, claCounts.myth, claCounts['']],
+            backgroundColor: [CLA_COLORS.litany + '30', CLA_COLORS.systemic + '30', CLA_COLORS.worldview + '30', CLA_COLORS.myth + '30', '#94a3b820'],
+            borderColor: [CLA_COLORS.litany, CLA_COLORS.systemic, CLA_COLORS.worldview, CLA_COLORS.myth, '#94a3b8'],
+            borderWidth: 2,
+          }],
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          plugins: { legend: { display: false } },
+          scales: { x: { beginAtZero: true, ticks: { stepSize: 5 } } },
+        },
+      });
+
+      // 4. PESTLE coverage (bar)
+      const pestleCounts = {};
+      ALL_SIGNALS.forEach(s => {
+        (s.pestle_categories || []).forEach(c => {
+          pestleCounts[c] = (pestleCounts[c] || 0) + 1;
+        });
+      });
+      const pestleLabels = Object.keys(pestleCounts).sort((a, b) => (pestleCounts[b] || 0) - (pestleCounts[a] || 0));
+      const pestleColorMap = { '政治': getStyle('--P'), '経済': getStyle('--E'), '社会': getStyle('--S'),
+        '技術': getStyle('--T'), '法律': getStyle('--L'), '環境': getStyle('--En'),
+        Political: getStyle('--P'), Economic: getStyle('--E'), Social: getStyle('--S'),
+        Technological: getStyle('--T'), Legal: getStyle('--L'), Environmental: getStyle('--En') };
+
+      CHARTS.pestle = new Chart(document.getElementById('pestleChart'), {
+        type: 'bar',
+        data: {
+          labels: pestleLabels,
+          datasets: [{
+            data: pestleLabels.map(l => pestleCounts[l] || 0),
+            backgroundColor: pestleLabels.map(l => (pestleColorMap[l] || '#94a3b8') + '30'),
+            borderColor: pestleLabels.map(l => pestleColorMap[l] || '#94a3b8'),
+            borderWidth: 2,
+          }],
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { display: false } },
+          scales: { y: { beginAtZero: true, ticks: { stepSize: 10 } } },
+        },
+      });
+
+      // 5. Impact x Composite Score Scatter
+      const impactVal = { high: 3, medium: 2, low: 1 };
+      const scatterData = ALL_SIGNALS.filter(s => s.composite_score).map(s => ({
+        x: s.composite_score,
+        y: impactVal[(s.potential_impact || '').toLowerCase()] || 0,
+        label: s.signal,
+      }));
+
+      if (scatterData.length > 0) {
+        CHARTS.scatter = new Chart(document.getElementById('scatterChart'), {
+          type: 'scatter',
+          data: {
+            datasets: [{
+              data: scatterData,
+              backgroundColor: scatterData.map(d => {
+                const s = ALL_SIGNALS.find(sg => sg.signal === d.label);
+                return (TYPE_MAP[s?.signal_type]?.color || '#94a3b8') + '60';
+              }),
+              borderColor: scatterData.map(d => {
+                const s = ALL_SIGNALS.find(sg => sg.signal === d.label);
+                return TYPE_MAP[s?.signal_type]?.color || '#94a3b8';
+              }),
+              borderWidth: 1,
+              pointRadius: 6,
+            }],
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                callbacks: { label: ctx => ctx.raw.label + ' (Score: ' + ctx.raw.x + ')' }
+              },
+            },
+            scales: {
+              x: { title: { display: true, text: 'Composite Score' }, min: 0, max: 10 },
+              y: { title: { display: true, text: 'Impact' }, min: 0, max: 4,
+                ticks: { callback: v => ['', 'Low', 'Medium', 'High', ''][v] || '' } },
+            },
+          },
+        });
+      } else {
+        document.getElementById('scatterChart').parentElement.innerHTML =
+          '<h3>Impact x Composite Score</h3><div class="empty-state" style="min-height:100px">Score data will appear after the next pipeline run.</div>';
+      }
+
+      // 6. Radar chart (average scores by signal type)
+      const radarTypes = Object.keys(TYPE_MAP);
+      const scoreKeys = ['novelty', 'disruption', 'connectivity', 'credibility', 'early_stage'];
+      const hasAnyScores = ALL_SIGNALS.some(s => s.scores?.novelty !== undefined);
+
+      if (hasAnyScores) {
+        const radarDatasets = radarTypes.map(type => {
+          const signals = ALL_SIGNALS.filter(s => s.signal_type === type);
+          const avgs = scoreKeys.map(k => {
+            const vals = signals.map(s => s.scores?.[k] || 0).filter(v => v > 0);
+            return vals.length > 0 ? vals.reduce((a, b) => a + b, 0) / vals.length : 0;
+          });
+          return {
+            label: TYPE_MAP[type].label,
+            data: avgs,
+            backgroundColor: TYPE_MAP[type].color + '15',
+            borderColor: TYPE_MAP[type].color,
+            borderWidth: 2,
+            pointRadius: 3,
+          };
+        }).filter(ds => ds.data.some(v => v > 0));
+
+        if (radarDatasets.length > 0) {
+          CHARTS.radar = new Chart(document.getElementById('radarChart'), {
+            type: 'radar',
+            data: {
+              labels: ['Novelty', 'Disruption', 'Connectivity', 'Credibility', 'Early Stage'],
+              datasets: radarDatasets,
+            },
+            options: {
+              responsive: true,
+              plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, padding: 8, font: { size: 10 } } } },
+              scales: { r: { min: 0, max: 10, ticks: { stepSize: 2 } } },
+            },
+          });
+        } else {
+          document.getElementById('radarChart').parentElement.innerHTML =
+            '<h3>Score Radar (Average by Signal Type)</h3><div class="empty-state" style="min-height:100px">Score data will appear after the next pipeline run.</div>';
+        }
+      } else {
+        document.getElementById('radarChart').parentElement.innerHTML =
+          '<h3>Score Radar (Average by Signal Type)</h3><div class="empty-state" style="min-height:100px">Score data will appear after the next pipeline run.</div>';
+      }
+
+      window._chartsReady = true;
+    }
+
+    // === Filter Event Handlers ===
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const filter = btn.dataset.filter;
+        const value = btn.dataset.value;
+        // Toggle active state within same filter group
+        document.querySelectorAll('.filter-btn[data-filter="' + filter + '"]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentFilters[filter] = value;
+        applyFilters();
+      });
+    });
+    document.getElementById('searchInput').addEventListener('input', e => {
+      currentFilters.search = e.target.value;
+      applyFilters();
+    });
+    document.getElementById('sortSelect').addEventListener('change', () => applyFilters());
+
+    // === Table header sorting ===
+    document.querySelectorAll('.sig-table th[data-col]').forEach(th => {
+      th.addEventListener('click', () => {
+        const col = th.dataset.col;
+        const select = document.getElementById('sortSelect');
+        const sortMap = {
+          signal: 'alpha',
+          signal_type: 'alpha',
+          potential_impact: 'composite_desc',
+          three_horizons: 'composite_desc',
+          cla_depth: 'composite_desc',
+          ansoff_level: 'ansoff_asc',
+          composite_score: 'composite_desc',
+        };
+        if (sortMap[col]) {
+          select.value = sortMap[col];
+          applyFilters();
+        }
+      });
+    });
+
+    // === Init ===
+    async function init() {
+      try {
+        await loadSignals();
+        renderKPIs();
+        renderCharts();
+        applyFilters();
+      } catch (err) {
+        console.error('Signal dashboard error:', err);
+        document.getElementById('signalGrid').innerHTML =
+          '<div class="empty-state">Error loading signals: ' + esc(err.message) + '</div>';
+      }
+    }
+
+    init();
+  </script>
+
+</body>
+</html>
