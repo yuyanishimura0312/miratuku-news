@@ -740,8 +740,9 @@
       font-size: 0.68rem;
       padding: 2px 8px;
       border-radius: 0;
-      background: var(--surface);
-      color: var(--text-secondary);
+      background: #C4756A0C;
+      color: #8E3A3A;
+      border: 1px solid #C4756A18;
       white-space: nowrap;
     }
 
@@ -5040,8 +5041,8 @@
             ((ws.pestle_categories && ws.pestle_categories.length > 0) || claDepth || ansoff ?
               '<div class="ws-card-meta">' +
                 (ws.pestle_categories || []).map(function(c) { return '<span class="ws-card-meta-tag">' + escapeHtml(c) + '</span>'; }).join('') +
-                (claDepth ? '<span class="ws-card-meta-tag" style="background:#f0e6ff;color:#7c3aed">CLA: ' + (claMap[claDepth] || claDepth) + '</span>' : '') +
-                (ansoff ? '<span class="ws-card-meta-tag" style="background:#fff3e0;color:#e65100">Ansoff L' + ansoff + '</span>' : '') +
+                (claDepth ? '<span class="ws-card-meta-tag" style="background:#8E3A3A14;color:#8E3A3A;border:1px solid #8E3A3A20">CLA: ' + (claMap[claDepth] || claDepth) + '</span>' : '') +
+                (ansoff ? '<span class="ws-card-meta-tag" style="background:#B8605A14;color:#B8605A;border:1px solid #B8605A20">Ansoff L' + ansoff + '</span>' : '') +
               '</div>' : '') +
             '<div class="ws-card-footer">' +
               '<div class="ws-card-score-bar-wrap">' +
@@ -5109,18 +5110,18 @@
       html += '<h2 style="font-family:var(--font-serif);font-size:1.25rem;font-weight:700;line-height:1.5;color:var(--text);margin:0">' + escapeHtml(ws.signal || '') + '</h2>';
       html += '</div></div>';
 
-      // Meta grid
-      html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border-light);margin-bottom:24px;border:1px solid var(--border-light)">';
+      // Meta grid — red-toned accent per item
       var metaItems = [
-        { label: 'Three Horizons', value: ws.three_horizons ? (horizonMap[ws.three_horizons] || ws.three_horizons) : 'N/A' },
-        { label: 'CLA Depth', value: ws.cla_depth ? (claMap[ws.cla_depth] || ws.cla_depth) : 'N/A' },
-        { label: 'Ansoff Level', value: ws.ansoff_level != null ? 'Level ' + ws.ansoff_level : 'N/A' },
-        { label: 'Time Horizon', value: ws.time_horizon || 'N/A' }
+        { label: 'Three Horizons', value: ws.three_horizons ? (horizonMap[ws.three_horizons] || ws.three_horizons) : 'N/A', color: '#C4756A' },
+        { label: 'CLA Depth', value: ws.cla_depth ? (claMap[ws.cla_depth] || ws.cla_depth) : 'N/A', color: '#8E3A3A' },
+        { label: 'Ansoff Level', value: ws.ansoff_level != null ? 'Level ' + ws.ansoff_level : 'N/A', color: '#B8605A' },
+        { label: 'Time Horizon', value: ws.time_horizon || 'N/A', color: '#A84A48' }
       ];
+      html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-bottom:24px">';
       metaItems.forEach(function(m) {
-        html += '<div style="background:var(--card);padding:12px 14px">' +
-          '<div style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);margin-bottom:3px">' + m.label + '</div>' +
-          '<div style="font-size:0.82rem;font-weight:600;color:var(--text)">' + escapeHtml(m.value) + '</div>' +
+        html += '<div style="background:var(--card);padding:14px 16px;border-top:2px solid ' + m.color + ';border-right:1px solid var(--border-light)">' +
+          '<div style="font-size:0.62rem;text-transform:uppercase;letter-spacing:0.06em;color:' + m.color + ';margin-bottom:4px;font-weight:600">' + m.label + '</div>' +
+          '<div style="font-size:0.85rem;font-weight:600;color:var(--text);line-height:1.4">' + escapeHtml(m.value) + '</div>' +
         '</div>';
       });
       html += '</div>';
@@ -5692,7 +5693,7 @@
               (ws.three_horizons ? '<span class="modal-signal-badge" style="background:#C4756A20;color:#C4756A">' + escapeHtml(ws.three_horizons) + '</span>' : '') +
             '</div>' +
             '<div class="modal-signal-desc">' + escapeHtml(ws.description || '') + '</div>' +
-            (ws.composite_score ? '<div style="font-size:11px;color:#888;margin-top:2px">Quality Score: ' + ws.composite_score + '/10 | CLA: ' + (ws.cla_depth || 'N/A') + ' | Ansoff L' + (ws.ansoff_level || '?') + '</div>' : '') +
+            (ws.composite_score ? '<div style="font-size:11px;color:#8E3A3A;margin-top:2px">Score: ' + ws.composite_score + '/10 | <span style="color:#8E3A3A">CLA: ' + (ws.cla_depth || 'N/A') + '</span> | <span style="color:#B8605A">Ansoff L' + (ws.ansoff_level || '?') + '</span></div>' : '') +
           '</div>';
         });
         html += '</div>';
