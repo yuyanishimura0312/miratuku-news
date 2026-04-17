@@ -3871,7 +3871,7 @@
       if (signals.length > 0) {
         // Store signals globally for popup access
         window._sidebarSignals = signals;
-        const stMap = { 'weak_signal': { l: 'WS', c: '#5B7FA6' }, 'emerging_trend': { l: 'ET', c: '#6A9BB8' }, 'wild_card': { l: 'WC', c: '#8BA89A' }, 'counter_trend': { l: 'CT', c: '#B09070' }, 'paradigm_shift': { l: 'PS', c: '#A06050' } };
+        const stMap = { 'weak_signal': { l: 'WS', c: '#C4756A' }, 'emerging_trend': { l: 'ET', c: '#B8605A' }, 'wild_card': { l: 'WC', c: '#A84A48' }, 'counter_trend': { l: 'CT', c: '#8E3A3A' }, 'paradigm_shift': { l: 'PS', c: '#6E2C2C' } };
         signals.forEach((ws, idx) => {
           const impactClass = (ws.potential_impact || '').toLowerCase() === 'high' ? 'ws-badge-high' :
                               (ws.potential_impact || '').toLowerCase() === 'medium' ? 'ws-badge-medium' : 'ws-badge-low';
@@ -4993,11 +4993,11 @@
 
       // Signal type labels and colors (academic classification)
       const signalTypeMap = {
-        'weak_signal': { label: 'Weak Signal', color: '#5B7FA6' },
-        'emerging_trend': { label: 'Emerging', color: '#6A9BB8' },
-        'wild_card': { label: 'Wild Card', color: '#8BA89A' },
-        'counter_trend': { label: 'Counter', color: '#B09070' },
-        'paradigm_shift': { label: 'Paradigm Shift', color: '#A06050' },
+        'weak_signal': { label: 'Weak Signal', color: '#C4756A' },
+        'emerging_trend': { label: 'Emerging', color: '#B8605A' },
+        'wild_card': { label: 'Wild Card', color: '#A84A48' },
+        'counter_trend': { label: 'Counter', color: '#8E3A3A' },
+        'paradigm_shift': { label: 'Paradigm Shift', color: '#6E2C2C' },
       };
       const horizonMap = { 'H1': 'H1 Decline', 'H2': 'H2 Transition', 'H3': 'H3 Emerging' };
       const claMap = { 'litany': 'Litany', 'systemic': 'Systemic', 'worldview': 'Worldview', 'myth': 'Myth' };
@@ -5067,20 +5067,20 @@
       const ws = signals[idx];
 
       const stMap = window._signalTypeMap || {
-        'weak_signal': { label: 'Weak Signal', color: '#5B7FA6' },
-        'emerging_trend': { label: 'Emerging Trend', color: '#6A9BB8' },
-        'wild_card': { label: 'Wild Card', color: '#8BA89A' },
-        'counter_trend': { label: 'Counter Trend', color: '#B09070' },
-        'paradigm_shift': { label: 'Paradigm Shift', color: '#A06050' }
+        'weak_signal': { label: 'Weak Signal', color: '#C4756A' },
+        'emerging_trend': { label: 'Emerging Trend', color: '#B8605A' },
+        'wild_card': { label: 'Wild Card', color: '#A84A48' },
+        'counter_trend': { label: 'Counter Trend', color: '#8E3A3A' },
+        'paradigm_shift': { label: 'Paradigm Shift', color: '#6E2C2C' }
       };
       const stInfo = stMap[ws.signal_type] || stMap['weak_signal'];
-      const impactColors = { 'high': '#A06050', 'medium': '#B09070', 'low': '#8B9DA6' };
+      const impactColors = { 'high': '#6E2C2C', 'medium': '#A84A48', 'low': '#C4756A' };
       const impactColor = impactColors[(ws.potential_impact || '').toLowerCase()] || '#6b7280';
       const composite = ws.composite_score || 0;
       const scoreColor = composite >= 7 ? '#1E8449' : composite >= 5 ? stInfo.color : '#999';
       const claMap = { 'litany': 'Litany (表層)', 'systemic': 'Systemic (構造)', 'worldview': 'Worldview (世界観)', 'myth': 'Myth/Metaphor (神話)' };
       const horizonMap = { 'H1': 'Horizon 1 — 衰退する現体制', 'H2': 'Horizon 2 — 移行期の革新', 'H3': 'Horizon 3 — 新興の未来' };
-      var pestleColors = { 'Political': '#A06050', 'Economic': '#B09070', 'Social': '#7A9B8A', 'Technological': '#5B7FA6', 'Legal': '#8B7FA0', 'Environmental': '#6A9B7A' };
+      var pestleColors = { 'Political': '#8E3A3A', 'Economic': '#A84A48', 'Social': '#B8605A', 'Technological': '#9E5050', 'Legal': '#7A3535', 'Environmental': '#C4756A' };
 
       const content = document.getElementById('articleModalContent');
       let html = '<div class="modal-reader-col">';
@@ -5177,7 +5177,7 @@
 
       // Counter trend
       if (ws.counter_trend) {
-        html += '<div style="margin-bottom:24px;padding:16px 20px;background:var(--surface);border-left:3px solid #B09070;border-radius:0 4px 4px 0">' +
+        html += '<div style="margin-bottom:24px;padding:16px 20px;background:var(--surface);border-left:3px solid #8E3A3A;border-radius:0 4px 4px 0">' +
           '<div class="ws-label" style="margin-top:0;margin-bottom:8px">Counter Trend</div>' +
           '<p style="font-size:0.9rem;line-height:1.8;color:var(--text-secondary);margin:0">' + escapeHtml(ws.counter_trend) + '</p>' +
         '</div>';
@@ -5678,7 +5678,7 @@
       if (relatedSignals.length > 0) {
         html += '<div class="modal-section-card">';
         html += '<h4 class="modal-section-heading">関連シグナル</h4>';
-        const modalStMap = { 'weak_signal': { l: 'Weak Signal', c: '#5B7FA6' }, 'emerging_trend': { l: 'Emerging', c: '#6A9BB8' }, 'wild_card': { l: 'Wild Card', c: '#8BA89A' }, 'counter_trend': { l: 'Counter', c: '#B09070' }, 'paradigm_shift': { l: 'Paradigm Shift', c: '#A06050' } };
+        const modalStMap = { 'weak_signal': { l: 'Weak Signal', c: '#C4756A' }, 'emerging_trend': { l: 'Emerging', c: '#B8605A' }, 'wild_card': { l: 'Wild Card', c: '#A84A48' }, 'counter_trend': { l: 'Counter', c: '#8E3A3A' }, 'paradigm_shift': { l: 'Paradigm Shift', c: '#6E2C2C' } };
         relatedSignals.forEach(ws => {
           const impactColor = (ws.potential_impact || '').toLowerCase() === 'high' ? '#e74c3c' :
                               (ws.potential_impact || '').toLowerCase() === 'medium' ? '#f39c12' : '#95a5a6';
@@ -5830,9 +5830,9 @@
       if (!signals || !signals[idx]) return;
       const ws = signals[idx];
 
-      const stMap = { 'weak_signal': { l: 'Weak Signal', c: '#5B7FA6' }, 'emerging_trend': { l: 'Emerging Trend', c: '#6A9BB8' }, 'wild_card': { l: 'Wild Card', c: '#8BA89A' }, 'counter_trend': { l: 'Counter Trend', c: '#B09070' }, 'paradigm_shift': { l: 'Paradigm Shift', c: '#A06050' } };
+      const stMap = { 'weak_signal': { l: 'Weak Signal', c: '#C4756A' }, 'emerging_trend': { l: 'Emerging Trend', c: '#B8605A' }, 'wild_card': { l: 'Wild Card', c: '#A84A48' }, 'counter_trend': { l: 'Counter Trend', c: '#8E3A3A' }, 'paradigm_shift': { l: 'Paradigm Shift', c: '#6E2C2C' } };
       const st = stMap[ws.signal_type] || stMap['weak_signal'];
-      const impactColors = { 'high': '#A06050', 'medium': '#B09070', 'low': '#8B9DA6' };
+      const impactColors = { 'high': '#6E2C2C', 'medium': '#A84A48', 'low': '#C4756A' };
       const impactColor = impactColors[(ws.potential_impact || '').toLowerCase()] || '#6b7280';
 
       const content = document.getElementById('articleModalContent');
@@ -5872,7 +5872,7 @@
         html += '<div style="margin-bottom:20px">' +
           '<h4 style="font-size:0.85rem;font-weight:700;color:var(--text);margin-bottom:8px">PESTLE Categories</h4>' +
           '<div style="display:flex;gap:6px;flex-wrap:wrap">';
-        var pestleColors = { 'Political': '#A06050', 'Economic': '#B09070', 'Social': '#7A9B8A', 'Technological': '#5B7FA6', 'Legal': '#8B7FA0', 'Environmental': '#6A9B7A' };
+        var pestleColors = { 'Political': '#8E3A3A', 'Economic': '#A84A48', 'Social': '#B8605A', 'Technological': '#9E5050', 'Legal': '#7A3535', 'Environmental': '#C4756A' };
         ws.pestle_categories.forEach(function(cat) {
           var pc = pestleColors[cat] || '#6b7280';
           html += '<span style="display:inline-block;padding:3px 10px;border-radius:4px;font-size:0.75rem;font-weight:600;background:' + pc + '18;color:' + pc + ';border:1px solid ' + pc + '30">' + escapeHtml(cat) + '</span>';
@@ -5882,7 +5882,7 @@
 
       // Counter trend
       if (ws.counter_trend) {
-        html += '<div style="margin-bottom:20px;padding:14px 16px;background:var(--surface);border-left:3px solid #B09070;border-radius:0 4px 4px 0">' +
+        html += '<div style="margin-bottom:20px;padding:14px 16px;background:var(--surface);border-left:3px solid #8E3A3A;border-radius:0 4px 4px 0">' +
           '<h4 style="font-size:0.85rem;font-weight:700;color:var(--text);margin-bottom:6px">Counter Trend</h4>' +
           '<p style="font-size:0.9rem;line-height:1.7;color:var(--text-secondary)">' + escapeHtml(ws.counter_trend) + '</p>' +
         '</div>';
