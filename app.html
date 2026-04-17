@@ -646,6 +646,160 @@
     .signal-desc { font-size: 0.84rem; line-height: 1.65; color: var(--text-secondary); }
 
     /* ================================================================
+       SIGNAL DASHBOARD
+       ================================================================ */
+    .sig-dashboard {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 3px solid #6E2C2C;
+      margin-bottom: 0;
+      padding: 20px 24px;
+    }
+    .sig-dash-row {
+      display: flex;
+      gap: 0;
+      border-bottom: 1px solid var(--border-light);
+      padding-bottom: 20px;
+      margin-bottom: 20px;
+    }
+    .sig-dash-row:last-child { border-bottom: none; padding-bottom: 0; margin-bottom: 0; }
+    .sig-dash-block {
+      padding: 0 24px 0 0;
+      border-right: 1px solid var(--border-light);
+      margin-right: 24px;
+    }
+    .sig-dash-block:last-child { border-right: none; margin-right: 0; padding-right: 0; }
+    .sig-dash-block--wide { flex: 2; }
+    .sig-dash-block--medium { flex: 1.5; }
+    .sig-dash-block--narrow { flex: 1; }
+    .sig-dash-label {
+      font-size: 0.62rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+    /* Type distribution bars */
+    .sig-type-bars { display: flex; flex-direction: column; gap: 7px; }
+    .sig-type-bar-row { display: flex; align-items: center; gap: 8px; font-size: 0.7rem; }
+    .sig-type-bar-label { width: 110px; color: var(--text-secondary); flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .sig-type-bar-track { flex: 1; height: 8px; background: var(--border-light); overflow: hidden; }
+    .sig-type-bar-fill { height: 100%; transition: width 0.6s ease; }
+    .sig-type-bar-count { font-size: 0.7rem; font-weight: 700; color: var(--text); min-width: 24px; text-align: right; }
+    /* Histogram */
+    .sig-histogram { display: flex; align-items: flex-end; gap: 3px; height: 56px; }
+    .sig-hist-col { display: flex; flex-direction: column; align-items: center; flex: 1; }
+    .sig-hist-bar { width: 100%; background: #C4756A; transition: height 0.4s ease; min-height: 2px; }
+    .sig-hist-bar--high { background: #6E2C2C; }
+    .sig-hist-bar--mid { background: #A84A48; }
+    .sig-hist-col-label { font-size: 0.55rem; color: var(--text-muted); margin-top: 3px; }
+    /* Impact summary */
+    .sig-impact-summary { display: flex; flex-direction: column; gap: 8px; }
+    .sig-impact-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .sig-impact-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .sig-impact-label { font-size: 0.72rem; color: var(--text-secondary); flex: 1; }
+    .sig-impact-count { font-size: 0.82rem; font-weight: 700; color: var(--text); }
+    .sig-impact-pct { font-size: 0.68rem; color: var(--text-muted); min-width: 32px; text-align: right; }
+    /* PESTLE x Horizon Matrix */
+    .sig-matrix-wrap { overflow-x: auto; }
+    .sig-matrix { border-collapse: collapse; width: 100%; font-size: 0.72rem; }
+    .sig-matrix th { font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); padding: 4px 12px; text-align: center; border-bottom: 1px solid var(--border); }
+    .sig-matrix th:first-child { text-align: left; padding-left: 0; }
+    .sig-matrix td { padding: 6px 12px; text-align: center; border-bottom: 1px solid var(--border-light); font-weight: 600; color: var(--text); }
+    .sig-matrix td:first-child { text-align: left; padding-left: 0; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-secondary); white-space: nowrap; }
+    .sig-matrix-cell--0 { background: transparent; color: var(--text-muted); }
+    .sig-matrix-cell--1 { background: #C4756A18; color: #C4756A; }
+    .sig-matrix-cell--2 { background: #C4756A28; color: #B8605A; }
+    .sig-matrix-cell--3 { background: #B8605A3A; color: #A84A48; }
+    .sig-matrix-cell--4 { background: #A84A4848; color: #8E3A3A; }
+    .sig-matrix-cell--hi { background: #6E2C2C; color: #fff; font-weight: 800; }
+
+    /* ================================================================
+       SIGNAL FILTER BAR
+       ================================================================ */
+    .sig-filterbar {
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 0 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0;
+      align-items: flex-end;
+    }
+    .sig-filter-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 20px 12px 0;
+      border-right: 1px solid var(--border-light);
+      margin-right: 20px;
+    }
+    .sig-filter-group:last-child { border-right: none; margin-right: 0; }
+    .sig-filter-group--sort { margin-left: auto; border-right: none; }
+    .sig-filter-label {
+      font-size: 0.62rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .sig-filter-chips { display: flex; gap: 4px; flex-wrap: wrap; }
+    .sig-chip {
+      padding: 4px 10px;
+      font-size: 0.68rem;
+      font-weight: 600;
+      font-family: var(--font);
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      cursor: pointer;
+      border-radius: 0;
+      transition: all 0.15s;
+      white-space: nowrap;
+      line-height: 1.4;
+    }
+    .sig-chip:hover { background: var(--surface); color: var(--text); }
+    .sig-chip--active { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .sig-sort-select {
+      font-size: 0.72rem;
+      font-family: var(--font);
+      padding: 5px 24px 5px 8px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text-secondary);
+      border-radius: 0;
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23999'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 8px center;
+    }
+    .sig-filter-result {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      padding: 0 0 12px 20px;
+      border-left: 1px solid var(--border-light);
+      white-space: nowrap;
+    }
+    .sig-filter-result span { font-weight: 700; color: var(--text); }
+    .ws-card--hidden { display: none; }
+
+    @media (max-width: 768px) {
+      .sig-dashboard { padding: 16px; }
+      .sig-dash-row { flex-direction: column; gap: 16px; }
+      .sig-dash-block { border-right: none; margin-right: 0; padding-right: 0; border-bottom: 1px solid var(--border-light); padding-bottom: 16px; }
+      .sig-dash-block:last-child { border-bottom: none; padding-bottom: 0; }
+      .sig-filterbar { flex-direction: column; gap: 8px; padding: 12px 0; }
+      .sig-filter-group { border-right: none; margin-right: 0; padding-right: 0; border-bottom: 1px solid var(--border-light); padding-bottom: 8px; }
+      .sig-filter-group--sort { margin-left: 0; }
+      .sig-filter-result { border-left: none; padding-left: 0; }
+    }
+
+    /* ================================================================
        SIGNAL CARDS — refined design
        ================================================================ */
 
@@ -4986,6 +5140,249 @@
       const container = document.getElementById('signalsContent');
       const weakSignals = aiData?.weak_signals || [];
       if (weakSignals.length === 0) { container.innerHTML = '<p class="text-muted">現在検出されているシグナルはありません。</p>'; return; }
+
+      // Signal type labels and colors
+      const signalTypeMap = {
+        'weak_signal': { label: 'Weak Signal', color: '#C4756A' },
+        'emerging_trend': { label: 'Emerging', color: '#B8605A' },
+        'wild_card': { label: 'Wild Card', color: '#A84A48' },
+        'counter_trend': { label: 'Counter', color: '#8E3A3A' },
+        'paradigm_shift': { label: 'Paradigm Shift', color: '#6E2C2C' },
+      };
+      const horizonMap = { 'H1': 'H1 Decline', 'H2': 'H2 Transition', 'H3': 'H3 Emerging' };
+      const claMap = { 'litany': 'Litany', 'systemic': 'Systemic', 'worldview': 'Worldview', 'myth': 'Myth' };
+      const pestleList = ['Political','Economic','Social','Technological','Legal','Environmental'];
+      const horizonList = ['H1','H2','H3'];
+
+      window._allSignals = weakSignals;
+      window._signalTypeMap = signalTypeMap;
+
+      // ===== Dashboard aggregation =====
+      var typeCount = {};
+      Object.keys(signalTypeMap).forEach(function(k) { typeCount[k] = 0; });
+      var impactCount = { high: 0, medium: 0, low: 0 };
+      var matrix = {};
+      pestleList.forEach(function(p) { matrix[p] = {}; horizonList.forEach(function(h) { matrix[p][h] = 0; }); });
+      var histBuckets = [0,0,0,0,0,0,0,0,0,0];
+
+      weakSignals.forEach(function(ws) {
+        if (typeCount[ws.signal_type] !== undefined) typeCount[ws.signal_type]++;
+        var imp = (ws.potential_impact || '').toLowerCase();
+        if (imp === 'high') impactCount.high++;
+        else if (imp === 'medium') impactCount.medium++;
+        else impactCount.low++;
+        var score = parseFloat(ws.composite_score) || 0;
+        var bucket = Math.min(Math.floor(score), 9);
+        histBuckets[bucket]++;
+        (ws.pestle_categories || []).forEach(function(p) {
+          if (matrix[p] && ws.three_horizons && matrix[p][ws.three_horizons] !== undefined) {
+            matrix[p][ws.three_horizons]++;
+          }
+        });
+      });
+
+      var maxTypeCount = Math.max.apply(null, Object.values(typeCount).concat([1]));
+      var maxHistBucket = Math.max.apply(null, histBuckets.concat([1]));
+      var maxCell = 0;
+      pestleList.forEach(function(p) { horizonList.forEach(function(h) { if (matrix[p][h] > maxCell) maxCell = matrix[p][h]; }); });
+
+      // Type bars HTML
+      var typeBarsHtml = Object.keys(signalTypeMap).map(function(key) {
+        var info = signalTypeMap[key];
+        var cnt = typeCount[key] || 0;
+        var pct = Math.round(cnt / maxTypeCount * 100);
+        return '<div class="sig-type-bar-row"><span class="sig-type-bar-label">' + info.label + '</span>' +
+          '<div class="sig-type-bar-track"><div class="sig-type-bar-fill" style="width:' + pct + '%;background:' + info.color + '"></div></div>' +
+          '<span class="sig-type-bar-count">' + cnt + '</span></div>';
+      }).join('');
+
+      // Histogram HTML
+      var histHtml = histBuckets.map(function(cnt, i) {
+        var h = Math.round(cnt / maxHistBucket * 52);
+        var cls = i >= 7 ? 'sig-hist-bar--high' : i >= 5 ? 'sig-hist-bar--mid' : '';
+        return '<div class="sig-hist-col"><div class="sig-hist-bar ' + cls + '" style="height:' + h + 'px" title="' + i + '-' + (i+1) + ': ' + cnt + '件"></div>' +
+          '<div class="sig-hist-col-label">' + i + '</div></div>';
+      }).join('');
+
+      // Impact HTML
+      var impactColors = { high: '#6E2C2C', medium: '#A84A48', low: '#C4756A' };
+      var impactHtml = ['high','medium','low'].map(function(imp) {
+        var cnt = impactCount[imp];
+        var pct = Math.round(cnt / weakSignals.length * 100);
+        return '<div class="sig-impact-row"><div class="sig-impact-dot" style="background:' + impactColors[imp] + '"></div>' +
+          '<span class="sig-impact-label">' + imp.charAt(0).toUpperCase() + imp.slice(1) + '</span>' +
+          '<span class="sig-impact-count">' + cnt + '</span>' +
+          '<span class="sig-impact-pct">' + pct + '%</span></div>';
+      }).join('');
+
+      // Matrix HTML
+      var cellClass = function(cnt) {
+        if (cnt === 0) return 'sig-matrix-cell--0';
+        if (cnt >= maxCell * 0.8) return 'sig-matrix-cell--hi';
+        if (cnt >= maxCell * 0.5) return 'sig-matrix-cell--4';
+        if (cnt >= maxCell * 0.3) return 'sig-matrix-cell--3';
+        if (cnt >= maxCell * 0.1) return 'sig-matrix-cell--2';
+        return 'sig-matrix-cell--1';
+      };
+      var matrixHtml = '<table class="sig-matrix"><thead><tr><th></th>' +
+        horizonList.map(function(h) { return '<th>' + h + '</th>'; }).join('') +
+        '</tr></thead><tbody>' +
+        pestleList.map(function(p) {
+          return '<tr><td>' + p.substring(0, 3).toUpperCase() + '</td>' +
+            horizonList.map(function(h) {
+              var cnt = matrix[p][h];
+              return '<td class="' + cellClass(cnt) + '">' + (cnt || '—') + '</td>';
+            }).join('') + '</tr>';
+        }).join('') + '</tbody></table>';
+
+      // ===== Card renderer =====
+      var renderCard = function(ws, i) {
+        var impactClass = (ws.potential_impact || '').toLowerCase() === 'high' ? 'ws-badge-high' :
+                          (ws.potential_impact || '').toLowerCase() === 'medium' ? 'ws-badge-medium' : 'ws-badge-low';
+        var stInfo = signalTypeMap[ws.signal_type] || signalTypeMap['weak_signal'];
+        var horizon = ws.three_horizons || '';
+        var claDepth = ws.cla_depth || '';
+        var ansoff = ws.ansoff_level || 0;
+        var composite = ws.composite_score || 0;
+        var isNoise = ws.noise_flag === true;
+        var wsBookmarkId = 'signal-' + i;
+        var wsIsBookmarked = bookmarks.some(function(b) { return b.id === wsBookmarkId; });
+        var scoreColor = composite >= 7 ? '#6E2C2C' : composite >= 5 ? stInfo.color : '#999';
+
+        return '<div class="ws-card' + (isNoise ? ' ws-card-noise' : '') + '" id="ws-card-' + i + '"' +
+          ' onclick="openSignalModal(' + i + ')" style="border-left-color:' + stInfo.color + '"' +
+          ' data-type="' + (ws.signal_type || '') + '"' +
+          ' data-impact="' + (ws.potential_impact || '').toLowerCase() + '"' +
+          ' data-horizon="' + (ws.three_horizons || '') + '"' +
+          ' data-pestle="' + (ws.pestle_categories || []).join(',') + '"' +
+          ' data-score="' + composite + '">' +
+          '<div class="ws-card-header">' +
+            '<div class="ws-card-score-circle" style="border-color:' + scoreColor + ';color:' + scoreColor + '">' + (composite ? Number(composite).toFixed(1) : '—') + '</div>' +
+            '<div class="ws-card-header-right">' +
+              '<div class="ws-card-badges">' +
+                '<span class="ws-badge" style="background:' + stInfo.color + '20;color:' + stInfo.color + ';border:1px solid ' + stInfo.color + '40">' + stInfo.label + '</span>' +
+                '<span class="ws-badge ' + impactClass + '">' + escapeHtml(ws.potential_impact || 'N/A') + '</span>' +
+                (horizon ? '<span class="ws-badge" style="background:#C4756A20;color:#C4756A;border:1px solid #C4756A40">' + (horizonMap[horizon] || horizon) + '</span>' : '') +
+                '<button class="bookmark-btn ' + (wsIsBookmarked ? 'bookmarked' : '') + '" onclick="event.stopPropagation();toggleBookmark(\'' + wsBookmarkId + '\',\'' + escapeAttr(ws.description || '') + '\',\'\',this)" title="ブックマーク">&#9734;</button>' +
+              '</div>' +
+              '<div class="ws-card-title">' + escapeHtml(ws.signal || (ws.description ? ws.description.substring(0, 120) : '')) + '</div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="ws-card-desc">' + escapeHtml(ws.description || '') + '</div>' +
+          (((ws.pestle_categories && ws.pestle_categories.length > 0) || claDepth || ansoff) ?
+            '<div class="ws-card-meta">' +
+              (ws.pestle_categories || []).map(function(c) { return '<span class="ws-card-meta-tag">' + escapeHtml(c) + '</span>'; }).join('') +
+              (claDepth ? '<span class="ws-card-meta-tag" style="background:#8E3A3A14;color:#8E3A3A;border:1px solid #8E3A3A20">CLA: ' + (claMap[claDepth] || claDepth) + '</span>' : '') +
+              (ansoff ? '<span class="ws-card-meta-tag" style="background:#B8605A14;color:#B8605A;border:1px solid #B8605A20">Ansoff L' + ansoff + '</span>' : '') +
+            '</div>' : '') +
+          '<div class="ws-card-footer">' +
+            '<div class="ws-card-score-bar-wrap"><span>Score</span>' +
+              '<div class="ws-card-score-bar"><div class="ws-card-score-bar-fill" style="width:' + (composite * 10) + '%;background:' + scoreColor + '"></div></div>' +
+              '<span style="font-weight:600">' + (composite ? Number(composite).toFixed(1) : '—') + '</span>' +
+            '</div>' +
+            '<span class="ws-card-detail-hint">詳細を見る &rarr;</span>' +
+          '</div>' +
+        '</div>';
+      };
+
+      var cardsHtml = weakSignals.map(function(ws, i) { return renderCard(ws, i); }).join('');
+
+      // ===== Assemble full HTML =====
+      container.innerHTML =
+        '<p class="pestle-meta-line">PESTLEニュースと学術論文から、学術的シグナル理論（Ansoff, Hiltunen, Inayatullah, Sharpe）に基づき検出された変化の兆し。<strong>' + weakSignals.length + '件</strong>のシグナルを検出。</p>' +
+        // Dashboard
+        '<div class="sig-dashboard">' +
+          '<div class="sig-dash-row">' +
+            '<div class="sig-dash-block sig-dash-block--wide"><div class="sig-dash-label">Signal Type Distribution</div><div class="sig-type-bars">' + typeBarsHtml + '</div></div>' +
+            '<div class="sig-dash-block sig-dash-block--medium"><div class="sig-dash-label">Score Distribution</div><div class="sig-histogram">' + histHtml + '</div></div>' +
+            '<div class="sig-dash-block sig-dash-block--narrow"><div class="sig-dash-label">Impact Summary</div><div class="sig-impact-summary">' + impactHtml + '</div></div>' +
+          '</div>' +
+          '<div class="sig-dash-row" style="margin-bottom:0"><div class="sig-dash-block" style="flex:1"><div class="sig-dash-label">PESTLE x Three Horizons Matrix</div><div class="sig-matrix-wrap">' + matrixHtml + '</div></div></div>' +
+        '</div>' +
+        // Filter bar
+        '<div class="sig-filterbar" id="sigFilterBar">' +
+          '<div class="sig-filter-group"><span class="sig-filter-label">Type</span><div class="sig-filter-chips" id="filterType">' +
+            '<button class="sig-chip sig-chip--active" data-val="all">All</button>' +
+            Object.keys(signalTypeMap).map(function(k) { return '<button class="sig-chip" data-val="' + k + '">' + signalTypeMap[k].label + '</button>'; }).join('') +
+          '</div></div>' +
+          '<div class="sig-filter-group"><span class="sig-filter-label">Impact</span><div class="sig-filter-chips" id="filterImpact">' +
+            '<button class="sig-chip sig-chip--active" data-val="all">All</button>' +
+            '<button class="sig-chip" data-val="high">High</button><button class="sig-chip" data-val="medium">Medium</button><button class="sig-chip" data-val="low">Low</button>' +
+          '</div></div>' +
+          '<div class="sig-filter-group"><span class="sig-filter-label">PESTLE</span><div class="sig-filter-chips" id="filterPestle">' +
+            '<button class="sig-chip sig-chip--active" data-val="all">All</button>' +
+            pestleList.map(function(p) { return '<button class="sig-chip" data-val="' + p + '">' + p.substring(0, 3) + '</button>'; }).join('') +
+          '</div></div>' +
+          '<div class="sig-filter-group"><span class="sig-filter-label">Horizon</span><div class="sig-filter-chips" id="filterHorizon">' +
+            '<button class="sig-chip sig-chip--active" data-val="all">All</button>' +
+            '<button class="sig-chip" data-val="H1">H1</button><button class="sig-chip" data-val="H2">H2</button><button class="sig-chip" data-val="H3">H3</button>' +
+          '</div></div>' +
+          '<div class="sig-filter-group sig-filter-group--sort"><span class="sig-filter-label">Sort</span>' +
+            '<select class="sig-sort-select" id="sigSortSelect"><option value="score_desc">Score (高い順)</option><option value="score_asc">Score (低い順)</option><option value="impact">Impact (High優先)</option><option value="horizon">Horizon (H3優先)</option></select>' +
+          '</div>' +
+          '<div class="sig-filter-result"><span id="sigFilterCount">' + weakSignals.length + '件</span>を表示</div>' +
+        '</div>' +
+        // Card grid
+        '<div class="ws-grid" id="wsGrid">' + cardsHtml + '</div>';
+
+      // ===== Filter / Sort logic =====
+      var filterState = { type: 'all', impact: 'all', pestle: 'all', horizon: 'all' };
+
+      function applyFilter() {
+        var grid = document.getElementById('wsGrid');
+        var cards = grid ? grid.querySelectorAll('.ws-card') : [];
+        var sortVal = (document.getElementById('sigSortSelect') || {}).value || 'score_desc';
+        var impactOrderMap = { high: 0, medium: 1, low: 2 };
+        var hOrderMap = { H3: 0, H2: 1, H1: 2 };
+        var cardsArr = Array.from(cards);
+        cardsArr.sort(function(a, b) {
+          if (sortVal === 'score_desc') return parseFloat(b.dataset.score || 0) - parseFloat(a.dataset.score || 0);
+          if (sortVal === 'score_asc') return parseFloat(a.dataset.score || 0) - parseFloat(b.dataset.score || 0);
+          if (sortVal === 'impact') return (impactOrderMap[a.dataset.impact] || 99) - (impactOrderMap[b.dataset.impact] || 99);
+          if (sortVal === 'horizon') return (hOrderMap[a.dataset.horizon] || 99) - (hOrderMap[b.dataset.horizon] || 99);
+          return 0;
+        });
+        if (grid) cardsArr.forEach(function(c) { grid.appendChild(c); });
+        var visible = 0;
+        cardsArr.forEach(function(card) {
+          var typeOk = filterState.type === 'all' || card.dataset.type === filterState.type;
+          var impactOk = filterState.impact === 'all' || card.dataset.impact === filterState.impact;
+          var pestleOk = filterState.pestle === 'all' || (card.dataset.pestle || '').split(',').indexOf(filterState.pestle) >= 0;
+          var horizonOk = filterState.horizon === 'all' || card.dataset.horizon === filterState.horizon;
+          var show = typeOk && impactOk && pestleOk && horizonOk;
+          card.classList.toggle('ws-card--hidden', !show);
+          if (show) visible++;
+        });
+        var countEl = document.getElementById('sigFilterCount');
+        if (countEl) countEl.textContent = visible + '件';
+      }
+
+      // Bind filter chips
+      [
+        { id: 'filterType', key: 'type' },
+        { id: 'filterImpact', key: 'impact' },
+        { id: 'filterPestle', key: 'pestle' },
+        { id: 'filterHorizon', key: 'horizon' }
+      ].forEach(function(cfg) {
+        var group = document.getElementById(cfg.id);
+        if (!group) return;
+        group.querySelectorAll('.sig-chip').forEach(function(btn) {
+          btn.addEventListener('click', function() {
+            group.querySelectorAll('.sig-chip').forEach(function(b) { b.classList.remove('sig-chip--active'); });
+            btn.classList.add('sig-chip--active');
+            filterState[cfg.key] = btn.dataset.val;
+            applyFilter();
+          });
+        });
+      });
+
+      var sortSelect = document.getElementById('sigSortSelect');
+      if (sortSelect) sortSelect.addEventListener('change', applyFilter);
+      applyFilter();
+      return; // end of new renderSignals
+    }
+
+    function renderSignals_REMOVED() { /* removed — see renderSignals above */
 
       const hasDetails = (ws) => {
         const cats = (ws.pestle_categories || []).join(', ');
