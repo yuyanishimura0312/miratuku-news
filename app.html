@@ -3227,61 +3227,7 @@
             <button data-claver="v1" id="claVerV1" style="padding:5px 14px;border:1px solid var(--border-light);border-radius:6px;background:var(--accent);color:#fff;cursor:pointer;font-size:12px;font-weight:600">v1 従来版</button>
             <button data-claver="v2" id="claVerV2" style="padding:5px 14px;border:1px solid var(--border-light);border-radius:6px;background:transparent;color:var(--text-secondary);cursor:pointer;font-size:12px">v2 神話学的深層強化版</button>
           </div>
-          <script>
-          (function(){
-            // Store original v1 data for restoration
-            var v1Backup = null;
-
-            document.getElementById('claVersionToggle').addEventListener('click', function(e) {
-              var btn = e.target.closest('[data-claver]'); if (!btn) return;
-              var ver = btn.getAttribute('data-claver');
-              var v1B = document.getElementById('claVerV1'), v2B = document.getElementById('claVerV2');
-              var archiveView = document.getElementById('claArchiveView');
-
-              if (ver === 'v2') {
-                v1B.style.background='transparent';v1B.style.color='var(--text-secondary)';
-                v2B.style.background='var(--accent)';v2B.style.color='#fff';
-
-                // Backup v1 data on first switch
-                if (!v1Backup && window._claYearly) {
-                  v1Backup = { yearly: window._claYearly, quarterly: window._claQuarterly };
-                }
-
-                // Load v2 data and inject into the same rendering pipeline
-                if (!window._claV2Loaded) {
-                  archiveView.innerHTML = '<div class="loading-indicator"><div class="loading-spinner loading-spinner-sm"></div><div>v2データを読み込み中...</div></div>';
-                  fetch('data/cla_v2.json?v='+Date.now()).then(function(r){return r.json()}).then(function(d){
-                    window._claV2Loaded = d;
-                    window._claYearly = d.entries || [];
-                    window._claQuarterly = [];
-                    // Wait for renderCLAArchiveView to be available
-                    function tryRender(attempts) {
-                      if (typeof renderCLAArchiveView === 'function') { renderCLAArchiveView(); }
-                      else if (attempts > 0) { setTimeout(function(){ tryRender(attempts-1); }, 500); }
-                      else { archiveView.innerHTML='<p style="padding:20px;color:var(--text-muted)">レンダリング関数の読み込みを待機中です。ページを再読み込みしてください。</p>'; }
-                    }
-                    tryRender(20);
-                  }).catch(function(err){
-                    archiveView.innerHTML='<p style="padding:20px;color:var(--text-muted)">v2データの読み込みに失敗しました: '+err+'</p>';
-                  });
-                } else {
-                  window._claYearly = window._claV2Loaded.entries || [];
-                  window._claQuarterly = [];
-                  if (typeof renderCLAArchiveView === 'function') renderCLAArchiveView();
-                }
-              } else {
-                v2B.style.background='transparent';v2B.style.color='var(--text-secondary)';
-                v1B.style.background='var(--accent)';v1B.style.color='#fff';
-                // Restore v1 data
-                if (v1Backup) {
-                  window._claYearly = v1Backup.yearly;
-                  window._claQuarterly = v1Backup.quarterly;
-                  if (typeof renderCLAArchiveView === 'function') renderCLAArchiveView();
-                }
-              }
-            });
-          })();
-          </script>
+          <!-- v2 toggle is handled in main script after loadCLAArchive completes -->
         </div>
         <div id="claArchiveView">
           <div class="loading-indicator"><div class="loading-spinner loading-spinner-sm"></div><div>読み込み中...</div></div>
@@ -5063,45 +5009,10 @@
       return count;
     };
 
-    // CLA v2 — Thompson Motif-Index enriched version
-    let claV2Data = null;
-    let claCurrentVersion = 'v1';
+    // CLA v2 toggle is set up inside loadCLAArchive() after v1 data loads
+    // (old renderCLAV2 removed — v2 now uses same renderCLAArchiveView as v1)
 
-    function setCLAVersion(ver) {
-      claCurrentVersion = ver;
-      var v1Btn = document.getElementById('claVerV1');
-      var v2Btn = document.getElementById('claVerV2');
-      var v1View = document.getElementById('claArchiveView');
-      var v2View = document.getElementById('claV2View');
-
-      if (ver === 'v2') {
-        v1Btn.style.background = 'transparent'; v1Btn.style.color = 'var(--text-secondary)';
-        v2Btn.style.background = 'var(--accent)'; v2Btn.style.color = '#fff';
-        v1View.style.display = 'none';
-        v2View.style.display = 'block';
-        if (!claV2Data) loadCLAV2();
-      } else {
-        v2Btn.style.background = 'transparent'; v2Btn.style.color = 'var(--text-secondary)';
-        v1Btn.style.background = 'var(--accent)'; v1Btn.style.color = '#fff';
-        v1View.style.display = 'block';
-        v2View.style.display = 'none';
-      }
-    }
-
-    async function loadCLAV2() {
-      var el = document.getElementById('claV2View');
-      el.innerHTML = '<div class="loading-indicator"><div class="loading-spinner loading-spinner-sm"></div><div>v2データを読み込み中...</div></div>';
-
-      try {
-        var data = await _fetchLocalJSON('data/cla_v2.json');
-        if (!data || !data.entries) throw new Error('No data');
-        claV2Data = data;
-        renderCLAV2(data);
-      } catch (e) {
-        el.innerHTML = '<p class="text-muted">v2データの読み込みに失敗しました。</p>';
-      }
-    }
-
+    function _REMOVED_renderCLAV2(data) { /* removed */ }
     function renderCLAV2(data) {
       var el = document.getElementById('claV2View');
       var entries = data.entries || [];
@@ -5325,8 +5236,56 @@
         window._claYearly = yearly;
         window._claQuarterly = quarterly;
         window._claMeta = metaData;
+        // Backup v1 data for version toggle
+        window._claV1Backup = { yearly: yearly.slice(), quarterly: quarterly.slice() };
 
         renderCLAArchiveView();
+
+        // Setup v2 toggle now that rendering is ready
+        var toggle = document.getElementById('claVersionToggle');
+        if (toggle && !toggle._bound) {
+          toggle._bound = true;
+          toggle.addEventListener('click', function(e) {
+            var btn = e.target.closest('[data-claver]');
+            if (!btn) return;
+            var ver = btn.getAttribute('data-claver');
+            var v1B = document.getElementById('claVerV1');
+            var v2B = document.getElementById('claVerV2');
+
+            if (ver === 'v2') {
+              v1B.style.background='transparent'; v1B.style.color='var(--text-secondary)';
+              v2B.style.background='var(--accent)'; v2B.style.color='#fff';
+
+              if (window._claV2Loaded) {
+                window._claYearly = window._claV2Loaded.entries || [];
+                window._claQuarterly = [];
+                renderCLAArchiveView();
+              } else {
+                var av = document.getElementById('claArchiveView');
+                av.innerHTML = '<div class="loading-indicator"><div class="loading-spinner loading-spinner-sm"></div><div>v2データを読み込み中...</div></div>';
+                fetch('data/cla_v2.json?v=' + Date.now())
+                  .then(function(r) { return r.json(); })
+                  .then(function(d) {
+                    window._claV2Loaded = d;
+                    window._claYearly = d.entries || [];
+                    window._claQuarterly = [];
+                    renderCLAArchiveView();
+                  })
+                  .catch(function() {
+                    av.innerHTML = '<p style="padding:20px;color:var(--text-muted)">v2データの読み込みに失敗しました。</p>';
+                  });
+              }
+            } else {
+              v2B.style.background='transparent'; v2B.style.color='var(--text-secondary)';
+              v1B.style.background='var(--accent)'; v1B.style.color='#fff';
+              if (window._claV1Backup) {
+                window._claYearly = window._claV1Backup.yearly;
+                window._claQuarterly = window._claV1Backup.quarterly;
+                renderCLAArchiveView();
+              }
+            }
+          });
+        }
       } catch (e) { console.error('CLA archive load error:', e); }
     }
 
