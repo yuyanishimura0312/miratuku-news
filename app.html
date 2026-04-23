@@ -3196,6 +3196,30 @@
         <div class="loading-indicator"><div class="loading-spinner"></div><div>CLA分析を読み込み中...</div></div>
       </div>
 
+      <!-- CLA Deep Layer Enhancement -->
+      <div id="claDeepLayer" style="margin-top:1.5rem">
+        <details class="report-card" id="claDeepDetails">
+          <summary class="report-summary">
+            <span class="report-chevron">&#9654;</span>
+            <span class="report-label">CLA深層データ分析</span>
+            <span class="report-count">Ngram・スーパーノード・社会指標・神話</span>
+          </summary>
+          <div class="report-body">
+            <!-- Tab navigation -->
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;border-bottom:1px solid var(--border-light);padding-bottom:10px">
+              <button class="cla-deep-tab active" onclick="switchCLADeepTab('ngram')" data-tab="ngram" style="padding:6px 14px;border:1px solid var(--border-light);border-radius:6px;background:var(--accent);color:#fff;cursor:pointer;font-size:13px;font-weight:600">概念トレンド</button>
+              <button class="cla-deep-tab" onclick="switchCLADeepTab('network')" data-tab="network" style="padding:6px 14px;border:1px solid var(--border-light);border-radius:6px;background:transparent;color:var(--text-secondary);cursor:pointer;font-size:13px">スーパーノード</button>
+              <button class="cla-deep-tab" onclick="switchCLADeepTab('evidence')" data-tab="evidence" style="padding:6px 14px;border:1px solid var(--border-light);border-radius:6px;background:transparent;color:var(--text-secondary);cursor:pointer;font-size:13px">社会指標</button>
+              <button class="cla-deep-tab" onclick="switchCLADeepTab('myth')" data-tab="myth" style="padding:6px 14px;border:1px solid var(--border-light);border-radius:6px;background:transparent;color:var(--text-secondary);cursor:pointer;font-size:13px">神話マッピング</button>
+            </div>
+            <div id="claDeepNgram" class="cla-deep-panel"></div>
+            <div id="claDeepNetwork" class="cla-deep-panel" style="display:none"></div>
+            <div id="claDeepEvidence" class="cla-deep-panel" style="display:none"></div>
+            <div id="claDeepMyth" class="cla-deep-panel" style="display:none"></div>
+          </div>
+        </details>
+      </div>
+
       <div id="claArchive" style="margin-top:1.5rem">
         <h2 class="section-title">CLA 変遷アーカイブ（1990-2026）</h2>
         <div id="claArchiveView">
@@ -3889,6 +3913,7 @@
           renderAlerts(alerts);
           renderHomeDashboard(dailyReport, latest, aiAnalysis, papers, insightReports);
           renderCLASummary(aiAnalysis);
+          loadCLADeepData();
           renderSignals(aiAnalysis);
           renderPapers(papers);
           renderMediaSources(mediaSources);
@@ -4540,6 +4565,278 @@
       html += '</div></div></details>';
       container.innerHTML = html;
       loadCLAArchive();
+    }
+
+    // ==============================================================
+    // CLA DEEP LAYER ENHANCEMENT
+    // ==============================================================
+    let claDeepData = {};
+
+    function switchCLADeepTab(tab) {
+      document.querySelectorAll('.cla-deep-tab').forEach(b => {
+        b.style.background = 'transparent'; b.style.color = 'var(--text-secondary)';
+        b.classList.remove('active');
+      });
+      const btn = document.querySelector(`.cla-deep-tab[data-tab="${tab}"]`);
+      if (btn) { btn.style.background = 'var(--accent)'; btn.style.color = '#fff'; btn.classList.add('active'); }
+      document.querySelectorAll('.cla-deep-panel').forEach(p => p.style.display = 'none');
+      const panel = document.getElementById('claDeep' + tab.charAt(0).toUpperCase() + tab.slice(1));
+      if (panel) panel.style.display = 'block';
+    }
+
+    async function loadCLADeepData() {
+      try {
+        const [ngram, network, evidence, myth] = await Promise.all([
+          fetchJSON('data/cla_ngram_overlay.json').catch(() => null),
+          fetchJSON('data/signal_network.json').catch(() => null),
+          fetchJSON('data/cla_evidence.json').catch(() => null),
+          fetchJSON('data/cla_myth_mapping.json').catch(() => null)
+        ]);
+        claDeepData = { ngram, network, evidence, myth };
+        if (ngram) renderNgramOverlay(ngram);
+        if (network) renderSignalNetwork(network);
+        if (evidence) renderCLAEvidence(evidence);
+        if (myth) renderMythMapping(myth);
+      } catch (e) { console.error('CLA deep data load error:', e); }
+    }
+
+    function renderNgramOverlay(data) {
+      const el = document.getElementById('claDeepNgram');
+      if (!data?.concepts) { el.innerHTML = '<p class="text-muted">Ngramデータなし</p>'; return; }
+
+      const groups = {};
+      Object.entries(data.concepts).forEach(([name, info]) => {
+        const cat = info.pestle_category || 'Other';
+        if (!groups[cat]) groups[cat] = [];
+        groups[cat].push({ name, ...info });
+      });
+
+      // Sort each group by trend magnitude
+      Object.values(groups).forEach(g => g.sort((a, b) => Math.abs(b.trend_10yr || 0) - Math.abs(a.trend_10yr || 0)));
+
+      const catColors = { Political: '#2563eb', Economic: '#d97706', Social: '#8b5cf6', Technological: '#dc2626', Environmental: '#16a34a', Mythological: '#78350f' };
+
+      let html = '<div style="margin-bottom:12px"><div class="fs-label" style="font-weight:700;margin-bottom:4px">Google Ngram 概念頻度トレンド（1950-2022）</div>';
+      html += '<div class="fs-caption" style="color:var(--text-muted)">書籍コーパスにおける概念の使用頻度変化。CLA世界観層・神話層の定量的裏付け</div></div>';
+
+      Object.entries(groups).forEach(([cat, concepts]) => {
+        const color = catColors[cat] || '#64748b';
+        html += `<div style="margin-bottom:16px"><div class="fs-meta" style="font-weight:700;color:${color};margin-bottom:8px">${cat}</div>`;
+        html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:8px">';
+        concepts.forEach(c => {
+          const trend = c.trend_10yr || 0;
+          const arrow = trend > 0 ? '↑' : trend < 0 ? '↓' : '→';
+          const trendColor = trend > 10 ? '#16a34a' : trend < -10 ? '#dc2626' : '#64748b';
+          // Mini sparkline from data
+          const vals = (c.data || []).map(d => d.freq);
+          const sparkSvg = buildSparkline(vals, color, 120, 24);
+          html += `<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--card-bg);border:1px solid var(--border-light);border-radius:6px">`;
+          html += `<div style="flex:1;min-width:0"><div class="fs-body-sm" style="font-weight:600">${c.name}</div>`;
+          html += `<div class="fs-caption" style="color:${trendColor};font-weight:700">${arrow} ${trend > 0 ? '+' : ''}${trend.toFixed(1)}%</div></div>`;
+          html += `<div>${sparkSvg}</div></div>`;
+        });
+        html += '</div></div>';
+      });
+      el.innerHTML = html;
+    }
+
+    function buildSparkline(values, color, width, height) {
+      if (!values || values.length < 2) return '';
+      const min = Math.min(...values.filter(v => v > 0));
+      const max = Math.max(...values);
+      const range = max - min || 1;
+      const step = width / (values.length - 1);
+      let path = '';
+      values.forEach((v, i) => {
+        const x = i * step;
+        const y = height - ((v - min) / range) * (height - 2) - 1;
+        path += (i === 0 ? 'M' : 'L') + x.toFixed(1) + ',' + y.toFixed(1);
+      });
+      return `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><path d="${path}" fill="none" stroke="${color}" stroke-width="1.5" opacity="0.7"/></svg>`;
+    }
+
+    function renderSignalNetwork(data) {
+      const el = document.getElementById('claDeepNetwork');
+      if (!data?.nodes) { el.innerHTML = '<p class="text-muted">ネットワークデータなし</p>'; return; }
+
+      const stats = data.stats || {};
+      const supernodes = data.nodes.filter(n => n.is_supernode);
+      const clusterInfo = data.clusters || {};
+
+      let html = '<div style="margin-bottom:12px"><div class="fs-label" style="font-weight:700;margin-bottom:4px">シグナル・スーパーノード・ネットワーク</div>';
+      html += '<div class="fs-caption" style="color:var(--text-muted)">シグナル間のクロスインパクト分析。高媒介中心性ノードが複数ドメインを横断するカスケードのハブ</div></div>';
+
+      // Stats bar
+      html += '<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px">';
+      html += `<div style="padding:8px 14px;background:var(--card-bg);border:1px solid var(--border-light);border-radius:6px;text-align:center"><div class="fs-body-sm" style="font-weight:700;color:var(--accent)">${stats.total_nodes || 0}</div><div class="fs-caption">シグナル</div></div>`;
+      html += `<div style="padding:8px 14px;background:var(--card-bg);border:1px solid var(--border-light);border-radius:6px;text-align:center"><div class="fs-body-sm" style="font-weight:700;color:var(--accent)">${stats.total_edges || 0}</div><div class="fs-caption">影響関係</div></div>`;
+      html += `<div style="padding:8px 14px;background:var(--card-bg);border:1px solid var(--border-light);border-radius:6px;text-align:center"><div class="fs-body-sm" style="font-weight:700;color:#dc2626">${stats.supernodes || 0}</div><div class="fs-caption">スーパーノード</div></div>`;
+      html += `<div style="padding:8px 14px;background:var(--card-bg);border:1px solid var(--border-light);border-radius:6px;text-align:center"><div class="fs-body-sm" style="font-weight:700;color:var(--accent)">${stats.llm_evaluated_edges || 0}</div><div class="fs-caption">LLM精密評価</div></div>`;
+      html += '</div>';
+
+      // Cluster overview
+      html += '<div class="fs-meta" style="font-weight:700;margin-bottom:8px">クラスター構造</div>';
+      html += '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">';
+      Object.entries(clusterInfo).forEach(([id, cl]) => {
+        html += `<div style="display:flex;align-items:center;gap:6px;padding:6px 12px;background:var(--card-bg);border:1px solid var(--border-light);border-radius:6px">`;
+        html += `<div style="width:10px;height:10px;border-radius:50%;background:${cl.color}"></div>`;
+        html += `<span class="fs-body-sm" style="font-weight:600">${cl.label}</span>`;
+        html += `<span class="fs-caption">${cl.size}件</span>`;
+        if (cl.supernodes > 0) html += `<span class="fs-caption" style="color:#dc2626;font-weight:700">★${cl.supernodes}</span>`;
+        html += '</div>';
+      });
+      html += '</div>';
+
+      // Supernodes detail
+      if (supernodes.length > 0) {
+        html += '<div class="fs-meta" style="font-weight:700;margin-bottom:8px;color:#dc2626">スーパーノード（カスケード・ハブ）</div>';
+        html += '<div style="display:flex;flex-direction:column;gap:8px">';
+        supernodes.sort((a, b) => b.betweenness - a.betweenness);
+        supernodes.forEach((sn, i) => {
+          const clColor = clusterInfo[sn.cluster_id]?.color || '#64748b';
+          html += `<div style="padding:12px 16px;background:var(--card-bg);border:1px solid var(--border-light);border-left:3px solid ${clColor};border-radius:6px">`;
+          html += `<div class="fs-body-sm" style="font-weight:700">${i + 1}. ${sn.name}</div>`;
+          html += `<div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:6px">`;
+          html += `<span class="fs-caption" style="background:var(--cla-${sn.cla_depth === 'worldview' ? 3 : sn.cla_depth === 'myth' ? 4 : sn.cla_depth === 'systemic' ? 2 : 1});padding:2px 8px;border-radius:4px">${sn.cla_depth}</span>`;
+          html += `<span class="fs-caption">PESTLE: ${sn.pestle_categories.join(', ')}</span>`;
+          html += `<span class="fs-caption">媒介中心性: ${sn.betweenness.toFixed(3)}</span>`;
+          html += `<span class="fs-caption">Score: ${sn.composite_score}</span>`;
+          html += '</div></div>';
+        });
+        html += '</div>';
+      }
+
+      // Top cross-impacts
+      const llmEdges = data.edges.filter(e => e.is_llm).sort((a, b) => Math.abs(b.impact_score) - Math.abs(a.impact_score)).slice(0, 10);
+      if (llmEdges.length > 0) {
+        const nodeMap = {};
+        data.nodes.forEach(n => nodeMap[n.id] = n.name);
+        html += '<div style="margin-top:16px"><div class="fs-meta" style="font-weight:700;margin-bottom:8px">主要な影響連鎖（LLM評価）</div>';
+        html += '<div style="display:flex;flex-direction:column;gap:4px">';
+        llmEdges.forEach(e => {
+          const scoreColor = e.impact_score > 0 ? '#16a34a' : '#dc2626';
+          const typeLabel = { amplify: '増幅', inhibit: '抑制', transform: '変質', catalyze: '触媒', neutral: '中立' }[e.impact_type] || e.impact_type;
+          html += `<div class="fs-caption" style="padding:4px 8px;background:var(--card-bg);border-radius:4px">`;
+          html += `<span style="color:${scoreColor};font-weight:700">[${e.impact_score > 0 ? '+' : ''}${e.impact_score.toFixed(1)} ${typeLabel}]</span> `;
+          html += `${(nodeMap[e.source] || '?').substring(0, 30)} → ${(nodeMap[e.target] || '?').substring(0, 30)}`;
+          html += '</div>';
+        });
+        html += '</div></div>';
+      }
+
+      el.innerHTML = html;
+    }
+
+    function renderCLAEvidence(data) {
+      const el = document.getElementById('claDeepEvidence');
+      if (!data?.indicators_by_pestle) { el.innerHTML = '<p class="text-muted">社会指標データなし</p>'; return; }
+
+      const catColors = { Political: '#2563eb', Economic: '#d97706', Social: '#8b5cf6', Technological: '#dc2626', Environmental: '#16a34a' };
+
+      let html = '<div style="margin-bottom:12px"><div class="fs-label" style="font-weight:700;margin-bottom:4px">社会指標エビデンス（World Bank + HDI）</div>';
+      html += '<div class="fs-caption" style="color:var(--text-muted)">CLA各層の定量的裏付け。10指標×8カ国×35年の時系列データ</div></div>';
+
+      // HDI highlight
+      if (data.hdi_summary) {
+        html += '<div style="margin-bottom:16px"><div class="fs-meta" style="font-weight:700;margin-bottom:8px">人間開発指数（HDI）推移</div>';
+        html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px">';
+        Object.entries(data.hdi_summary).forEach(([cc, vals]) => {
+          const latest = vals[vals.length - 1];
+          const first = vals[0];
+          const change = latest && first ? ((latest.value - first.value) / first.value * 100).toFixed(1) : '?';
+          const spark = buildSparkline(vals.map(v => v.value), '#8b5cf6', 80, 20);
+          html += `<div style="padding:8px;background:var(--card-bg);border:1px solid var(--border-light);border-radius:6px;text-align:center">`;
+          html += `<div class="fs-meta" style="font-weight:700">${cc}</div>`;
+          html += `<div class="fs-caption">${latest?.value?.toFixed(3) || '?'} <span style="color:${parseFloat(change) > 0 ? '#16a34a' : '#dc2626'}">(${change}%)</span></div>`;
+          html += `<div style="margin-top:4px">${spark}</div></div>`;
+        });
+        html += '</div></div>';
+      }
+
+      // Indicators by PESTLE
+      Object.entries(data.indicators_by_pestle).forEach(([pestle, indicators]) => {
+        const color = catColors[pestle] || '#64748b';
+        html += `<div style="margin-bottom:16px"><div class="fs-meta" style="font-weight:700;color:${color};margin-bottom:8px">${pestle}</div>`;
+        indicators.forEach(ind => {
+          html += `<div style="margin-bottom:8px;padding:8px 12px;background:var(--card-bg);border:1px solid var(--border-light);border-radius:6px">`;
+          html += `<div class="fs-body-sm" style="font-weight:600;margin-bottom:6px">${ind.name}</div>`;
+          html += '<div style="display:flex;gap:8px;flex-wrap:wrap">';
+          Object.entries(ind.countries).forEach(([cc, vals]) => {
+            if (vals.length === 0) return;
+            const latest = vals[vals.length - 1];
+            const spark = buildSparkline(vals.map(v => v.value), color, 60, 16);
+            html += `<div style="display:flex;align-items:center;gap:4px"><span class="fs-caption" style="font-weight:600;width:28px">${cc.substring(0, 3)}</span>${spark}<span class="fs-caption">${typeof latest?.value === 'number' ? (latest.value > 1000 ? (latest.value / 1000).toFixed(0) + 'K' : latest.value.toFixed(1)) : '?'}</span></div>`;
+          });
+          html += '</div></div>';
+        });
+        html += '</div>';
+      });
+
+      el.innerHTML = html;
+    }
+
+    function renderMythMapping(data) {
+      const el = document.getElementById('claDeepMyth');
+      if (!data?.thompson_summary) { el.innerHTML = '<p class="text-muted">神話データなし</p>'; return; }
+
+      let html = '<div style="margin-bottom:12px"><div class="fs-label" style="font-weight:700;margin-bottom:4px">神話パターンマッピング</div>';
+      html += '<div class="fs-caption" style="color:var(--text-muted)">Thompson Motif-Index（45,496モチーフ）+ UNESCO無形文化遺産（849件）とCLA神話層の接続</div></div>';
+
+      // Thompson category treemap (horizontal bars)
+      const cats = Object.entries(data.thompson_summary).sort((a, b) => b[1].count - a[1].count);
+      const maxCount = cats[0]?.[1]?.count || 1;
+      const thomColors = ['#dc2626', '#d97706', '#16a34a', '#2563eb', '#8b5cf6', '#ec4899', '#14b8a6', '#f59e0b', '#6366f1', '#10b981', '#f43f5e', '#0ea5e9'];
+
+      html += '<div class="fs-meta" style="font-weight:700;margin-bottom:8px">Thompson Motif-Index カテゴリ分布</div>';
+      html += '<div style="display:flex;flex-direction:column;gap:3px;margin-bottom:16px">';
+      cats.forEach(([cat, info], i) => {
+        const pct = (info.count / maxCount * 100).toFixed(0);
+        const color = thomColors[i % thomColors.length];
+        html += `<div style="display:flex;align-items:center;gap:8px">`;
+        html += `<div class="fs-caption" style="width:180px;text-align:right;flex-shrink:0">${cat} ${info.name_en || ''}</div>`;
+        html += `<div style="flex:1;height:18px;background:var(--border-light);border-radius:3px;overflow:hidden"><div style="width:${pct}%;height:100%;background:${color};border-radius:3px;transition:width 0.5s"></div></div>`;
+        html += `<div class="fs-caption" style="width:50px;flex-shrink:0">${info.count.toLocaleString()}</div>`;
+        html += '</div>';
+      });
+      html += '</div>';
+
+      // CLA → Thompson keyword mapping
+      if (data.keyword_to_thompson) {
+        html += '<div class="fs-meta" style="font-weight:700;margin-bottom:8px">CLA神話キーワード → Thompson分類マッピング</div>';
+        html += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px">';
+        Object.entries(data.keyword_to_thompson).forEach(([kw, categories]) => {
+          html += `<div style="padding:4px 10px;background:var(--card-bg);border:1px solid var(--border-light);border-radius:12px;font-size:12px">`;
+          html += `<span style="font-weight:600">${kw}</span> → <span style="color:var(--text-muted)">${categories.join(',')}</span></div>`;
+        });
+        html += '</div>';
+      }
+
+      // Connection guide example
+      if (data.cla_myth_connection_guide?.example) {
+        const ex = data.cla_myth_connection_guide.example;
+        html += '<div style="padding:12px 16px;background:var(--cla-4);border:1px solid var(--border-light);border-radius:8px;margin-bottom:16px">';
+        html += '<div class="fs-meta" style="font-weight:700;margin-bottom:6px">接続例</div>';
+        html += `<div class="fs-body-sm" style="margin-bottom:4px"><strong>CLAテキスト:</strong> ${escapeHtml(ex.cla_text)}</div>`;
+        html += `<div class="fs-caption" style="margin-bottom:2px"><strong>マッチキーワード:</strong> ${ex.matched_keywords.join(', ')}</div>`;
+        html += `<div class="fs-caption" style="margin-bottom:2px"><strong>Thompson分類:</strong> ${ex.thompson_categories.join(', ')}</div>`;
+        html += `<div class="fs-caption" style="color:var(--accent)"><strong>解釈:</strong> ${escapeHtml(ex.interpretation)}</div>`;
+        html += '</div>';
+      }
+
+      // UNESCO ICH
+      if (data.unesco_ich) {
+        html += '<div class="fs-meta" style="font-weight:700;margin-bottom:8px">UNESCO無形文化遺産（生きた神話的実践）</div>';
+        html += `<div class="fs-caption" style="margin-bottom:8px">全${data.unesco_ich.total}件の無形文化遺産データ</div>`;
+        if (data.unesco_ich.archetype_distribution) {
+          html += '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">';
+          Object.entries(data.unesco_ich.archetype_distribution).sort((a, b) => b[1] - a[1]).forEach(([tag, count]) => {
+            html += `<span style="padding:3px 10px;background:var(--card-bg);border:1px solid var(--border-light);border-radius:12px;font-size:11px">${tag} <strong>${count}</strong></span>`;
+          });
+          html += '</div>';
+        }
+      }
+
+      el.innerHTML = html;
     }
 
     // CLA Firestore import — callable from console or admin: importCLAToFirestore()
