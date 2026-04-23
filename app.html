@@ -3221,10 +3221,17 @@
       </div>
 
       <div id="claArchive" style="margin-top:1.5rem">
-        <h2 class="section-title">CLA 変遷アーカイブ（1990-2026）</h2>
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap">
+          <h2 class="section-title" style="margin:0">CLA 変遷アーカイブ</h2>
+          <div id="claVersionToggle" style="display:flex;gap:4px;margin-left:auto">
+            <button onclick="setCLAVersion('v1')" id="claVerV1" style="padding:5px 14px;border:1px solid var(--border-light);border-radius:6px;background:var(--accent);color:#fff;cursor:pointer;font-size:12px;font-weight:600">v1 従来版</button>
+            <button onclick="setCLAVersion('v2')" id="claVerV2" style="padding:5px 14px;border:1px solid var(--border-light);border-radius:6px;background:transparent;color:var(--text-secondary);cursor:pointer;font-size:12px">v2 神話学的深層強化版</button>
+          </div>
+        </div>
         <div id="claArchiveView">
           <div class="loading-indicator"><div class="loading-spinner loading-spinner-sm"></div><div>読み込み中...</div></div>
         </div>
+        <div id="claV2View" style="display:none"></div>
       </div>
     </section>
 
@@ -5001,6 +5008,182 @@
       console.log('CLA import complete! ' + count + ' historical + meta reports');
       return count;
     };
+
+    // CLA v2 — Thompson Motif-Index enriched version
+    let claV2Data = null;
+    let claCurrentVersion = 'v1';
+
+    function setCLAVersion(ver) {
+      claCurrentVersion = ver;
+      var v1Btn = document.getElementById('claVerV1');
+      var v2Btn = document.getElementById('claVerV2');
+      var v1View = document.getElementById('claArchiveView');
+      var v2View = document.getElementById('claV2View');
+
+      if (ver === 'v2') {
+        v1Btn.style.background = 'transparent'; v1Btn.style.color = 'var(--text-secondary)';
+        v2Btn.style.background = 'var(--accent)'; v2Btn.style.color = '#fff';
+        v1View.style.display = 'none';
+        v2View.style.display = 'block';
+        if (!claV2Data) loadCLAV2();
+      } else {
+        v2Btn.style.background = 'transparent'; v2Btn.style.color = 'var(--text-secondary)';
+        v1Btn.style.background = 'var(--accent)'; v1Btn.style.color = '#fff';
+        v1View.style.display = 'block';
+        v2View.style.display = 'none';
+      }
+    }
+
+    async function loadCLAV2() {
+      var el = document.getElementById('claV2View');
+      el.innerHTML = '<div class="loading-indicator"><div class="loading-spinner loading-spinner-sm"></div><div>v2データを読み込み中...</div></div>';
+
+      try {
+        var data = await _fetchLocalJSON('data/cla_v2.json');
+        if (!data || !data.entries) throw new Error('No data');
+        claV2Data = data;
+        renderCLAV2(data);
+      } catch (e) {
+        el.innerHTML = '<p class="text-muted">v2データの読み込みに失敗しました。</p>';
+      }
+    }
+
+    function renderCLAV2(data) {
+      var el = document.getElementById('claV2View');
+      var entries = data.entries || [];
+      var snTypes = data.supernode_types || {};
+
+      // Decade grouping
+      var decades = {};
+      entries.forEach(function(e) {
+        var dec = e.period.substring(0, 3) + '0s';
+        if (e.period === '2025') dec = '2020s';
+        if (!decades[dec]) decades[dec] = [];
+        decades[dec].push(e);
+      });
+
+      var catColors = {Political:'var(--P)',Economic:'var(--E)',Social:'var(--S)',Technological:'var(--T)',Legal:'var(--L)',Environmental:'var(--En)'};
+      var catJa = {Political:'政治',Economic:'経済',Social:'社会',Technological:'技術',Legal:'法律',Environmental:'環境'};
+      var layerLabels = [
+        {key:'litany',label:'リタニー',color:'#92400e'},
+        {key:'systemic_causes',label:'社会的原因',color:'#1e40af'},
+        {key:'worldview',label:'世界観',color:'#5b21b6'},
+        {key:'myth_metaphor',label:'神話・メタファー',color:'#9d174d'},
+        {key:'key_tension',label:'核心的緊張',color:'#991b1b'},
+        {key:'emerging_narrative',label:'新たな物語',color:'#065f46'},
+      ];
+
+      var snColors = {'危機':'#dc2626','主権秩序':'#2563eb','経済構造':'#d97706','構造的':'#6b635b','社会分裂':'#8b5cf6','技術権力':'#f59e0b'};
+
+      var html = '';
+
+      // Summary bar
+      html += '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">';
+      html += '<div style="padding:6px 14px;background:var(--card-bg);border:1px solid var(--border-light);border-radius:6px;font-size:12px"><strong>' + entries.length + '</strong> 年</div>';
+      html += '<div style="padding:6px 14px;background:var(--card-bg);border:1px solid var(--border-light);border-radius:6px;font-size:12px"><strong>' + (entries.length * 6) + '</strong> 分析</div>';
+      Object.entries(snColors).forEach(function(kv) {
+        var type = kv[0], color = kv[1];
+        var count = (snTypes[type] || {}).years ? snTypes[type].years.length : 0;
+        if (count > 0) {
+          html += '<div style="padding:6px 14px;background:var(--card-bg);border:1px solid var(--border-light);border-radius:6px;font-size:12px;display:flex;align-items:center;gap:4px">';
+          html += '<span style="width:8px;height:8px;border-radius:50%;background:' + color + '"></span>' + type + ' <strong>' + count + '</strong></div>';
+        }
+      });
+      html += '</div>';
+
+      // Year selector
+      html += '<div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border-light)">';
+      entries.forEach(function(e, i) {
+        var sn = e.supernode || {};
+        var snColor = snColors[sn.type] || '#6b635b';
+        var active = i === 0 ? 'background:' + snColor + ';color:#fff;border-color:' + snColor : '';
+        html += '<button class="clav2-year-btn" data-idx="' + i + '" style="padding:4px 10px;border:1px solid var(--border-light);border-radius:5px;background:transparent;color:var(--text-secondary);cursor:pointer;font-size:11px;font-weight:600;border-bottom:3px solid ' + snColor + ';' + active + '" onclick="showCLAV2Year(' + i + ')">' + e.period + '</button>';
+      });
+      html += '</div>';
+
+      // Year panels
+      entries.forEach(function(e, i) {
+        var sn = e.supernode || {};
+        var snColor = snColors[sn.type] || '#6b635b';
+        var display = i === 0 ? 'block' : 'none';
+
+        html += '<div class="clav2-year-panel" id="clav2p-' + i + '" style="display:' + display + '">';
+
+        // Supernode banner
+        html += '<div style="padding:10px 16px;background:var(--card-bg);border:1px solid var(--border-light);border-left:4px solid ' + snColor + ';border-radius:8px;margin-bottom:12px;display:flex;align-items:center;gap:10px">';
+        html += '<span style="width:10px;height:10px;border-radius:50%;background:' + snColor + ';flex-shrink:0"></span>';
+        html += '<div><div class="fs-meta" style="font-weight:700;color:' + snColor + '">' + (sn.type || '') + '</div>';
+        html += '<div class="fs-caption" style="color:var(--text-muted)">' + (sn.description || '') + '</div></div></div>';
+
+        // Category tabs
+        var cats = Object.keys(e.categories || {});
+        var catOrder = ['Political','Economic','Social','Technological','Legal','Environmental'];
+        cats.sort(function(a,b) { return catOrder.indexOf(a) - catOrder.indexOf(b); });
+
+        html += '<div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:12px">';
+        cats.forEach(function(cat, ci) {
+          var color = catColors[cat] || 'var(--accent)';
+          var st = ci === 0 ? 'background:' + color + ';color:#fff' : '';
+          html += '<button class="clav2-cat-btn" data-yi="' + i + '" data-cat="' + cat + '" style="padding:5px 12px;border:1px solid var(--border-light);border-radius:6px;background:transparent;color:var(--text-secondary);cursor:pointer;font-size:12px;font-weight:600;' + st + '" onclick="showCLAV2Cat(' + i + ',\'' + cat + '\',this)">' + (catJa[cat] || cat) + '</button>';
+        });
+        html += '</div>';
+
+        // Category panels
+        cats.forEach(function(cat, ci) {
+          var catData = e.categories[cat] || {};
+          var cdisplay = ci === 0 ? 'block' : 'none';
+
+          html += '<div class="clav2-cat-panel" data-yi="' + i + '" data-cat="' + cat + '" style="display:' + cdisplay + '">';
+          html += '<div style="background:var(--card-bg);border:1px solid var(--border-light);border-radius:10px;overflow:hidden">';
+
+          layerLabels.forEach(function(layer, li) {
+            var text = catData[layer.key] || '';
+            if (!text) return;
+            html += '<div style="padding:12px 16px;border-bottom:1px solid var(--border-light)">';
+            html += '<div class="fs-label" style="font-weight:700;color:' + layer.color + ';margin-bottom:3px;font-size:11px;text-transform:uppercase;letter-spacing:0.04em">' + layer.label + '</div>';
+            html += '<div class="fs-body-sm" style="line-height:1.85">' + escapeHtml(text) + '</div>';
+            html += '</div>';
+          });
+
+          html += '</div></div>';
+        });
+
+        html += '</div>';
+      });
+
+      html += '<div style="margin-top:16px;padding:12px 16px;background:var(--card-bg);border:1px solid var(--border-light);border-radius:8px;font-size:11px;color:var(--text-muted)">';
+      html += '<strong>CLA v2</strong> — Thompson Motif-Index (45,496モチーフ) + Google Ngram (20概念) + World Bank社会指標 + 年別スーパーノード分析。';
+      html += ' 学術的根拠: Wahab(2024), Inayatullah(2024-2025), Sustainability Science(2025)。</div>';
+
+      el.innerHTML = html;
+    }
+
+    function showCLAV2Year(idx) {
+      document.querySelectorAll('.clav2-year-btn').forEach(function(b) {
+        b.style.background = 'transparent'; b.style.color = 'var(--text-secondary)';
+      });
+      var btn = document.querySelector('.clav2-year-btn[data-idx="' + idx + '"]');
+      if (btn) {
+        var snColors = {'危機':'#dc2626','主権秩序':'#2563eb','経済構造':'#d97706','構造的':'#6b635b','社会分裂':'#8b5cf6','技術権力':'#f59e0b'};
+        var entry = claV2Data.entries[idx];
+        var snColor = snColors[(entry.supernode || {}).type] || '#6b635b';
+        btn.style.background = snColor; btn.style.color = '#fff'; btn.style.borderColor = snColor;
+      }
+      document.querySelectorAll('.clav2-year-panel').forEach(function(p) { p.style.display = 'none'; });
+      var panel = document.getElementById('clav2p-' + idx);
+      if (panel) panel.style.display = 'block';
+    }
+
+    function showCLAV2Cat(yearIdx, cat, btn) {
+      var panel = document.getElementById('clav2p-' + yearIdx);
+      if (!panel) return;
+      panel.querySelectorAll('.clav2-cat-btn').forEach(function(b) { b.style.background = 'transparent'; b.style.color = 'var(--text-secondary)'; });
+      var catColors = {Political:'var(--P)',Economic:'var(--E)',Social:'var(--S)',Technological:'var(--T)',Legal:'var(--L)',Environmental:'var(--En)'};
+      btn.style.background = catColors[cat] || 'var(--accent)'; btn.style.color = '#fff';
+      panel.querySelectorAll('.clav2-cat-panel').forEach(function(p) { p.style.display = 'none'; });
+      var cp = panel.querySelector('.clav2-cat-panel[data-cat="' + cat + '"]');
+      if (cp) cp.style.display = 'block';
+    }
 
     // CLA Archive — tries Firestore first, falls back to static JSON
     async function loadCLAArchive() {
