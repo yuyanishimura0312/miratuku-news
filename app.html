@@ -3224,9 +3224,37 @@
         <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap">
           <h2 class="section-title" style="margin:0">CLA 変遷アーカイブ</h2>
           <div id="claVersionToggle" style="display:flex;gap:4px;margin-left:auto">
-            <button onclick="setCLAVersion('v1')" id="claVerV1" style="padding:5px 14px;border:1px solid var(--border-light);border-radius:6px;background:var(--accent);color:#fff;cursor:pointer;font-size:12px;font-weight:600">v1 従来版</button>
-            <button onclick="setCLAVersion('v2')" id="claVerV2" style="padding:5px 14px;border:1px solid var(--border-light);border-radius:6px;background:transparent;color:var(--text-secondary);cursor:pointer;font-size:12px">v2 神話学的深層強化版</button>
+            <button data-claver="v1" id="claVerV1" style="padding:5px 14px;border:1px solid var(--border-light);border-radius:6px;background:var(--accent);color:#fff;cursor:pointer;font-size:12px;font-weight:600">v1 従来版</button>
+            <button data-claver="v2" id="claVerV2" style="padding:5px 14px;border:1px solid var(--border-light);border-radius:6px;background:transparent;color:var(--text-secondary);cursor:pointer;font-size:12px">v2 神話学的深層強化版</button>
           </div>
+          <script>
+          document.getElementById('claVersionToggle').addEventListener('click', function(e) {
+            var btn = e.target.closest('[data-claver]');
+            if (!btn) return;
+            var ver = btn.getAttribute('data-claver');
+            var v1Btn = document.getElementById('claVerV1');
+            var v2Btn = document.getElementById('claVerV2');
+            var v1View = document.getElementById('claArchiveView');
+            var v2View = document.getElementById('claV2View');
+            if (ver === 'v2') {
+              v1Btn.style.background = 'transparent'; v1Btn.style.color = 'var(--text-secondary)';
+              v2Btn.style.background = 'var(--accent)'; v2Btn.style.color = '#fff';
+              v1View.style.display = 'none'; v2View.style.display = 'block';
+              if (!v2View._loaded) {
+                v2View._loaded = true;
+                fetch('data/cla_v2.json?v=' + Date.now()).then(function(r){return r.json()}).then(function(data) {
+                  if (typeof renderCLAV2 === 'function') renderCLAV2(data);
+                  else v2View.innerHTML = '<p>v2レンダリング関数の読み込み待ち...</p>';
+                  window._claV2Data = data;
+                }).catch(function(){v2View.innerHTML='<p style="color:var(--text-muted)">v2データの読み込みに失敗しました。</p>'});
+              }
+            } else {
+              v2Btn.style.background = 'transparent'; v2Btn.style.color = 'var(--text-secondary)';
+              v1Btn.style.background = 'var(--accent)'; v1Btn.style.color = '#fff';
+              v1View.style.display = 'block'; v2View.style.display = 'none';
+            }
+          });
+          </script>
         </div>
         <div id="claArchiveView">
           <div class="loading-indicator"><div class="loading-spinner loading-spinner-sm"></div><div>読み込み中...</div></div>
@@ -5097,7 +5125,7 @@
         var sn = e.supernode || {};
         var snColor = snColors[sn.type] || '#6b635b';
         var active = i === 0 ? 'background:' + snColor + ';color:#fff;border-color:' + snColor : '';
-        html += '<button class="clav2-year-btn" data-idx="' + i + '" style="padding:4px 10px;border:1px solid var(--border-light);border-radius:5px;background:transparent;color:var(--text-secondary);cursor:pointer;font-size:11px;font-weight:600;border-bottom:3px solid ' + snColor + ';' + active + '" onclick="showCLAV2Year(' + i + ')">' + e.period + '</button>';
+        html += '<button class="clav2-year-btn" data-idx="' + i + '" data-sncolor="' + snColor + '" style="padding:4px 10px;border:1px solid var(--border-light);border-radius:5px;background:transparent;color:var(--text-secondary);cursor:pointer;font-size:11px;font-weight:600;border-bottom:3px solid ' + snColor + ';' + active + '">' + e.period + '</button>';
       });
       html += '</div>';
 
@@ -5124,7 +5152,7 @@
         cats.forEach(function(cat, ci) {
           var color = catColors[cat] || 'var(--accent)';
           var st = ci === 0 ? 'background:' + color + ';color:#fff' : '';
-          html += '<button class="clav2-cat-btn" data-yi="' + i + '" data-cat="' + cat + '" style="padding:5px 12px;border:1px solid var(--border-light);border-radius:6px;background:transparent;color:var(--text-secondary);cursor:pointer;font-size:12px;font-weight:600;' + st + '" onclick="showCLAV2Cat(' + i + ',\'' + cat + '\',this)">' + (catJa[cat] || cat) + '</button>';
+          html += '<button class="clav2-cat-btn" data-yi="' + i + '" data-cat="' + cat + '" style="padding:5px 12px;border:1px solid var(--border-light);border-radius:6px;background:transparent;color:var(--text-secondary);cursor:pointer;font-size:12px;font-weight:600;' + st + '">' + (catJa[cat] || cat) + '</button>';
         });
         html += '</div>';
 
@@ -5156,6 +5184,39 @@
       html += ' 学術的根拠: Wahab(2024), Inayatullah(2024-2025), Sustainability Science(2025)。</div>';
 
       el.innerHTML = html;
+
+      // Event delegation for year buttons
+      el.addEventListener('click', function(e) {
+        var yearBtn = e.target.closest('.clav2-year-btn');
+        if (yearBtn) {
+          var idx = parseInt(yearBtn.getAttribute('data-idx'));
+          el.querySelectorAll('.clav2-year-btn').forEach(function(b) {
+            b.style.background = 'transparent'; b.style.color = 'var(--text-secondary)';
+          });
+          var snColor = yearBtn.getAttribute('data-sncolor') || '#6b635b';
+          yearBtn.style.background = snColor; yearBtn.style.color = '#fff'; yearBtn.style.borderColor = snColor;
+          el.querySelectorAll('.clav2-year-panel').forEach(function(p) { p.style.display = 'none'; });
+          var panel = document.getElementById('clav2p-' + idx);
+          if (panel) panel.style.display = 'block';
+          return;
+        }
+
+        var catBtn = e.target.closest('.clav2-cat-btn');
+        if (catBtn) {
+          var yi = catBtn.getAttribute('data-yi');
+          var cat = catBtn.getAttribute('data-cat');
+          var yearPanel = document.getElementById('clav2p-' + yi);
+          if (!yearPanel) return;
+          yearPanel.querySelectorAll('.clav2-cat-btn').forEach(function(b) {
+            b.style.background = 'transparent'; b.style.color = 'var(--text-secondary)';
+          });
+          var catColors = {Political:'var(--P)',Economic:'var(--E)',Social:'var(--S)',Technological:'var(--T)',Legal:'var(--L)',Environmental:'var(--En)'};
+          catBtn.style.background = catColors[cat] || 'var(--accent)'; catBtn.style.color = '#fff';
+          yearPanel.querySelectorAll('.clav2-cat-panel').forEach(function(p) { p.style.display = 'none'; });
+          var cp = yearPanel.querySelector('.clav2-cat-panel[data-cat="' + cat + '"]');
+          if (cp) cp.style.display = 'block';
+        }
+      });
     }
 
     function showCLAV2Year(idx) {
