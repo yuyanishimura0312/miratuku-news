@@ -4667,35 +4667,20 @@
       }
     };
 
+    function _fetchLocalJSON(path) {
+      return fetch(path + '?v=' + Date.now()).then(r => r.ok ? r.json() : null).catch(() => null);
+    }
+
     async function loadCLADeepData() {
-      try {
-        const [ngram, network, evidence, myth] = await Promise.all([
-          fetchJSON('data/cla_ngram_overlay.json').catch(() => null),
-          fetchJSON('data/signal_network.json').catch(() => null),
-          fetchJSON('data/cla_evidence.json').catch(() => null),
-          fetchJSON('data/cla_myth_mapping.json').catch(() => null)
-        ]);
-        claDeepData = {
-          ngram: ngram || CLA_DEEP_SAMPLE.ngram,
-          network: network || CLA_DEEP_SAMPLE.network,
-          evidence: evidence,
-          myth: myth || CLA_DEEP_SAMPLE.myth
-        };
-        renderNgramOverlay(claDeepData.ngram);
-        renderSignalNetwork(claDeepData.network);
-        if (claDeepData.evidence) renderCLAEvidence(claDeepData.evidence);
-        renderMythMapping(claDeepData.myth);
-      } catch (e) {
-        console.error('CLA deep data load error:', e);
-        // Fallback to sample data
-        claDeepData = CLA_DEEP_SAMPLE;
-        renderNgramOverlay(CLA_DEEP_SAMPLE.ngram);
-        renderSignalNetwork(CLA_DEEP_SAMPLE.network);
-        renderMythMapping(CLA_DEEP_SAMPLE.myth);
-      }
-      // Attach tab switching after render
+      // Render sample data immediately so tabs have content
+      renderNgramOverlay(CLA_DEEP_SAMPLE.ngram);
+      renderSignalNetwork(CLA_DEEP_SAMPLE.network);
+      renderMythMapping(CLA_DEEP_SAMPLE.myth);
+
+      // Attach tab switching
       var tabBar = document.getElementById('claDeepTabBar');
-      if (tabBar) {
+      if (tabBar && !tabBar._bound) {
+        tabBar._bound = true;
         tabBar.addEventListener('click', function(e) {
           var btn = e.target.closest('[data-tab]');
           if (!btn) return;
@@ -4708,6 +4693,22 @@
           var panel = document.getElementById('claDeep' + tab.charAt(0).toUpperCase() + tab.slice(1));
           if (panel) panel.style.display = 'block';
         });
+      }
+
+      // Then try to load full data from local data/ directory (not DATA_BASE)
+      try {
+        const [ngram, network, evidence, myth] = await Promise.all([
+          _fetchLocalJSON('data/cla_ngram_overlay.json'),
+          _fetchLocalJSON('data/signal_network.json'),
+          _fetchLocalJSON('data/cla_evidence.json'),
+          _fetchLocalJSON('data/cla_myth_mapping.json')
+        ]);
+        if (ngram) renderNgramOverlay(ngram);
+        if (network) renderSignalNetwork(network);
+        if (evidence) renderCLAEvidence(evidence);
+        if (myth) renderMythMapping(myth);
+      } catch (e) {
+        console.error('CLA deep data upgrade error (sample data shown):', e);
       }
     }
 
