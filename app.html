@@ -3252,15 +3252,19 @@
                   archiveView.innerHTML = '<div class="loading-indicator"><div class="loading-spinner loading-spinner-sm"></div><div>v2データを読み込み中...</div></div>';
                   fetch('data/cla_v2.json?v='+Date.now()).then(function(r){return r.json()}).then(function(d){
                     window._claV2Loaded = d;
-                    // Convert v2 entries to v1 format and inject
                     window._claYearly = d.entries || [];
                     window._claQuarterly = [];
-                    if (typeof renderCLAArchiveView === 'function') renderCLAArchiveView();
-                  }).catch(function(){
-                    archiveView.innerHTML='<p style="padding:20px;color:var(--text-muted)">v2データの読み込みに失敗しました。</p>';
+                    // Wait for renderCLAArchiveView to be available
+                    function tryRender(attempts) {
+                      if (typeof renderCLAArchiveView === 'function') { renderCLAArchiveView(); }
+                      else if (attempts > 0) { setTimeout(function(){ tryRender(attempts-1); }, 500); }
+                      else { archiveView.innerHTML='<p style="padding:20px;color:var(--text-muted)">レンダリング関数の読み込みを待機中です。ページを再読み込みしてください。</p>'; }
+                    }
+                    tryRender(20);
+                  }).catch(function(err){
+                    archiveView.innerHTML='<p style="padding:20px;color:var(--text-muted)">v2データの読み込みに失敗しました: '+err+'</p>';
                   });
                 } else {
-                  // Already loaded, just swap data
                   window._claYearly = window._claV2Loaded.entries || [];
                   window._claQuarterly = [];
                   if (typeof renderCLAArchiveView === 'function') renderCLAArchiveView();
