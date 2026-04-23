@@ -3228,32 +3228,119 @@
             <button data-claver="v2" id="claVerV2" style="padding:5px 14px;border:1px solid var(--border-light);border-radius:6px;background:transparent;color:var(--text-secondary);cursor:pointer;font-size:12px">v2 神話学的深層強化版</button>
           </div>
           <script>
-          document.getElementById('claVersionToggle').addEventListener('click', function(e) {
-            var btn = e.target.closest('[data-claver]');
-            if (!btn) return;
-            var ver = btn.getAttribute('data-claver');
-            var v1Btn = document.getElementById('claVerV1');
-            var v2Btn = document.getElementById('claVerV2');
-            var v1View = document.getElementById('claArchiveView');
-            var v2View = document.getElementById('claV2View');
-            if (ver === 'v2') {
-              v1Btn.style.background = 'transparent'; v1Btn.style.color = 'var(--text-secondary)';
-              v2Btn.style.background = 'var(--accent)'; v2Btn.style.color = '#fff';
-              v1View.style.display = 'none'; v2View.style.display = 'block';
-              if (!v2View._loaded) {
-                v2View._loaded = true;
-                fetch('data/cla_v2.json?v=' + Date.now()).then(function(r){return r.json()}).then(function(data) {
-                  if (typeof renderCLAV2 === 'function') renderCLAV2(data);
-                  else v2View.innerHTML = '<p>v2レンダリング関数の読み込み待ち...</p>';
-                  window._claV2Data = data;
-                }).catch(function(){v2View.innerHTML='<p style="color:var(--text-muted)">v2データの読み込みに失敗しました。</p>'});
-              }
-            } else {
-              v2Btn.style.background = 'transparent'; v2Btn.style.color = 'var(--text-secondary)';
-              v1Btn.style.background = 'var(--accent)'; v1Btn.style.color = '#fff';
-              v1View.style.display = 'block'; v2View.style.display = 'none';
+          (function(){
+            var catColors = {Political:'#2563eb',Economic:'#d97706',Social:'#8b5cf6',Technological:'#dc2626',Legal:'#64748b',Environmental:'#16a34a'};
+            var catJa = {Political:'政治',Economic:'経済',Social:'社会',Technological:'技術',Legal:'法律',Environmental:'環境'};
+            var snColorMap = {'危機':'#dc2626','主権秩序':'#2563eb','経済構造':'#d97706','構造的':'#6b635b','社会分裂':'#8b5cf6','技術権力':'#f59e0b'};
+            var layers = [
+              {key:'litany',label:'リタニー',c:'#92400e'},{key:'systemic_causes',label:'社会的原因',c:'#1e40af'},
+              {key:'worldview',label:'世界観',c:'#5b21b6'},{key:'myth_metaphor',label:'神話・メタファー',c:'#9d174d'},
+              {key:'key_tension',label:'核心的緊張',c:'#991b1b'},{key:'emerging_narrative',label:'新たな物語',c:'#065f46'}
+            ];
+            function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+            function buildV2(data, el) {
+              var entries = data.entries || [];
+              var h = '';
+              // Summary
+              h += '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">';
+              h += '<span style="padding:4px 12px;background:var(--card-bg);border:1px solid var(--border-light);border-radius:6px;font-size:11px"><b>'+entries.length+'</b> 年</span>';
+              h += '<span style="padding:4px 12px;background:var(--card-bg);border:1px solid var(--border-light);border-radius:6px;font-size:11px"><b>'+(entries.length*6)+'</b> 分析</span>';
+              Object.keys(snColorMap).forEach(function(t){
+                var ys = (data.supernode_types||{})[t]; var n = ys && ys.years ? ys.years.length : 0;
+                if(n) h+='<span style="padding:4px 12px;background:var(--card-bg);border:1px solid var(--border-light);border-radius:6px;font-size:11px;display:inline-flex;align-items:center;gap:3px"><span style="width:6px;height:6px;border-radius:50%;background:'+snColorMap[t]+'"></span>'+t+' <b>'+n+'</b></span>';
+              });
+              h += '</div>';
+              // Year buttons
+              h += '<div style="display:flex;gap:3px;flex-wrap:wrap;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border-light)">';
+              entries.forEach(function(e,i){
+                var sc = snColorMap[(e.supernode||{}).type]||'#6b635b';
+                var act = i===0 ? 'background:'+sc+';color:#fff;border-color:'+sc : '';
+                h += '<button class="v2yb" data-i="'+i+'" data-sc="'+sc+'" style="padding:3px 8px;border:1px solid var(--border-light);border-radius:4px;background:transparent;color:var(--text-secondary);cursor:pointer;font-size:10px;font-weight:600;border-bottom:2px solid '+sc+';'+act+'">'+e.period+'</button>';
+              });
+              h += '</div>';
+              // Year panels
+              entries.forEach(function(e,i){
+                var sc = snColorMap[(e.supernode||{}).type]||'#6b635b';
+                h += '<div class="v2yp" data-i="'+i+'" style="display:'+(i===0?'block':'none')+'">';
+                // SN banner
+                h += '<div style="padding:8px 14px;background:var(--card-bg);border:1px solid var(--border-light);border-left:3px solid '+sc+';border-radius:6px;margin-bottom:10px;display:flex;align-items:center;gap:8px">';
+                h += '<span style="width:8px;height:8px;border-radius:50%;background:'+sc+'"></span>';
+                h += '<span class="fs-meta" style="font-weight:700;color:'+sc+'">'+((e.supernode||{}).type||'')+'</span>';
+                h += '<span class="fs-caption" style="color:var(--text-muted)">'+((e.supernode||{}).description||'')+'</span></div>';
+                // Cat tabs
+                var cats = ['Political','Economic','Social','Technological','Legal','Environmental'].filter(function(c){return e.categories&&e.categories[c]});
+                h += '<div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px">';
+                cats.forEach(function(c,ci){
+                  var st = ci===0 ? 'background:'+catColors[c]+';color:#fff' : '';
+                  h += '<button class="v2cb" data-i="'+i+'" data-c="'+c+'" style="padding:4px 10px;border:1px solid var(--border-light);border-radius:5px;background:transparent;color:var(--text-secondary);cursor:pointer;font-size:11px;font-weight:600;'+st+'">'+(catJa[c]||c)+'</button>';
+                });
+                h += '</div>';
+                // Cat panels
+                cats.forEach(function(c,ci){
+                  var cd = e.categories[c]||{};
+                  h += '<div class="v2cp" data-i="'+i+'" data-c="'+c+'" style="display:'+(ci===0?'block':'none')+'">';
+                  h += '<div style="background:var(--card-bg);border:1px solid var(--border-light);border-radius:8px;overflow:hidden">';
+                  layers.forEach(function(l){
+                    var t = cd[l.key]; if(!t) return;
+                    h += '<div style="padding:10px 14px;border-bottom:1px solid var(--border-light)">';
+                    h += '<div class="fs-label" style="font-weight:700;color:'+l.c+';margin-bottom:2px;font-size:10px;text-transform:uppercase;letter-spacing:.04em">'+l.label+'</div>';
+                    h += '<div class="fs-body-sm" style="line-height:1.85">'+esc(t)+'</div></div>';
+                  });
+                  h += '</div></div>';
+                });
+                h += '</div>';
+              });
+              h += '<div style="margin-top:12px;padding:10px 14px;background:var(--card-bg);border:1px solid var(--border-light);border-radius:6px;font-size:10px;color:var(--text-muted)">';
+              h += '<b>CLA v2</b> — Thompson Motif-Index + Ngram + World Bank + 年別スーパーノード。';
+              h += ' 学術的根拠: Wahab(2024), Inayatullah(2024-2025), Sustainability Science(2025) N=790。</div>';
+              el.innerHTML = h;
+              // Delegation
+              el.addEventListener('click', function(ev){
+                var yb = ev.target.closest('.v2yb');
+                if(yb){
+                  var idx = yb.getAttribute('data-i'), sc2 = yb.getAttribute('data-sc');
+                  el.querySelectorAll('.v2yb').forEach(function(b){b.style.background='transparent';b.style.color='var(--text-secondary)'});
+                  yb.style.background=sc2;yb.style.color='#fff';yb.style.borderColor=sc2;
+                  el.querySelectorAll('.v2yp').forEach(function(p){p.style.display='none'});
+                  var yp = el.querySelector('.v2yp[data-i="'+idx+'"]'); if(yp) yp.style.display='block';
+                  return;
+                }
+                var cb = ev.target.closest('.v2cb');
+                if(cb){
+                  var yi = cb.getAttribute('data-i'), cc = cb.getAttribute('data-c');
+                  var yp2 = el.querySelector('.v2yp[data-i="'+yi+'"]'); if(!yp2) return;
+                  yp2.querySelectorAll('.v2cb').forEach(function(b){b.style.background='transparent';b.style.color='var(--text-secondary)'});
+                  cb.style.background=catColors[cc]||'var(--accent)';cb.style.color='#fff';
+                  yp2.querySelectorAll('.v2cp').forEach(function(p){p.style.display='none'});
+                  var cp = yp2.querySelector('.v2cp[data-c="'+cc+'"]'); if(cp) cp.style.display='block';
+                }
+              });
             }
-          });
+
+            document.getElementById('claVersionToggle').addEventListener('click', function(e) {
+              var btn = e.target.closest('[data-claver]'); if (!btn) return;
+              var ver = btn.getAttribute('data-claver');
+              var v1B = document.getElementById('claVerV1'), v2B = document.getElementById('claVerV2');
+              var v1V = document.getElementById('claArchiveView'), v2V = document.getElementById('claV2View');
+              if (ver === 'v2') {
+                v1B.style.background='transparent';v1B.style.color='var(--text-secondary)';
+                v2B.style.background='var(--accent)';v2B.style.color='#fff';
+                v1V.style.display='none';v2V.style.display='block';
+                if (!v2V._loaded) {
+                  v2V._loaded = true;
+                  v2V.innerHTML = '<div style="padding:20px;color:var(--text-muted)">読み込み中...</div>';
+                  fetch('data/cla_v2.json?v='+Date.now()).then(function(r){return r.json()}).then(function(d){
+                    buildV2(d, v2V);
+                  }).catch(function(){v2V.innerHTML='<p style="padding:20px;color:var(--text-muted)">v2データの読み込みに失敗しました。</p>'});
+                }
+              } else {
+                v2B.style.background='transparent';v2B.style.color='var(--text-secondary)';
+                v1B.style.background='var(--accent)';v1B.style.color='#fff';
+                v1V.style.display='block';v2V.style.display='none';
+              }
+            });
+          })();
           </script>
         </div>
         <div id="claArchiveView">
