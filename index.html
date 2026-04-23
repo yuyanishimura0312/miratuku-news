@@ -228,6 +228,50 @@
             text-transform: uppercase;
         }
 
+        .demo-section {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #E8DDD2;
+        }
+        .demo-section p {
+            font-size: 0.76rem;
+            color: #7A6B5E;
+            margin-bottom: 0.75rem;
+            text-align: center;
+        }
+        .demo-credentials {
+            background: #F5EFE8;
+            border-radius: 6px;
+            padding: 0.65rem 1rem;
+            margin-bottom: 0.75rem;
+            font-size: 0.78rem;
+            color: #6B5445;
+            line-height: 1.7;
+        }
+        .demo-credentials code {
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            background: #fff;
+            padding: 0.15rem 0.4rem;
+            border-radius: 3px;
+            font-size: 0.76rem;
+            color: #7A4033;
+        }
+        .btn-demo {
+            width: 100%;
+            padding: 0.7rem;
+            background: transparent;
+            color: #7A4033;
+            border: 1.5px solid #7A4033;
+            border-radius: 6px;
+            font-size: 0.82rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+            font-family: inherit;
+        }
+        .btn-demo:hover { background: #7A4033; color: #fff; }
+        .btn-demo:disabled { opacity: 0.5; cursor: not-allowed; }
+
         /* Mobile: stack panels */
         @media (max-width: 900px) {
             body { flex-direction: column; }
@@ -318,6 +362,15 @@
                     アカウント作成後、7日間の無料トライアルが開始されます
                 </div>
             </form>
+
+            <div class="demo-section">
+                <p>まずは体験してみたい方はこちら</p>
+                <div class="demo-credentials">
+                    ID: <code>demo@miratuku-news.com</code><br>
+                    PW: <code>demo2024</code>
+                </div>
+                <button class="btn-demo" onclick="handleDemoLogin()" id="demo-btn">サンプルアカウントでログイン</button>
+            </div>
 
             <div class="provider-badge">Provided by miratuku</div>
         </div>
@@ -433,6 +486,50 @@
                 showError('signup-error', msgs[err.code] || err.message);
                 btn.disabled = false;
                 btn.textContent = 'アカウント作成';
+            }
+        }
+
+        const DEMO_EMAIL = 'demo@miratuku-news.com';
+        const DEMO_PASSWORD = 'demo2024';
+
+        async function handleDemoLogin() {
+            const btn = document.getElementById('demo-btn');
+            btn.disabled = true;
+            btn.textContent = 'ログイン中...';
+            document.getElementById('login-error').style.display = 'none';
+
+            try {
+                // Try signing in first
+                await auth.signInWithEmailAndPassword(DEMO_EMAIL, DEMO_PASSWORD);
+                window.location.href = 'app.html';
+            } catch (err) {
+                if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
+                    // Account doesn't exist yet — create it
+                    try {
+                        const cred = await auth.createUserWithEmailAndPassword(DEMO_EMAIL, DEMO_PASSWORD);
+                        await cred.user.updateProfile({ displayName: 'Demo User' });
+                        // Set trial far in the future (2099)
+                        const trialEnd = new Date('2099-12-31');
+                        await db.collection('users').doc(cred.user.uid).set({
+                            email: DEMO_EMAIL,
+                            displayName: 'Demo User',
+                            status: 'active',
+                            role: 'demo',
+                            trialExpiresAt: firebase.firestore.Timestamp.fromDate(trialEnd),
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                            lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
+                        });
+                        window.location.href = 'app.html';
+                    } catch (createErr) {
+                        showError('login-error', 'デモアカウントの作成に失敗しました: ' + createErr.message);
+                        btn.disabled = false;
+                        btn.textContent = 'サンプルアカウントでログイン';
+                    }
+                } else {
+                    showError('login-error', 'デモログインに失敗しました。もう一度お試しください。');
+                    btn.disabled = false;
+                    btn.textContent = 'サンプルアカウントでログイン';
+                }
             }
         }
 
