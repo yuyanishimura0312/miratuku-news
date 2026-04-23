@@ -6001,7 +6001,7 @@
       "latest_value": 4.1609072809478675e-07
     }
   },
-  "generated_at": "2026-04-23T08:00:00Z",
-  "source": "Google Books Ngram Viewer (en-2019 corpus, smoothing=3)",
-  "coverage": "1950-2022, 20 concepts"
+  "source": "Google Books Ngram Viewer (en-2019, smoothing=3)",
+  "coverage": "1950-2022, 20 concepts",
+  "generated_at": "2026-04-23T09:23:02.834427+09:00"
 }
