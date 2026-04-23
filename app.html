@@ -3212,24 +3212,6 @@
               <button class="cla-deep-tab" data-tab="evidence" style="padding:6px 14px;border:1px solid var(--border-light);border-radius:6px;background:transparent;color:var(--text-secondary);cursor:pointer;font-size:13px">社会指標</button>
               <button class="cla-deep-tab" data-tab="myth" style="padding:6px 14px;border:1px solid var(--border-light);border-radius:6px;background:transparent;color:var(--text-secondary);cursor:pointer;font-size:13px">神話マッピング</button>
             </div>
-            <script>
-            document.getElementById('claDeepTabBar').addEventListener('click', function(e) {
-              var btn = e.target.closest('.cla-deep-tab');
-              if (!btn) return;
-              var tab = btn.getAttribute('data-tab');
-              // Update button styles
-              this.querySelectorAll('.cla-deep-tab').forEach(function(b) {
-                b.style.background = 'transparent'; b.style.color = 'var(--text-secondary)';
-                b.style.fontWeight = 'normal';
-              });
-              btn.style.background = 'var(--accent)'; btn.style.color = '#fff'; btn.style.fontWeight = '600';
-              // Show/hide panels
-              document.querySelectorAll('.cla-deep-panel').forEach(function(p) { p.style.display = 'none'; });
-              var panelId = 'claDeep' + tab.charAt(0).toUpperCase() + tab.slice(1);
-              var panel = document.getElementById(panelId);
-              if (panel) panel.style.display = 'block';
-            });
-            </script>
             <div id="claDeepNgram" class="cla-deep-panel"></div>
             <div id="claDeepNetwork" class="cla-deep-panel" style="display:none"></div>
             <div id="claDeepEvidence" class="cla-deep-panel" style="display:none"></div>
@@ -4710,6 +4692,22 @@
         renderNgramOverlay(CLA_DEEP_SAMPLE.ngram);
         renderSignalNetwork(CLA_DEEP_SAMPLE.network);
         renderMythMapping(CLA_DEEP_SAMPLE.myth);
+      }
+      // Attach tab switching after render
+      var tabBar = document.getElementById('claDeepTabBar');
+      if (tabBar) {
+        tabBar.addEventListener('click', function(e) {
+          var btn = e.target.closest('[data-tab]');
+          if (!btn) return;
+          var tab = btn.getAttribute('data-tab');
+          tabBar.querySelectorAll('.cla-deep-tab').forEach(function(b) {
+            b.style.background = 'transparent'; b.style.color = 'var(--text-secondary)'; b.style.fontWeight = 'normal';
+          });
+          btn.style.background = 'var(--accent)'; btn.style.color = '#fff'; btn.style.fontWeight = '600';
+          document.querySelectorAll('.cla-deep-panel').forEach(function(p) { p.style.display = 'none'; });
+          var panel = document.getElementById('claDeep' + tab.charAt(0).toUpperCase() + tab.slice(1));
+          if (panel) panel.style.display = 'block';
+        });
       }
     }
 
